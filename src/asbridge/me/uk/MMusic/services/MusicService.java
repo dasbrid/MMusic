@@ -13,7 +13,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.activities.MainActivity;
+import asbridge.me.uk.MMusic.activities.MusicPlayerActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class MusicService extends Service implements
         mp.start();
 
         // Create notification
-        Intent notIntent = new Intent(this, MainActivity.class);
+        Intent notIntent = new Intent(this, MusicPlayerActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -198,6 +198,22 @@ public class MusicService extends Service implements
         player.start();
     }
 
+    public void playRandom() {
+        int newSong = songPosn;
+        while(newSong==songPosn){
+            newSong=rand.nextInt(songs.size());
+        }
+        songPosn=newSong;
+        playSong();
+    }
+
+    public void playFirst() {
+        if (songs.size() > 0){
+            songPosn = 0;
+            playSong();
+        }
+    }
+
     // skip to previous
     public void playPrev(){
         songPosn--;
@@ -208,11 +224,7 @@ public class MusicService extends Service implements
     //skip to next
     public void playNext(){
         if (shuffle) {
-            int newSong = songPosn;
-            while(newSong==songPosn){
-                newSong=rand.nextInt(songs.size());
-            }
-            songPosn=newSong;
+            playRandom();
         } else {
             songPosn++;
             if (songPosn >= songs.size()) songPosn = 0;

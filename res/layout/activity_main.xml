@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
               android:orientation="vertical"
-              android:background="#FF330000"
-              tools:context=".MainActivity" >
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
-    <ListView
-            android:id="@+id/song_list"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-    </ListView>
-
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play All Music"
+            android:onClick="btnPlayAllClicked"
+            android:id="@+id/btnPlayAll" android:layout_gravity="center_horizontal"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play Artist"
+            android:onClick="btnPlayArtistClicked"
+            android:id="@+id/btnPlayArtist" android:layout_gravity="center_horizontal"/>
 </LinearLayout>
-
