@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
 
     public void btnPlayArtistClicked(View v) {
         // start the slideshow activity
-        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        Intent intent = new Intent(this, ActivityTemp.class);
         intent.putExtra("playlistType", "artist");
         intent.putExtra("artistname", "Bob Marley");
         this.startActivity(intent);

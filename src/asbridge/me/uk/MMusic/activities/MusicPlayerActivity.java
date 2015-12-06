@@ -245,7 +245,7 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
             //pass list
             musicSrv.setList(songList);
             musicBound = true;
-            playRandom();
+            //playRandom();
         }
 
         @Override
@@ -306,7 +306,9 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
     // Don't stop the playback when the backbutton is pressed
     @Override
     public void onBackPressed() {
+        Log.d(TAG, "onbackpressed");
         moveTaskToBack(true);
+//        super.onBackPressed();
     }
 
     // handle user interaction with the menu
