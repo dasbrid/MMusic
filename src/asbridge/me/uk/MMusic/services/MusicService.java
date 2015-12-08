@@ -21,6 +21,17 @@ import java.util.Random;
 
 /**
  * Created by David on 05/12/2015.
+ * See http://developer.android.com/guide/components/services.html
+ * A Bound service.
+ *
+ * To create a bound service, you must implement the onBind() callback method to
+ * return an IBinder that defines the interface for communication with the service.
+ * Other application components can then call bindService() to retrieve the interface
+ * and begin calling methods on the service.
+ * The service lives only to serve the application component that is bound to it,
+ * so when there are no components bound to the service,
+ * the system destroys it (you do not need to stop a bound service in the way you must
+ * when the service is started through onStartCommand()).
  */
 public class MusicService extends Service implements
     MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
@@ -35,9 +46,60 @@ public class MusicService extends Service implements
     //current position
     private int songPosn;
 
+    public interface NewSong {
+        public void newSongPlaying(String title);
+    }
+/*
+    private NewSong nsi = null;
+    public void setnsi (NewSong newSong)
+    {
+        nsi=newSong;
+    }
+*/
+    /**
+     * This allows binding. class MusicBinder implements the IBinder interface.
+     * It implements the method getService() which returns the
+     * singleton instance of this service, allowing access to the service by an application
+      */
+    // Single instance of the IBinder used to bind to the service
+    // returned by onBind
     private final IBinder musicBind = new MusicBinder();
 
-    private String songTitle="";
+    // Class implementing IBinder. Allows interaction from the app to the service
+    // Just returns the instance of the service so that we can call it's methods
+    public class MusicBinder extends Binder {
+        public MusicService getService() {
+            return MusicService.this;
+        }
+    }
+
+    /**
+     * Overrides abstract method of Service
+     * This is called by applications that want to bind to our service.
+     * Returns the singleton instance of binder object
+     * @param intent
+     * @return
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "Music Service onBind");
+        return musicBind;
+    }
+
+    /** Overrides method of service
+     * Service will be unbound when all
+     * @param intent
+     * @return
+     */
+    @Override
+    public boolean onUnbind(Intent intent){
+        player.stop();
+        player.release();
+        return false;
+    }
+
+    private Song currentSong = null;
+//    private String songTitle="";
     private static final int NOTIFY_ID=1;
 
     private boolean shuffle=false;
@@ -60,7 +122,7 @@ public class MusicService extends Service implements
         player.reset();
         //get song
         Song playSong = songs.get(songPosn);
-        songTitle=playSong.getTitle();
+        currentSong=playSong;
         Log.d(TAG, "playSong is "+(playSong==null?"null":"not null"));
 
 //get id
@@ -86,24 +148,20 @@ public class MusicService extends Service implements
         songPosn=songIndex;
     }
 
-    @Override
-    public IBinder onBind(Intent arg0) {
-        Log.d(TAG, "Music Service onBind");
-        return musicBind;
-    }
 
-    @Override
-    public boolean onUnbind(Intent intent){
-        player.stop();
-        player.release();
-        return false;
-    }
 
     // required by interfaces
     // callback when media player is ready, triggered after we have called prepareAsync
     public void onPrepared(MediaPlayer mp) {
         //start playback
         mp.start();
+
+        // Broadcast the fact that a new song is now playing
+        Intent songPlayingIntent = new Intent("SONG_PLAYING");
+        songPlayingIntent.putExtra("SONG_TITLE", currentSong.getTitle());
+        songPlayingIntent.putExtra("SONG_ARTIST", currentSong.getArtist());
+        sendBroadcast(songPlayingIntent);
+
 
         // Create notification
         Intent notIntent = new Intent(this, MusicPlayerActivity.class);
@@ -115,10 +173,10 @@ public class MusicService extends Service implements
 
         builder.setContentIntent(pendInt)
                 .setSmallIcon(R.drawable.play)
-                .setTicker(songTitle)
+                .setTicker(currentSong.getTitle())
                 .setOngoing(true)
                 .setContentTitle("Playing")
-        .setContentText(songTitle);
+        .setContentText(currentSong.getTitle());
         Notification not = builder.build();
 
         startForeground(NOTIFY_ID, not);
@@ -165,11 +223,7 @@ public class MusicService extends Service implements
         songs=theSongs;
     }
 
-    public class MusicBinder extends Binder {
-        public MusicService getService() {
-            return MusicService.this;
-        }
-    }
+
 
     /*****************************
      * Following methods used by activity to control playback
@@ -203,13 +257,13 @@ public class MusicService extends Service implements
         while(newSong==songPosn){
             newSong=rand.nextInt(songs.size());
         }
-        songPosn=newSong;
+        setSong(newSong);
         playSong();
     }
 
     public void playFirst() {
         if (songs.size() > 0){
-            songPosn = 0;
+            setSong(0);
             playSong();
         }
     }

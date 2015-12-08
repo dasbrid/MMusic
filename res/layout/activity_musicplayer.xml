@@ -10,8 +10,46 @@
     <ListView
             android:id="@+id/song_list"
             android:layout_width="fill_parent"
+            android:background="#33FF0000"
             android:layout_height="wrap_content" >
     </ListView>
+
+    <Button
+            android:text="next"
+            android:id="@+id/btnNext"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+    >
+
+    </Button>
+    <Button
+            android:text="play"
+            android:id="@+id/btnPlay"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+    >
+    </Button>
+    <Button
+            android:text="artist"
+            android:id="@+id/btnArtist"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+    >
+    </Button>
+    <Button
+        android:text="play all"
+        android:id="@+id/btnPlayAll"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+>
+</Button>
+    <TextView
+        android:text="Now Playing:"
+        android:id="@+id/tvNowPlaying"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+    >
+    </TextView>
 
 </LinearLayout>
 

@@ -9,8 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.MediaController;
+import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.MusicController;
@@ -20,11 +19,11 @@ import asbridge.me.uk.MMusic.utils.Content;
 
 import java.util.ArrayList;
 
-public class MusicPlayerActivity extends Activity implements MediaController.MediaPlayerControl {
+public class MusicPlayerActivity extends Activity implements /*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
 
     private ArrayList<Song> songList;
     private ListView songView;
-
+    private SongAdapter songAdt;
     private MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound=false;
@@ -34,10 +33,26 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
 
     private boolean paused=false, playbackPaused=false;
 
+    private SongPlayingReceiver dataUpdateReceiver;
+
+    // When the service starts playing a song it will broadcast the title
+    private class SongPlayingReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("SONG_PLAYING")) {
+                String songTitle = intent.getStringExtra("SONG_TITLE");
+                String songArtist = intent.getStringExtra("SONG_ARTIST");
+                TextView tvNowPlaying = (TextView) findViewById(R.id.tvNowPlaying);
+                tvNowPlaying.setText(songArtist + "--" + songTitle);
+            }
+        }
+    }
+
     // used to save paused state so it can be resumed
     @Override
     protected void onPause(){
         super.onPause();
+        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
         paused=true;
     }
 
@@ -45,6 +60,9 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
     @Override
     protected void onResume(){
         super.onResume();
+        if (dataUpdateReceiver == null) dataUpdateReceiver = new SongPlayingReceiver();
+        IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
+        registerReceiver(dataUpdateReceiver, intentFilter);
         if(paused){
             setController();
             paused=false;
@@ -122,6 +140,50 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
      * Previous methods are from the mediaPlayerControl interface
      *********************************************************/
 
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnNext:
+                musicSrv.playNext();;
+                break;
+            case R.id.btnPlay:
+                if (playbackPaused) {
+                    musicSrv.playFirst();
+                    playbackPaused = false;
+                } else {
+                    musicSrv.pausePlayer();
+                    playbackPaused = true;
+                }
+                break;
+            case R.id.btnArtist:
+                changeArtist();
+                break;
+            case R.id.btnPlayAll:
+                playAll();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void playAll() {
+        Log.d(TAG, "playAll");
+        songList.clear();
+        Content.getAllSongs(this, songList );
+        musicSrv.pausePlayer();
+        musicSrv.setList(songList);
+        songAdt.notifyDataSetChanged();
+        musicSrv.playFirst();
+    }
+
+    public void changeArtist() {
+        Log.d(TAG, "changeArtist");
+        songList.clear();
+        Content.getSongsForGivenArtist(this, "Ben l'Oncle Soul", songList );
+        musicSrv.setList(songList);
+        songAdt.notifyDataSetChanged();
+        musicSrv.playFirst();
+    }
+
     // called in oncreate to set up the music controller
     private void setController(){
         //set the controller up
@@ -139,6 +201,16 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
         });
 
         controller.setMediaPlayer(this);
+
+        Button btnNext = (Button) findViewById(R.id.btnNext);
+        btnNext.setOnClickListener(this);
+        Button btnPlay = (Button) findViewById(R.id.btnPlay);
+        btnPlay.setOnClickListener(this);
+        Button btnArtist = (Button) findViewById(R.id.btnArtist);
+        btnArtist.setOnClickListener(this);
+        Button btnPlayAll = (Button) findViewById(R.id.btnPlayAll);
+        btnPlayAll.setOnClickListener(this);
+
         controller.setAnchorView(findViewById(R.id.song_list));
         controller.setEnabled(true);
     }
@@ -229,7 +301,7 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
             }
         });
 */
-        SongAdapter songAdt = new SongAdapter(this, songList);
+        songAdt = new SongAdapter(this, songList);
         songView.setAdapter(songAdt);
     }
 
@@ -244,6 +316,7 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
             musicSrv = binder.getService();
             //pass list
             musicSrv.setList(songList);
+
             musicBound = true;
             //playRandom();
         }
@@ -284,11 +357,13 @@ public class MusicPlayerActivity extends Activity implements MediaController.Med
                 if (musicSrv != null) {
                     musicSrv.setSong(pickedSongIndex);
                     musicSrv.playSong();
+/* TEMP_CONTROLLER
                     if(playbackPaused){
                         setController();
                         playbackPaused=false;
                     }
                     controller.show(0);
+*/
                 }
             }
         }
