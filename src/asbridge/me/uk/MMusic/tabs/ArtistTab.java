@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistAdapter;
@@ -36,11 +37,12 @@ public class ArtistTab extends Fragment implements View.OnClickListener {
         listener = l;
     }
 
+    @Override
     public void onClick(View v) {
+        Log.d(TAG, "onclick");
         switch (v.getId()) {
-            case R.id.btnArtist:
+            case R.id.btnArtistxx:
                 changeArtist();
-                ;
                 break;
         }
     }
@@ -57,6 +59,8 @@ public class ArtistTab extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.tab_artist, container, false);
+        Button btnArtist = (Button) v.findViewById(R.id.btnArtistxx);
+        btnArtist.setOnClickListener(this);
 
         lvBucketList = (ListView)v.findViewById(R.id.lvArtistList);
 

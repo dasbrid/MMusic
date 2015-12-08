@@ -1,9 +1,11 @@
 package asbridge.me.uk.MMusic.activities;
 
 import android.app.Activity;
+import android.support.v4.app.FragmentManager;
 import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -209,8 +211,6 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.O
         btnNext.setOnClickListener(this);
         Button btnPlay = (Button) findViewById(R.id.btnPlay);
         btnPlay.setOnClickListener(this);
-        Button btnArtist = (Button) findViewById(R.id.btnArtist);
-        btnArtist.setOnClickListener(this);
         Button btnPlayAll = (Button) findViewById(R.id.btnPlayAll);
         btnPlayAll.setOnClickListener(this);
 
@@ -265,6 +265,17 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.O
         return true;
     }
 
+    public void setFragment(Fragment frag)
+    {
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.findFragmentById(R.id.artist_fragment_container) == null) {
+            fm.beginTransaction().add(R.id.artist_fragment_container, frag).commit();
+        }
+
+    }
+
+    private ArtistTab mArtistFragment;
+
     /**
      * Called when the activity is first created.
      */
@@ -274,6 +285,11 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer);
 
+        mArtistFragment = new ArtistTab();
+
+        //Now you can set the fragment to be visible here
+        setFragment(mArtistFragment);
+        mArtistFragment.setOnArtistsChangedListener(this);
         String playlistType = "all";
         String artistname = null;
 

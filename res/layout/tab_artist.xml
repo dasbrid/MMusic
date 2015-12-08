@@ -12,7 +12,7 @@
     </ListView>
     <Button
             android:text="artist"
-            android:id="@+id/btnArtist"
+            android:id="@+id/btnArtistxx"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
     >
