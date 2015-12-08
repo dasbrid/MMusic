@@ -17,11 +17,45 @@ public class Content {
 
     private static String TAG = "DAVE:Content";
 
+    public static void getArtists(Context context, ArrayList<String> artistList) {
+        //retrieve song info
+        ContentResolver musicResolver = context.getContentResolver();
+        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {
+                MediaStore.Audio.Media.ARTIST,
+        };
+
+        String sortOrder = MediaStore.Audio.Media.ARTIST + " ASC";
+        String groupBy = "1) GROUP BY (1"; // this is really WHERE (1) GROUP BY (1)
+        Cursor musicCursor = musicResolver.query(musicUri, projection, groupBy, null, sortOrder);
+        Log.d(TAG, "got artists from ContentResolver, count = " + (musicCursor == null ? null : musicCursor.getCount()));
+        if(musicCursor!=null && musicCursor.moveToFirst()){
+            //get columns
+            int artistColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.ARTIST);
+            //add items to list
+            do {
+                String thisArtist = musicCursor.getString(artistColumn);
+                // Log.d(TAG, "adding song, title = " + thisTitle);
+                artistList.add(thisArtist);
+            }
+            while (musicCursor.moveToNext());
+        }
+    }
+
+
     public static void getAllSongs(Context context, ArrayList<Song> songList) {
         String selection = null;
         String[] selectionargs = null;
         String sortOrder = MediaStore.Audio.Media.ARTIST + " ASC";
         getSongs(context, selection, selectionargs, sortOrder, songList);
+    }
+
+    public static void getSongsForGivenArtistList(Context context, ArrayList<String> artistList, ArrayList<Song> songList) {
+        for (String artist : artistList) {
+            getSongsForGivenArtist(context, artist, songList);
+        }
     }
 
     public static void getSongsForGivenArtist(Context context, String artist, ArrayList<Song> songList) {

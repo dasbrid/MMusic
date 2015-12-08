@@ -36,7 +36,7 @@ public class ArtistAdapter extends BaseAdapter {
         return artists.get(index);
     }
 
-    public String getArtists(int position) {
+    public String getArtist(int position) {
         return artists.get(position);
     }
 

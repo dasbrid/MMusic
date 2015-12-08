@@ -15,12 +15,13 @@ import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.MusicController;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.MusicService;
+import asbridge.me.uk.MMusic.tabs.ArtistTab;
 import asbridge.me.uk.MMusic.utils.Content;
 import android.support.v4.app.FragmentActivity;
 
 import java.util.ArrayList;
 
-public class MusicPlayerActivity extends FragmentActivity implements /*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
+public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.OnArtistsChangedListener,/*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
 
     private ArrayList<Song> songList;
     private ListView songView;
@@ -47,6 +48,19 @@ public class MusicPlayerActivity extends FragmentActivity implements /*MusicServ
                 tvNowPlaying.setText(songArtist + "--" + songTitle);
             }
         }
+    }
+
+    public void onArtistsChanged(ArrayList<String > artists)
+    {
+        songList.clear();
+        Content.getSongsForGivenArtistList(this, artists, songList );
+        musicSrv.pausePlayer();
+        musicSrv.setList(songList);
+        songAdt.notifyDataSetChanged();
+        musicSrv.playFirst();
+        musicSrv.setList(songList);
+        songAdt.notifyDataSetChanged();
+        musicSrv.playFirst();
     }
 
     // used to save paused state so it can be resumed
@@ -155,9 +169,6 @@ public class MusicPlayerActivity extends FragmentActivity implements /*MusicServ
                     playbackPaused = true;
                 }
                 break;
-            case R.id.btnArtist:
-                changeArtist();
-                break;
             case R.id.btnPlayAll:
                 playAll();
                 break;
@@ -171,15 +182,6 @@ public class MusicPlayerActivity extends FragmentActivity implements /*MusicServ
         songList.clear();
         Content.getAllSongs(this, songList );
         musicSrv.pausePlayer();
-        musicSrv.setList(songList);
-        songAdt.notifyDataSetChanged();
-        musicSrv.playFirst();
-    }
-
-    public void changeArtist() {
-        Log.d(TAG, "changeArtist");
-        songList.clear();
-        Content.getSongsForGivenArtist(this, "Ben l'Oncle Soul", songList );
         musicSrv.setList(songList);
         songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
