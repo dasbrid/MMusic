@@ -16,10 +16,11 @@ import asbridge.me.uk.MMusic.classes.MusicController;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.utils.Content;
+import android.support.v4.app.FragmentActivity;
 
 import java.util.ArrayList;
 
-public class MusicPlayerActivity extends Activity implements /*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
+public class MusicPlayerActivity extends FragmentActivity implements /*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
 
     private ArrayList<Song> songList;
     private ListView songView;

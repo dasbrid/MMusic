@@ -50,6 +50,10 @@
         android:layout_height="wrap_content"
     >
     </TextView>
-
+    <fragment android:name="asbridge.me.uk.MMusic.tabs.ArtistTab"
+              android:id="@+id/artist_fragment"
+              android:layout_weight="2"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content" />
 </LinearLayout>
 
