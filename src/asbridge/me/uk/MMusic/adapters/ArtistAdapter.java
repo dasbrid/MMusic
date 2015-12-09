@@ -1,12 +1,11 @@
 package asbridge.me.uk.MMusic.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckedTextView;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.util.ArrayList;
 
@@ -14,6 +13,8 @@ import java.util.ArrayList;
  * Created by AsbridgeD on 08/12/2015.
  */
 public class ArtistAdapter extends BaseAdapter {
+
+    private String TAG = "DAVE:ArtistAdapter";
 
     private ArrayList<String> artists;
     private LayoutInflater artistInf;
@@ -23,7 +24,6 @@ public class ArtistAdapter extends BaseAdapter {
         artists=theSongs;
         artistInf=LayoutInflater.from(c);
     }
-
 
     @Override
     public int getCount() {
@@ -50,13 +50,10 @@ public class ArtistAdapter extends BaseAdapter {
         //get album using position
         String currArtist = artists.get(position);
 
-        //map to album layout
-//        LinearLayout songLay = (LinearLayout)songInf.inflate(R.layout.bucket_in_list, parent, false);
-
         // using standard android layout, but could copy anc customise, but must be a checked text view...
         CheckedTextView songLay = (CheckedTextView)artistInf.inflate(android.R.layout.simple_list_item_multiple_choice/*R.layout.bucket_in_list_android*/, parent, false);
-        TextView tvBucketName = (TextView)songLay.findViewById(android.R.id.text1);
-        tvBucketName.setText(currArtist);
+        TextView tvArtist = (TextView)songLay.findViewById(android.R.id.text1);
+        tvArtist.setText(currArtist);
 
         //set position as tag
         songLay.setTag(position);

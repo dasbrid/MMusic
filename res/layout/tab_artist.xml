@@ -3,6 +3,24 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+    <CheckBox
+      android:id="@+id/cbCheckAll"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="40dp"
+      android:layout_marginTop="10dp"
+      android:checked="false"
+    />
+
+    <TextView
+      android:id="@+id/textView_checkAll"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:layout_toRightOf="@id/cbCheckAll"
+      android:text="Check All"
+      android:textSize="14sp"
+      android:textStyle="bold" />
     <ListView
             android:id="@+id/lvArtistList"
             android:layout_width="fill_parent"
@@ -12,7 +30,7 @@
     </ListView>
     <Button
             android:text="artist"
-            android:id="@+id/btnArtistxx"
+            android:id="@+id/btnArtist"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
     >

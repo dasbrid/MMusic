@@ -52,8 +52,13 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.O
         }
     }
 
+
+
     public void onArtistsChanged(ArrayList<String > artists)
     {
+        Log.d(TAG, "onArtistsChanged:"+artists.size());
+        if (artists.size()==0)
+            return;
         songList.clear();
         Content.getSongsForGivenArtistList(this, artists, songList );
         musicSrv.pausePlayer();
