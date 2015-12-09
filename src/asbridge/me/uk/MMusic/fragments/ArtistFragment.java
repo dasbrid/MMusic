@@ -1,6 +1,5 @@
-package asbridge.me.uk.MMusic.tabs;
+package asbridge.me.uk.MMusic.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistAdapter;
-import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.Content;
 
 import java.util.ArrayList;
@@ -18,9 +16,9 @@ import android.support.v4.app.Fragment;
 /**
  * Created by AsbridgeD on 08/12/2015.
  */
-public class ArtistTab extends Fragment implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class ArtistFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
-    private String TAG = "DAVE: ArtistTab";
+    private String TAG = "DAVE: ArtistFragment";
 
     private CheckBox cbCheckAll;
     private ArrayList<String> artistList;
@@ -69,7 +67,7 @@ public class ArtistTab extends Fragment implements CompoundButton.OnCheckedChang
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.tab_artist, container, false);
+        View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
 

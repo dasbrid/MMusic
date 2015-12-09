@@ -1,6 +1,5 @@
 package asbridge.me.uk.MMusic.activities;
 
-import android.app.Activity;
 import android.support.v4.app.FragmentManager;
 import android.content.*;
 import android.os.Bundle;
@@ -16,14 +15,15 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.MusicController;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.fragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.services.MusicService;
-import asbridge.me.uk.MMusic.tabs.ArtistTab;
+import asbridge.me.uk.MMusic.fragments.ArtistFragment;
 import asbridge.me.uk.MMusic.utils.Content;
 import android.support.v4.app.FragmentActivity;
 
 import java.util.ArrayList;
 
-public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.OnArtistsChangedListener,/*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
+public class MusicPlayerActivity extends FragmentActivity implements ArtistFragment.OnArtistsChangedListener,/*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
 
     private ArrayList<Song> songList;
     private ListView songView;
@@ -270,16 +270,24 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.O
         return true;
     }
 
-    public void setFragment(Fragment frag)
+    public void setArtistFragment(Fragment frag)
     {
         FragmentManager fm = getSupportFragmentManager();
         if (fm.findFragmentById(R.id.artist_fragment_container) == null) {
             fm.beginTransaction().add(R.id.artist_fragment_container, frag).commit();
         }
-
     }
 
-    private ArtistTab mArtistFragment;
+    public void setMusicPlayerFragment(Fragment frag)
+    {
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.findFragmentById(R.id.music_player_fragment_container) == null) {
+            fm.beginTransaction().add(R.id.music_player_fragment_container, frag).commit();
+        }
+    }
+
+    private ArtistFragment mArtistFragment;
+    private MusicPlayerFragment mMusicPlayerFragment;
 
     /**
      * Called when the activity is first created.
@@ -290,11 +298,17 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistTab.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer);
 
-        mArtistFragment = new ArtistTab();
-
+        mArtistFragment = new ArtistFragment();
         //Now you can set the fragment to be visible here
-        setFragment(mArtistFragment);
+        setArtistFragment(mArtistFragment);
         mArtistFragment.setOnArtistsChangedListener(this);
+
+        mMusicPlayerFragment = new MusicPlayerFragment();
+        //Now you can set the fragment to be visible here
+        setArtistFragment(mMusicPlayerFragment);
+
+
+
         String playlistType = "all";
         String artistname = null;
 

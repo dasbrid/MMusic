@@ -22,6 +22,7 @@
 
         </activity>
         <activity android:name=".activities.ActivityTemp" android:label="temp"/>
+        <activity android:name=".fragments.MusicPlayerFragment"/>
         <service android:enabled="true" android:name=".services.MusicService" />
     </application>
 </manifest>
