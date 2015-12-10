@@ -23,11 +23,14 @@ import android.support.v4.app.FragmentActivity;
 
 import java.util.ArrayList;
 
-public class MusicPlayerActivity extends FragmentActivity implements ArtistFragment.OnArtistsChangedListener,/*MusicService.NewSong,*/ View.OnClickListener, MediaController.MediaPlayerControl {
+public class MusicPlayerActivity extends FragmentActivity
+        implements ArtistFragment.OnArtistsChangedListener,
+MusicPlayerFragment.MusicPlayerFragmentListener,
+        View.OnClickListener, MediaController.MediaPlayerControl {
 
     private ArrayList<Song> songList;
-    private ListView songView;
-    private SongAdapter songAdt;
+    //private ListView songView;
+    //private SongAdapter songAdt;
     private MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound=false;
@@ -59,14 +62,17 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
         Log.d(TAG, "onArtistsChanged:"+artists.size());
         if (artists.size()==0)
             return;
+
         songList.clear();
         Content.getSongsForGivenArtistList(this, artists, songList );
         musicSrv.pausePlayer();
         musicSrv.setList(songList);
-        songAdt.notifyDataSetChanged();
+        mMusicPlayerFragment.setSongList(songList);
         musicSrv.playFirst();
         musicSrv.setList(songList);
-        songAdt.notifyDataSetChanged();
+
+        mMusicPlayerFragment.setSongList(songList);
+//        songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
     }
 
@@ -167,9 +173,7 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
 
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnNext:
-                musicSrv.playNext();;
-                break;
+            /*
             case R.id.btnPlay:
                 if (playbackPaused) {
                     musicSrv.playFirst();
@@ -178,7 +182,7 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
                     musicSrv.pausePlayer();
                     playbackPaused = true;
                 }
-                break;
+                break;*/
             case R.id.btnPlayAll:
                 playAll();
                 break;
@@ -187,13 +191,38 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
         }
     }
 
+    // from fragment listener
+    public void onPlayClicked()
+    {
+        Log.d(TAG, "onPlayClicked");
+        if (playbackPaused) {
+            //TODO: Don't start at the first song each time
+            musicSrv.playFirst();
+            playbackPaused = false;
+        } else {
+            Log.d(TAG, "playing -> pausing");
+            musicSrv.pausePlayer();
+            playbackPaused = true;
+        }
+    }
+
+    // from fragment listener
+    public void onNextClicked()
+    {
+        Log.d(TAG, "onNextClicked");
+        playbackPaused = false;
+        musicSrv.playNext();
+    }
+
+
     public void playAll() {
         Log.d(TAG, "playAll");
         songList.clear();
         Content.getAllSongs(this, songList );
         musicSrv.pausePlayer();
         musicSrv.setList(songList);
-        songAdt.notifyDataSetChanged();
+        mMusicPlayerFragment.setSongList(songList);
+        //songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
     }
 
@@ -215,10 +244,6 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
 
         controller.setMediaPlayer(this);
 
-        Button btnNext = (Button) findViewById(R.id.btnNext);
-        btnNext.setOnClickListener(this);
-        Button btnPlay = (Button) findViewById(R.id.btnPlay);
-        btnPlay.setOnClickListener(this);
         Button btnPlayAll = (Button) findViewById(R.id.btnPlayAll);
         btnPlayAll.setOnClickListener(this);
 
@@ -309,6 +334,7 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
         mMusicPlayerFragment = new MusicPlayerFragment();
         //Now you can set the fragment to be visible here
         setMusicPlayerFragment(mMusicPlayerFragment);
+        mMusicPlayerFragment.setListener(this);
 
         String playlistType = "all";
         String artistname = null;
@@ -322,7 +348,7 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
         // setup the music controller
         setController();
 
-        songView = (ListView)findViewById(R.id.song_list);
+//        songView = (ListView)findViewById(R.id.song_list);
         songList = new ArrayList<Song>();
 
         if (playlistType.equals("all")) {
@@ -333,8 +359,8 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
 
         // mMusicPlayerFragment.setSongList(songList); fragment view not created yet, moved to onResume
 
-        songAdt = new SongAdapter(this, songList);
-        songView.setAdapter(songAdt);
+        //songAdt = new SongAdapter(this, songList);
+        //songView.setAdapter(songAdt);
     }
 
     //connect to the service
