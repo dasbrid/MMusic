@@ -22,7 +22,7 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
 
     private CheckBox cbCheckAll;
     private ArrayList<String> artistList;
-    ListView lvBucketList;
+    ListView lvArtistList;
     ArtistAdapter artistAdapter;
 
     private OnArtistsChangedListener listener = null;
@@ -36,8 +36,8 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         if (buttonView.getId() == R.id.cbCheckAll) {
             Log.d(TAG, "checkAll");
             cbCheckAll.setChecked(isChecked);
-            for (int i = 0; i < lvBucketList.getChildCount(); i++) {
-                lvBucketList.setItemChecked(i, isChecked);
+            for (int i = 0; i < lvArtistList.getChildCount(); i++) {
+                lvArtistList.setItemChecked(i, isChecked);
             }
             artistAdapter.notifyDataSetChanged();
         }
@@ -71,22 +71,22 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
 
-        lvBucketList = (ListView)v.findViewById(R.id.lvArtistList);
+        lvArtistList = (ListView)v.findViewById(R.id.lvArtistList);
         cbCheckAll = (CheckBox)v.findViewById(R.id.cbCheckAll);
         cbCheckAll.setOnCheckedChangeListener(this);
-        lvBucketList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        lvArtistList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         artistList = new ArrayList<String>();
 
         Content.getArtists(getContext(), artistList);
 
         artistAdapter = new ArtistAdapter(getContext(), artistList);
-        lvBucketList.setAdapter(artistAdapter);
+        lvArtistList.setAdapter(artistAdapter);
         return v;
     }
 
     public ArrayList<String> getSelectedArtists() {
-        SparseBooleanArray checked = lvBucketList.getCheckedItemPositions();
+        SparseBooleanArray checked = lvArtistList.getCheckedItemPositions();
         ArrayList<String> selectedItems = new ArrayList<String>();
         ArrayList<String> selectedBucketIDs = new ArrayList<String>();
         for (int i = 0; i < checked.size(); i++) {

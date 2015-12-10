@@ -82,6 +82,9 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
     @Override
     protected void onResume(){
         super.onResume();
+
+        mMusicPlayerFragment.setSongList(songList);
+
         if (dataUpdateReceiver == null) dataUpdateReceiver = new SongPlayingReceiver();
         IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
         registerReceiver(dataUpdateReceiver, intentFilter);
@@ -305,9 +308,7 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
 
         mMusicPlayerFragment = new MusicPlayerFragment();
         //Now you can set the fragment to be visible here
-        setArtistFragment(mMusicPlayerFragment);
-
-
+        setMusicPlayerFragment(mMusicPlayerFragment);
 
         String playlistType = "all";
         String artistname = null;
@@ -330,15 +331,8 @@ public class MusicPlayerActivity extends FragmentActivity implements ArtistFragm
             Content.getSongsForGivenArtist(this, artistname, songList);
         }
 
-/*
-        // Ordering is done in the get* methods
-        // sort the songs by title
-        Collections.sort(songList, new Comparator<Song>(){
-            public int compare(Song a, Song b){
-                return a.getTitle().compareTo(b.getTitle());
-            }
-        });
-*/
+        // mMusicPlayerFragment.setSongList(songList); fragment view not created yet, moved to onResume
+
         songAdt = new SongAdapter(this, songList);
         songView.setAdapter(songAdt);
     }

@@ -16,12 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MainActivity"
-                  android:label="Choose Music"
-        >
-
-        </activity>
-        <activity android:name=".activities.ActivityTemp" android:label="temp"/>
         <activity android:name=".fragments.MusicPlayerFragment"/>
         <service android:enabled="true" android:name=".services.MusicService" />
     </application>
