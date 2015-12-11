@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.adapters.SongAdapter;
-import asbridge.me.uk.MMusic.classes.MusicController;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.fragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.services.MusicService;
@@ -25,8 +23,8 @@ import java.util.ArrayList;
 
 public class MusicPlayerActivity extends FragmentActivity
         implements ArtistFragment.OnArtistsChangedListener,
-MusicPlayerFragment.MusicPlayerFragmentListener,
-        View.OnClickListener, MediaController.MediaPlayerControl {
+                    MusicPlayerFragment.MusicPlayerFragmentListener,
+                    View.OnClickListener {
 
     private ArrayList<Song> songList;
     private MusicService musicSrv;
@@ -37,7 +35,6 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
 
     private ArtistFragment mArtistFragment;
     private MusicPlayerFragment mMusicPlayerFragment;
-//    private MusicController controller;
 
     private boolean paused=false, playbackPaused=false;
 
@@ -95,83 +92,14 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
         registerReceiver(dataUpdateReceiver, intentFilter);
         if(paused){
-            // setController(); CONTROLLER
             paused=false;
         }
     }
 
     @Override
     protected void onStop() {
-        /*     CONTROLLER
-        controller.hide();
-        */
         super.onStop();
     }
-
-    /*********************************************************
-     * Following methods from the mediaPlayerControl interface
-     *********************************************************/
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        if(musicSrv!=null && musicBound && musicSrv.isPng())
-        return musicSrv.getPosn();
-        else return 0;
-    }
-
-    @Override
-    public int getDuration() {
-        if(musicSrv!=null && musicBound && musicSrv.isPng())
-        return musicSrv.getDur();
-        else return 0;
-    }
-
-    @Override
-    public boolean isPlaying() {
-        if(musicSrv!=null && musicBound)
-        return musicSrv.isPng();
-        return false;
-    }
-
-    @Override
-    public void pause() {
-        playbackPaused=true;
-        musicSrv.pausePlayer();
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        musicSrv.seek(pos);
-    }
-
-    @Override
-    public void start() {
-        musicSrv.go();
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        if (getDuration() == 0)
-            return 0;
-        return (getCurrentPosition()*100)/getDuration();
-    }
-    /*********************************************************
-     * Previous methods are from the mediaPlayerControl interface
-     *********************************************************/
 
     public void onClick(View v) {
         switch (v.getId()) {
@@ -222,74 +150,7 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         //songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
     }
-/*
-    // called in oncreate to set up the music controller
-    private void setController(){
-        //set the controller up
-        controller = new MusicController(this);
-        controller.setPrevNextListeners(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playNext();
-            }
-        }, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playPrev();
-            }
-        });
 
-        controller.setMediaPlayer(this);
-
-        controller.setAnchorView(findViewById(R.id.song_list));
-        controller.setEnabled(true);
-    }
-*/
-/*
-    private void playFirst() {
-        musicSrv.playFirst();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
-*/
-/*
-    private void playRandom() {
-        musicSrv.playRandom();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
-*/
-    /*
-    // play next (calls the method in the music controller)
-    // called when user clicks on next button in the controller
-    private void playNext(){
-        // call the music service method to play the next tune
-        musicSrv.playNext();
-        // starts playing if the playing was psused
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
-*/
-    /*
-    //play previous (calls the method in the music controller)
-    private void playPrev(){
-        musicSrv.playPrev();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
-*/
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
@@ -311,7 +172,6 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
             fm.beginTransaction().add(R.id.music_player_fragment_container, frag).commit();
         }
     }
-
 
     /**
      * Called when the activity is first created.
@@ -341,11 +201,8 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
             artistname = parameters.getString("artistname");
         }
 
-        // setup the music controller
-//        setController(); CONTROLLER
         Button btnPlayAll = (Button) findViewById(R.id.btnPlayAll);
         btnPlayAll.setOnClickListener(this);
-//        songView = (ListView)findViewById(R.id.song_list);
         songList = new ArrayList<Song>();
 
         if (playlistType.equals("all")) {
@@ -353,11 +210,6 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         } else if (playlistType.equals("artist")) {
             Content.getSongsForGivenArtist(this, artistname, songList);
         }
-
-        // mMusicPlayerFragment.setSongList(songList); fragment view not created yet, moved to onResume
-
-        //songAdt = new SongAdapter(this, songList);
-        //songView.setAdapter(songAdt);
     }
 
     //connect to the service
@@ -412,13 +264,6 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
                 if (musicSrv != null) {
                     musicSrv.setSong(pickedSongIndex);
                     musicSrv.playSong();
-/* TEMP_CONTROLLER
-                    if(playbackPaused){
-                        setController();
-                        playbackPaused=false;
-                    }
-                    controller.show(0);
-*/
                 }
             }
         }
