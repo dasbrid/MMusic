@@ -29,14 +29,15 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         View.OnClickListener, MediaController.MediaPlayerControl {
 
     private ArrayList<Song> songList;
-    //private ListView songView;
-    //private SongAdapter songAdt;
     private MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound=false;
     private static String TAG = "DAVE:";
 
-    private MusicController controller;
+
+    private ArtistFragment mArtistFragment;
+    private MusicPlayerFragment mMusicPlayerFragment;
+//    private MusicController controller;
 
     private boolean paused=false, playbackPaused=false;
 
@@ -49,8 +50,7 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
             if (intent.getAction().equals("SONG_PLAYING")) {
                 String songTitle = intent.getStringExtra("SONG_TITLE");
                 String songArtist = intent.getStringExtra("SONG_ARTIST");
-                TextView tvNowPlaying = (TextView) findViewById(R.id.tvNowPlaying);
-                tvNowPlaying.setText(songArtist + "--" + songTitle);
+                mMusicPlayerFragment.setNowPlaying(songArtist, songTitle);
             }
         }
     }
@@ -95,14 +95,16 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
         registerReceiver(dataUpdateReceiver, intentFilter);
         if(paused){
-            setController();
+            // setController(); CONTROLLER
             paused=false;
         }
     }
 
     @Override
     protected void onStop() {
+        /*     CONTROLLER
         controller.hide();
+        */
         super.onStop();
     }
 
@@ -173,16 +175,6 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
 
     public void onClick(View v) {
         switch (v.getId()) {
-            /*
-            case R.id.btnPlay:
-                if (playbackPaused) {
-                    musicSrv.playFirst();
-                    playbackPaused = false;
-                } else {
-                    musicSrv.pausePlayer();
-                    playbackPaused = true;
-                }
-                break;*/
             case R.id.btnPlayAll:
                 playAll();
                 break;
@@ -190,23 +182,28 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
                 break;
         }
     }
-
-    // from fragment listener
+    // from fragment music player
     public void onPlayClicked()
     {
         Log.d(TAG, "onPlayClicked");
         if (playbackPaused) {
             //TODO: Don't start at the first song each time
-            musicSrv.playFirst();
+
+
+
+
+            musicSrv.resumePlaying();// playFirst();
             playbackPaused = false;
         } else {
             Log.d(TAG, "playing -> pausing");
+
+
             musicSrv.pausePlayer();
             playbackPaused = true;
         }
     }
 
-    // from fragment listener
+    // from fragment music player
     public void onNextClicked()
     {
         Log.d(TAG, "onNextClicked");
@@ -214,7 +211,7 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         musicSrv.playNext();
     }
 
-
+    // from button in activita
     public void playAll() {
         Log.d(TAG, "playAll");
         songList.clear();
@@ -225,7 +222,7 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         //songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
     }
-
+/*
     // called in oncreate to set up the music controller
     private void setController(){
         //set the controller up
@@ -244,13 +241,11 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
 
         controller.setMediaPlayer(this);
 
-        Button btnPlayAll = (Button) findViewById(R.id.btnPlayAll);
-        btnPlayAll.setOnClickListener(this);
-
         controller.setAnchorView(findViewById(R.id.song_list));
         controller.setEnabled(true);
     }
-
+*/
+/*
     private void playFirst() {
         musicSrv.playFirst();
         if(playbackPaused){
@@ -259,7 +254,8 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         }
         controller.show(0);
     }
-
+*/
+/*
     private void playRandom() {
         musicSrv.playRandom();
         if(playbackPaused){
@@ -268,7 +264,8 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         }
         controller.show(0);
     }
-
+*/
+    /*
     // play next (calls the method in the music controller)
     // called when user clicks on next button in the controller
     private void playNext(){
@@ -281,7 +278,8 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         }
         controller.show(0);
     }
-
+*/
+    /*
     //play previous (calls the method in the music controller)
     private void playPrev(){
         musicSrv.playPrev();
@@ -291,7 +289,7 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         }
         controller.show(0);
     }
-
+*/
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
@@ -314,8 +312,6 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         }
     }
 
-    private ArtistFragment mArtistFragment;
-    private MusicPlayerFragment mMusicPlayerFragment;
 
     /**
      * Called when the activity is first created.
@@ -346,8 +342,9 @@ MusicPlayerFragment.MusicPlayerFragmentListener,
         }
 
         // setup the music controller
-        setController();
-
+//        setController(); CONTROLLER
+        Button btnPlayAll = (Button) findViewById(R.id.btnPlayAll);
+        btnPlayAll.setOnClickListener(this);
 //        songView = (ListView)findViewById(R.id.song_list);
         songList = new ArrayList<Song>();
 

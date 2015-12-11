@@ -19,13 +19,6 @@
 >
 </Button>
 </LinearLayout>
-    <TextView
-        android:text="Now Playing:"
-        android:id="@+id/tvNowPlaying"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-    >
-    </TextView>
     <FrameLayout
                  android:id="@+id/artist_fragment_container"
                  android:layout_width="match_parent"

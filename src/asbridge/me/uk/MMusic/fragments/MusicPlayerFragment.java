@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -25,6 +26,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
     private SongAdapter songAdt;
     private ListView lvSongList;
+    private TextView tvNowPlaying;
     private ArrayList<Song> songList;
 
     private MusicPlayerFragmentListener listener = null;
@@ -44,6 +46,8 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
         Button btnNext = (Button) v.findViewById(R.id.frag_btnNext);
         btnNext.setOnClickListener(this);
+
+        tvNowPlaying = (TextView) v.findViewById(R.id.frag_tvNowPlaying);
 
         lvSongList = (ListView)v.findViewById(R.id.frag_song_list);
 
@@ -79,6 +83,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         songList.addAll(songs);
         Log.d(TAG, "setSongList:"+songList.size());
         songAdt.notifyDataSetChanged();
+    }
+
+    public void setNowPlaying(String songArtist, String songTitle) {
+        tvNowPlaying.setText(songArtist + "--" + songTitle);
     }
 
 }

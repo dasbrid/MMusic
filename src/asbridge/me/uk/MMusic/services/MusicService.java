@@ -224,6 +224,7 @@ public class MusicService extends Service implements
     }
 
 
+    private int currentPos = 0;
 
     /*****************************
      * Following methods used by activity to control playback
@@ -242,6 +243,12 @@ public class MusicService extends Service implements
 
     public void pausePlayer(){
         player.pause();
+        currentPos = player.getCurrentPosition();
+    }
+
+    public void resumePlaying() {
+        player.seekTo(currentPos);
+        player.start();
     }
 
     public void seek(int posn){
