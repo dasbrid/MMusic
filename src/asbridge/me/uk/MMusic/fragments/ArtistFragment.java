@@ -67,6 +67,7 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);

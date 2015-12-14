@@ -11,12 +11,17 @@
                   android:label="MMusic"
                   android:launchMode="singleTop"
         >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
-        <activity android:name=".fragments.MusicPlayerFragment"/>
+        <activity android:name=".activities.PagerActivity">
+
+        </activity>
+        <activity android:name=".activities.PlayAllActivivy" android:label="Play All Music" android:launchMode="singleTop">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent-filter>
+        </activity>
         <service android:enabled="true" android:name=".services.MusicService" />
+        <service android:enabled="true" android:name=".services.SimpleMusicService" />
     </application>
 </manifest>

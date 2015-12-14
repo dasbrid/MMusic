@@ -40,7 +40,7 @@ public class MusicService extends Service implements
     private static String TAG = "DAVE:";
 
     //media player
-    private MediaPlayer player;
+    private MediaPlayer player = null;
     //song list
     private ArrayList<Song> songs;
     //current position

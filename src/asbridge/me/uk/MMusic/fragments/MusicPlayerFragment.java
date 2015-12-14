@@ -35,6 +35,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         public void onNextClicked();
     }
 
+    public MusicPlayerFragment () {
+        super();
+        songList = new ArrayList<Song>();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,9 +55,9 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
         lvSongList = (ListView)v.findViewById(R.id.frag_song_list);
 
-        songList = new ArrayList<Song>();
 
         songAdt = new SongAdapter(getContext(), songList);
+
         lvSongList.setAdapter(songAdt);
         return v;
     }
@@ -82,7 +86,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         songList.clear();
         songList.addAll(songs);
         Log.d(TAG, "setSongList:"+songList.size());
-        songAdt.notifyDataSetChanged();
+//        songAdt.notifyDataSetChanged();
     }
 
     public void setNowPlaying(String songArtist, String songTitle) {
