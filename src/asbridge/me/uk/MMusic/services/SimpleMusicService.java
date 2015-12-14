@@ -14,6 +14,7 @@ import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.Content;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by David on 13/12/2015.
@@ -28,6 +29,15 @@ public class SimpleMusicService extends Service
 
     private static final String ACTION_PLAY = "com.example.action.PLAY";
     private MediaPlayer player = null;
+    //song list
+    private ArrayList<Song> songs = null;
+    private Random rand;
+
+    private int currentSongIndex = -1;
+
+    public void setSongList(ArrayList<Song> songList) {
+        this.songs = songList;
+    }
 
     /**
      * This allows binding. class MusicBinder implements the IBinder interface.
@@ -81,7 +91,7 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService onCreate");
         //create the service
         super.onCreate();
-
+        rand=new Random();
         // initialise the mediaplayer
         initialiseMediaPlayer();
     }
@@ -100,15 +110,6 @@ public class SimpleMusicService extends Service
         */
     }
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        Log.d(TAG, "SimpleMusicService onCompletion");
-        if(player.getCurrentPosition() > 0){
-            mp.reset();
-            // playNext(); // play the next song, but for now we just stop
-        }
-    }
-
     // required by interface MediaPlayer.OnPreparedListener
     // callback when ready to play a song, after calling prepareAsync
     @Override
@@ -119,14 +120,36 @@ public class SimpleMusicService extends Service
         // we can broadcast song started and set notification ... optionally
     }
 
-    // play button pressed in the activity start playing the song
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        Log.d(TAG, "SimpleMusicService onCompletion");
+        if(player.getCurrentPosition() > 0){
+            mp.reset();
+            playNext();
+        }
+    }
+
     public void startPlay() {
         Log.d(TAG, "SimpleMusicService startPlay");
+        playNext();
+    }
+
+    // play button pressed in the activity start playing the song
+    public void playNext() {
+        Log.d(TAG, "SimpleMusicService playNext");
         player.reset();
         //get a song
-        ArrayList<Song> songList = new ArrayList<>();
-        Content.getAllSongs(getApplicationContext(), songList);
-        Song theSong = songList.get(0);
+        if (this.songs == null || this.songs.size() < 1) {
+            Log.d(TAG, "no songs to play");
+            return;
+        }
+
+        int newSongIndex = currentSongIndex;
+        while(newSongIndex == currentSongIndex){
+            newSongIndex=rand.nextInt(songs.size());
+        }
+
+        Song theSong = this.songs.get(newSongIndex);
         long theSongId = theSong.getID();
 
         Log.d(TAG, "song="+theSong.getTitle()+" id="+ theSongId);

@@ -127,6 +127,12 @@ public class PlayAllActivivy extends Activity {
             SimpleMusicService.SimpleMusicBinder binder = (SimpleMusicService.SimpleMusicBinder)service;
             //get service
             serviceReference = binder.getService();
+
+            // set the list of songs in the service
+            ArrayList<Song> songList = new ArrayList<>();
+            Content.getAllSongs(getApplicationContext(), songList);
+            serviceReference.setSongList(songList);
+
             isBound = true;
         }
 
