@@ -103,7 +103,7 @@ public class PlayAllActivivy extends Activity {
         startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        /*
         Notification.Builder builder = new Notification.Builder(this);
 
         builder.setContentIntent(contentIntent)
@@ -115,7 +115,8 @@ public class PlayAllActivivy extends Activity {
         Notification notification = builder.build();
 
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(-34/*NOTIFICATION_ID*/, notification);
+        nm.notify(-34, notification);
+        */
     }
 
     //connect to the service

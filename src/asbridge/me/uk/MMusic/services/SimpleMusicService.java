@@ -1,5 +1,7 @@
 package asbridge.me.uk.MMusic.services;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -10,6 +12,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.activities.MusicPlayerActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.Content;
 
@@ -27,6 +31,7 @@ public class SimpleMusicService extends Service
 
     private String TAG="DAVE:SimpleMusicService";
 
+    private static final int NOTIFY_ID=1;
     private static final String ACTION_PLAY = "com.example.action.PLAY";
     private MediaPlayer player = null;
     //song list
@@ -118,6 +123,24 @@ public class SimpleMusicService extends Service
         // start playback
         mp.start();
         // we can broadcast song started and set notification ... optionally
+        // Create notification
+        Intent notIntent = new Intent(this, MusicPlayerActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder builder = new Notification.Builder(this);
+        Song currentSong = songs.get(currentSongIndex);
+        builder.setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.play)
+                .setTicker(currentSong.getTitle())
+                .setOngoing(true)
+                .setContentTitle("Playing")
+                .setContentText(currentSong.getTitle());
+        Notification not = builder.build();
+
+        startForeground(NOTIFY_ID, not);
+
     }
 
     @Override
