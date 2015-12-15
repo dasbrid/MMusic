@@ -10,6 +10,7 @@ import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
+import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.Content;
 
 import java.util.ArrayList;
@@ -36,9 +37,9 @@ public class PlayAllActivivy extends Activity {
     private class SongPlayingReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("SONG_PLAYING")) {
-                String songTitle = intent.getStringExtra("SONG_TITLE");
-                String songArtist = intent.getStringExtra("SONG_ARTIST");
+            if (intent.getAction().equals(AppConstants.INTENT_ACTION_SONG_PLAYING)) {
+                String songTitle = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_TITLE);
+                String songArtist = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_ARTIST);
                 updateNowPlaying(songArtist, songTitle);
             }
         }

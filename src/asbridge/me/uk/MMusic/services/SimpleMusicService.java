@@ -160,9 +160,9 @@ public class SimpleMusicService extends Service
 
         // Broadcast the fact that a new song is now playing
         // can be used by the activity to update its textview
-        Intent songPlayingIntent = new Intent("SONG_PLAYING");
-        songPlayingIntent.putExtra("SONG_TITLE", currentSong.getTitle());
-        songPlayingIntent.putExtra("SONG_ARTIST", currentSong.getArtist());
+        Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PLAYING);
+        songPlayingIntent.putExtra(AppConstants.INTENT_EXTRA_SONG_TITLE, currentSong.getTitle());
+        songPlayingIntent.putExtra(AppConstants.INTENT_EXTRA_SONG_ARTIST, currentSong.getArtist());
         sendBroadcast(songPlayingIntent);
 
         // we can broadcast song started and set notification
