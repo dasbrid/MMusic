@@ -174,9 +174,9 @@ public class SimpleMusicService extends Service
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //this is the intent that is supposed to be called when the button is clicked
-        Intent stopIntent = new Intent("STOP_EVENT");
+        Intent stopIntent = new Intent(AppConstants.INTENT_ACTION_STOP);
         PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
-        Intent nextIntent = new Intent("NEXT_EVENT");
+        Intent nextIntent = new Intent(AppConstants.INTENT_ACTION_NEXT);
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
 
 
