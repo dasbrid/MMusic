@@ -46,7 +46,7 @@ public class SimpleMusicService extends Service
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
-            if (intent.getAction().equals(AppConstants.INTENT_ACTION_NEXT)) {
+            if (intent.getAction().equals(AppConstants.INTENT_ACTION_STOP)) {
                 Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
                 stopPlay();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_NEXT)) {
