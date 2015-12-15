@@ -44,22 +44,6 @@ public class PlayAllActivivy extends Activity {
         }
     }
 
-    private StopButtonListener stopButtonListener;
-    // When the service starts playing a song it will broadcast the title
-    public class StopButtonListener extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
-            if (intent.getAction().equals("STOP_EVENT")) {
-                Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
-                stopPlayback();
-            } else if (intent.getAction().equals("NEXT_EVENT")) {
-                Log.d(TAG, "SwitchButtonListener:OnReceive:NEXT_EVENT");
-                playNextSong();
-            }
-        }
-    }
-
     private void updateNowPlaying(String songArtist, String songTitle) {
         tvNowPlaying.setText(songArtist + "-" + songTitle);
     }
@@ -70,7 +54,6 @@ public class PlayAllActivivy extends Activity {
         super.onPause();
         Log.d(TAG, "onPause");
         if (songPlayingReceiver != null) unregisterReceiver(songPlayingReceiver);
-        if (stopButtonListener != null) unregisterReceiver(stopButtonListener);
 
         // paused=true; // TODO: used to remember the paused state (see onResume)
     }
@@ -82,13 +65,10 @@ public class PlayAllActivivy extends Activity {
         Log.d(TAG, "onResume");
         // TODO: get current song and update now playing
 
+        // set up the listener for broadcast from the service for new song playing
         if (songPlayingReceiver == null) songPlayingReceiver = new SongPlayingReceiver();
         IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
         registerReceiver(songPlayingReceiver, intentFilter);
-
-        if (stopButtonListener == null) stopButtonListener = new StopButtonListener();
-        registerReceiver(stopButtonListener, new IntentFilter("STOP_EVENT"));
-        registerReceiver(stopButtonListener, new IntentFilter("NEXT_EVENT"));
 
         if (serviceReference != null) {
             Song currentSong = serviceReference.getCurrentSong();
@@ -161,7 +141,7 @@ public class PlayAllActivivy extends Activity {
 
     public void playNextSong() {
         if (isBound)
-            serviceReference.startPlay();
+            serviceReference.playNextSong();
 
     }
 

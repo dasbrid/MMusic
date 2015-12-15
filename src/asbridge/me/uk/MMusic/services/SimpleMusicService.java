@@ -3,8 +3,7 @@ package asbridge.me.uk.MMusic.services;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ContentUris;
-import android.content.Intent;
+import android.content.*;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -13,10 +12,9 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.activities.MusicPlayerActivity;
 import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.utils.Content;
+import asbridge.me.uk.MMusic.utils.AppConstants;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -41,6 +39,28 @@ public class SimpleMusicService extends Service
 
     private int currentSongIndex = -1;
 
+
+    // broadcast receeiver receives actions from notification
+    private MusicControlListener musicControlListener;
+    public class MusicControlListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
+            if (intent.getAction().equals(AppConstants.INTENT_ACTION_NEXT)) {
+                Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
+                stopPlay();
+            } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_NEXT)) {
+                Log.d(TAG, "SwitchButtonListener:OnReceive:NEXT_EVENT");
+                playNextSong();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (musicControlListener != null) unregisterReceiver(musicControlListener);
+        super.onDestroy();
+    }
     // called from activity to set the songs to play
     public void setSongList(ArrayList<Song> songList) {
         this.songs = songList;
@@ -108,6 +128,10 @@ public class SimpleMusicService extends Service
         rand=new Random();
         // initialise the mediaplayer
         initialiseMediaPlayer();
+        // set up the listener for the broadcast from the notification (play next and stop buttons)
+        if (musicControlListener == null) musicControlListener = new MusicControlListener();
+        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_NEXT));
+        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_STOP));
     }
 
     private void initialiseMediaPlayer() {
@@ -180,13 +204,14 @@ public class SimpleMusicService extends Service
         }
     }
 
-    public void startPlay() {
-        Log.d(TAG, "SimpleMusicService startPlay");
+    // can be called from outside the service (e.g. from next button in the activity)
+    public void playNextSong() {
+        Log.d(TAG, "SimpleMusicService playNextSong");
         playNext();
     }
 
     // play button pressed in the activity start playing the song
-    public void playNext() {
+    private void playNext() {
         Log.d(TAG, "SimpleMusicService playNext");
         player.reset();
         //get a song
