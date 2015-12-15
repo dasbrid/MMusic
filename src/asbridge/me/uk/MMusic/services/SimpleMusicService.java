@@ -14,6 +14,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.MusicPlayerActivity;
+import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.Content;
 
@@ -40,8 +41,16 @@ public class SimpleMusicService extends Service
 
     private int currentSongIndex = -1;
 
+    // called from activity to set the songs to play
     public void setSongList(ArrayList<Song> songList) {
         this.songs = songList;
+    }
+
+    // returns the current playing song
+    public Song getCurrentSong() {
+        if (songs == null || songs.size() == 0 || currentSongIndex == -1)
+            return null;
+        return songs.get(currentSongIndex);
     }
 
     /**
@@ -122,16 +131,36 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService onPrepared");
         // start playback
         mp.start();
-        // we can broadcast song started and set notification ... optionally
-        // Create notification
-        Intent notIntent = new Intent(this, MusicPlayerActivity.class);
+
+        Song currentSong = songs.get(currentSongIndex);
+
+        // Broadcast the fact that a new song is now playing
+        // can be used by the activity to update its textview
+        Intent songPlayingIntent = new Intent("SONG_PLAYING");
+        songPlayingIntent.putExtra("SONG_TITLE", currentSong.getTitle());
+        songPlayingIntent.putExtra("SONG_ARTIST", currentSong.getArtist());
+        sendBroadcast(songPlayingIntent);
+
+        // we can broadcast song started and set notification
+        Intent notIntent = new Intent(this, PlayAllActivivy.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        // pending intent to go back to the activity
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        //this is the intent that is supposed to be called when the button is clicked
+        Intent stopIntent = new Intent("STOP_EVENT");
+        PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
+        Intent nextIntent = new Intent("NEXT_EVENT");
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
+
+
         Notification.Builder builder = new Notification.Builder(this);
-        Song currentSong = songs.get(currentSongIndex);
+
         builder.setContentIntent(pendInt)
+                .addAction(R.drawable.ic_launcher, "Stop", pendingStopIntent)
+                .addAction(R.drawable.ic_launcher, "Next", pendingNextIntent)
                 .setSmallIcon(R.drawable.play)
                 .setTicker(currentSong.getTitle())
                 .setOngoing(true)
@@ -140,7 +169,6 @@ public class SimpleMusicService extends Service
         Notification not = builder.build();
 
         startForeground(NOTIFY_ID, not);
-
     }
 
     @Override
@@ -171,8 +199,8 @@ public class SimpleMusicService extends Service
         while(newSongIndex == currentSongIndex){
             newSongIndex=rand.nextInt(songs.size());
         }
-
-        Song theSong = this.songs.get(newSongIndex);
+        currentSongIndex = newSongIndex;
+        Song theSong = this.songs.get(currentSongIndex);
         long theSongId = theSong.getID();
 
         Log.d(TAG, "song="+theSong.getTitle()+" id="+ theSongId);

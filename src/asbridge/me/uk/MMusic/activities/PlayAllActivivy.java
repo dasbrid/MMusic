@@ -1,17 +1,12 @@
 package asbridge.me.uk.MMusic.activities;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
@@ -34,15 +29,88 @@ public class PlayAllActivivy extends Activity {
     private boolean isBound;
     private SimpleMusicService serviceReference;
 
+    private TextView tvNowPlaying;
+
+    private SongPlayingReceiver songPlayingReceiver;
+    // When the service starts playing a song it will broadcast the title
+    private class SongPlayingReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("SONG_PLAYING")) {
+                String songTitle = intent.getStringExtra("SONG_TITLE");
+                String songArtist = intent.getStringExtra("SONG_ARTIST");
+                updateNowPlaying(songArtist, songTitle);
+            }
+        }
+    }
+
+    private SwitchButtonListener stopButtonListener;
+    // When the service starts playing a song it will broadcast the title
+    public class SwitchButtonListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "SwitchButtonListener:OnReceive");
+            if (intent.getAction().equals("STOP_EVENT")) {
+                Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
+                stopPlayback();
+            } else if (intent.getAction().equals("NEXT_EVENT")) {
+                Log.d(TAG, "SwitchButtonListener:OnReceive:NEXT_EVENT");
+                playNextSong();
+            }
+        }
+    }
+
+    private void updateNowPlaying(String songArtist, String songTitle) {
+        tvNowPlaying.setText(songArtist + "-" + songTitle);
+    }
+
+    // used to save paused state so it can be resumed
+    @Override
+    protected void onPause(){
+        super.onPause();
+        Log.d(TAG, "onPause");
+        if (songPlayingReceiver != null) unregisterReceiver(songPlayingReceiver);
+        if (stopButtonListener != null) unregisterReceiver(stopButtonListener);
+
+        // paused=true; // TODO: used to remember the paused state (see onResume)
+    }
+
+    // uses the saved paused state
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d(TAG, "onResume");
+        // TODO: get current song and update now playing
+
+        if (songPlayingReceiver == null) songPlayingReceiver = new SongPlayingReceiver();
+        IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
+        registerReceiver(songPlayingReceiver, intentFilter);
+
+        if (stopButtonListener == null) stopButtonListener = new SwitchButtonListener();
+        registerReceiver(stopButtonListener, new IntentFilter("SWITCH_EVENT"));
+
+        if (serviceReference != null) {
+            Song currentSong = serviceReference.getCurrentSong();
+            if (currentSong != null)
+                updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
+        }
+        /* restore the paused state (see onPause)
+        if(paused){
+            paused=false;
+        }
+        */
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_play_all);
 
+        tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
+
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         startService(playIntent);
-        sendNotification();
     }
 
     //start the Service instance when the Activity instance starts
@@ -78,45 +146,33 @@ public class PlayAllActivivy extends Activity {
         Log.d(TAG, "onDestroy");
         if (isFinishing()) {
             Log.d(TAG, "isFinishing");
-            // genuinly finishing, not orientation change etc
+            // genuinely finishing, not orientation change etc
             Intent intentStopService = new Intent (this, SimpleMusicService.class);
             stopService(intentStopService);
             unbindService(myConnection); ///???
         }
     }
 
-    public void btnPlayClicked(View v) {
-        Log.d(TAG, "btnPlayClicked");
-        if (isBound)
-            serviceReference.startPlay();
+    public void btnNextClicked(View v) {
+        Log.d(TAG, "btnNextClicked");
+        playNextSong();
     }
 
-    public void btnPauseClicked(View v) {
-        Log.d(TAG, "btnPauseClicked");
+    public void playNextSong() {
+        if (isBound)
+            serviceReference.startPlay();
+
+    }
+
+    public void btnStopClicked(View v) {
+        Log.d(TAG, "btnStopClicked");
+        stopPlayback();
+    }
+
+    private void stopPlayback() {
         if (isBound)
             serviceReference.stopPlay();
 
-    }
-
-    private void sendNotification() {
-        Intent startIntent = new Intent(this, PlayAllActivivy.class);
-        startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        /*
-        Notification.Builder builder = new Notification.Builder(this);
-
-        builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.play)
-                .setTicker("Music Playing(ish)")
-                .setOngoing(true)
-                .setContentTitle("Service Running")
-                .setContentText("not actually playing");
-        Notification notification = builder.build();
-
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(-34, notification);
-        */
     }
 
     //connect to the service
@@ -144,8 +200,6 @@ public class PlayAllActivivy extends Activity {
             isBound = false;
         }
     };
-
-
 
     private void doBindService() {
         Log.d(TAG, "BindService");
@@ -179,7 +233,4 @@ public class PlayAllActivivy extends Activity {
     };
 
     */
-/*
-
-*/
 }
