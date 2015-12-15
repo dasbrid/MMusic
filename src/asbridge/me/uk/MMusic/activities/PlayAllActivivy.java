@@ -44,12 +44,12 @@ public class PlayAllActivivy extends Activity {
         }
     }
 
-    private SwitchButtonListener stopButtonListener;
+    private StopButtonListener stopButtonListener;
     // When the service starts playing a song it will broadcast the title
-    public class SwitchButtonListener extends BroadcastReceiver {
+    public class StopButtonListener extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "SwitchButtonListener:OnReceive");
+            Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
             if (intent.getAction().equals("STOP_EVENT")) {
                 Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
                 stopPlayback();
@@ -86,8 +86,9 @@ public class PlayAllActivivy extends Activity {
         IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
         registerReceiver(songPlayingReceiver, intentFilter);
 
-        if (stopButtonListener == null) stopButtonListener = new SwitchButtonListener();
-        registerReceiver(stopButtonListener, new IntentFilter("SWITCH_EVENT"));
+        if (stopButtonListener == null) stopButtonListener = new StopButtonListener();
+        registerReceiver(stopButtonListener, new IntentFilter("STOP_EVENT"));
+        registerReceiver(stopButtonListener, new IntentFilter("NEXT_EVENT"));
 
         if (serviceReference != null) {
             Song currentSong = serviceReference.getCurrentSong();

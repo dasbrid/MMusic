@@ -14,7 +14,7 @@
     <Button
             android:id="@+id/btnStop"
             android:text="Stop"
-            android:onClick="btnPauseClicked"
+            android:onClick="btnStopClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     <TextView
