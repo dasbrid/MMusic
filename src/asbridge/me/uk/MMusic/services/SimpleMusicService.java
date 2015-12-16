@@ -38,7 +38,8 @@ public class SimpleMusicService extends Service
     private Random rand;
 
     private int currentSongIndex = -1;
-
+    private int currentPos = 0;
+    private boolean stopped = true;
 
     // broadcast receeiver receives actions from notification
     private MusicControlListener musicControlListener;
@@ -51,7 +52,7 @@ public class SimpleMusicService extends Service
                 stopPlay();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_NEXT)) {
                 Log.d(TAG, "SwitchButtonListener:OnReceive:NEXT_EVENT");
-                playNextSong();
+                playSong();
             }
         }
     }
@@ -155,7 +156,7 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService onPrepared");
         // start playback
         mp.start();
-
+        stopped = false;
         Song currentSong = songs.get(currentSongIndex);
 
         // Broadcast the fact that a new song is now playing
@@ -206,9 +207,12 @@ public class SimpleMusicService extends Service
     }
 
     // can be called from outside the service (e.g. from next button in the activity)
-    public void playNextSong() {
+    public void playSong() {
         Log.d(TAG, "SimpleMusicService playNextSong");
-        playNext();
+        if (stopped)
+            playNext();
+        else
+            resumePlaying();
     }
 
     // play button pressed in the activity start playing the song
@@ -247,12 +251,20 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService stopPlay");
         //TODO: Cancel notification
         player.reset();
+        stopped = true;
     }
 
     // stop button pressed in activity pause the player
     public void pausePlay() {
-        Log.d(TAG, "SimpleMusicService stopPlay");
+        Log.d(TAG, "SimpleMusicService pausePlay");
         // TODO: set pause flag and resume afterwards
         player.pause();
+        currentPos = player.getCurrentPosition();
     }
+
+    public void resumePlaying() {
+        player.seekTo(currentPos);
+        player.start();
+    }
+
 }

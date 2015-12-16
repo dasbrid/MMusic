@@ -137,12 +137,12 @@ public class PlayAllActivivy extends Activity {
 
     public void btnNextClicked(View v) {
         Log.d(TAG, "btnNextClicked");
-        playNextSong();
+        playSong();
     }
 
-    public void playNextSong() {
+    public void playSong() {
         if (isBound)
-            serviceReference.playNextSong();
+            serviceReference.playSong();
 
     }
 
