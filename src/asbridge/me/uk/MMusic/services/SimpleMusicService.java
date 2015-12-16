@@ -189,7 +189,8 @@ public class SimpleMusicService extends Service
                 .setTicker(currentSong.getTitle())
                 .setOngoing(true)
                 .setContentTitle("Playing")
-                .setContentText(currentSong.getTitle());
+                .setContentText(currentSong.getTitle())
+                .setPriority(Notification.PRIORITY_MAX);
         Notification not = builder.build();
 
         startForeground(NOTIFY_ID, not);
@@ -244,7 +245,14 @@ public class SimpleMusicService extends Service
     // stop button pressed in activity pause the player
     public void stopPlay() {
         Log.d(TAG, "SimpleMusicService stopPlay");
-        player.pause();
+        //TODO: Cancel notification
+        player.reset();
     }
 
+    // stop button pressed in activity pause the player
+    public void pausePlay() {
+        Log.d(TAG, "SimpleMusicService stopPlay");
+        // TODO: set pause flag and resume afterwards
+        player.pause();
+    }
 }

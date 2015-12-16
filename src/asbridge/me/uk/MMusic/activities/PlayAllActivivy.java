@@ -68,7 +68,7 @@ public class PlayAllActivivy extends Activity {
 
         // set up the listener for broadcast from the service for new song playing
         if (songPlayingReceiver == null) songPlayingReceiver = new SongPlayingReceiver();
-        IntentFilter intentFilter = new IntentFilter("SONG_PLAYING");
+        IntentFilter intentFilter = new IntentFilter(AppConstants.INTENT_ACTION_SONG_PLAYING);
         registerReceiver(songPlayingReceiver, intentFilter);
 
         if (serviceReference != null) {
@@ -154,7 +154,16 @@ public class PlayAllActivivy extends Activity {
     private void stopPlayback() {
         if (isBound)
             serviceReference.stopPlay();
+    }
 
+    public void btnPauseClicked(View v) {
+        Log.d(TAG, "btnPauseClicked");
+        pausePlayback();
+    }
+
+    private void pausePlayback() {
+        if (isBound)
+            serviceReference.pausePlay();
     }
 
     //connect to the service

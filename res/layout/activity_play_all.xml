@@ -10,7 +10,12 @@
             android:text="Next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
+    <Button
+            android:id="@+id/btnPause"
+            android:text="Pause"
+            android:onClick="btnPauseClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     <Button
             android:id="@+id/btnStop"
             android:text="Stop"
