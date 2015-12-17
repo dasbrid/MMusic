@@ -30,6 +30,15 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/btnNext"
     />
+    <Button
+            android:id="@+id/btnRemoveNext"
+            android:text="Remove next Song"
+            android:onClick="btnRemoveNextClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/btnStop"
+
+    />
     <ImageButton
             android:id="@+id/btnExit"
             android:src="@drawable/end"
@@ -55,17 +64,7 @@
                 android:text="Play queue:"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-    <TextView
-            android:id="@+id/tvPlayingNext"
-            android:text="Next Playing"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        <Button
-                android:id="@+id/btnChangeNext"
-                android:text="Change Next Song"
-                android:onClick="btnChangeNextClicked"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+
         <ListView
                 android:id="@+id/lvPlayQueue"
                 android:layout_width="fill_parent"

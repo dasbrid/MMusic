@@ -37,7 +37,6 @@ public class SimpleMusicService extends Service
     private ArrayList<Song> songs = null;
     private Random rand;
 
-//    private ArrayList<Song> playQueue;
     private Queue<Song> playQueue;
     private Song currentSong;
 
@@ -257,16 +256,29 @@ public class SimpleMusicService extends Service
         return songIndex;
     }
 
-    public void changePlayQueue() {
+    public void fillPlayQueue() {
         int i = playQueue.size();
         for (; i< AppConstants.PLAY_QUEUE_SIZE ; i++) {
             int nextSongIndex = getRandomSongIndex(-1);
             playQueue.add(songs.get(nextSongIndex));
         }
         // broadcast that the play queue has changed
-        // can be used by the activity to update its textview
+        // can be used by the activity to update its playqueue
         Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
         sendBroadcast(changeNextSongIntent);
+    }
+
+    public void removeSongFromPlayQueue(long songID) {
+        Log.d(TAG, "SimpleMusicService removeSongFromPlayQueue:id="+songID+" size="+playQueue.size());
+        for (Song s : playQueue) {
+            Log.d(TAG, "s="+s.getID());
+            if (s.getID() == songID) {
+                Log.d(TAG, "found");
+                playQueue.remove(s);
+                fillPlayQueue();
+                break;
+            }
+        }
     }
 
     // play button pressed in the activity start playing the song
@@ -281,14 +293,14 @@ public class SimpleMusicService extends Service
 
         if (playQueue.size() < AppConstants.PLAY_QUEUE_SIZE) {
             // nothing in the queue, so initialise
-            changePlayQueue();
+            fillPlayQueue();
         }
         // get the next song to play (from the queue)
         currentSong = playQueue.remove(); //get(AppConstants.PLAY_QUEUE_SIZE-1);
         //playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
 
         // add a song into the queue
-        changePlayQueue();
+        fillPlayQueue();
 
         long theSongId = currentSong.getID();
 

@@ -133,7 +133,6 @@ public class PlayAllActivivy extends Activity {
         setContentView(R.layout.activity_play_all);
 
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
-        tvPlayingNext = (TextView) findViewById(R.id.tvPlayingNext);
 
         lvPlayQueue = (ListView) findViewById(R.id.lvPlayQueue);
         playQueue = new ArrayList<>();
@@ -174,14 +173,16 @@ public class PlayAllActivivy extends Activity {
         }
     }
 
-    public void btnChangeNextClicked(View v) {
-        Log.d(TAG, "btnChangeClicked");
-        changeNextSong();
+    public void btnRemoveNextClicked(View v) {
+        Log.d(TAG, "btnRemoveNextClicked");
+        removeNextSong();
     }
 
-    private  void changeNextSong() {
-        if (isBound)
-            serviceReference.changePlayQueue();
+    private  void removeNextSong() {
+        if (isBound) {
+            long songId = playQueue.get(0).getID();
+            serviceReference.removeSongFromPlayQueue(songId);
+        }
     }
 
     public void btnNextClicked(View v) {
