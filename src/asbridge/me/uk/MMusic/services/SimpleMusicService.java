@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import android.widget.MediaController;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -25,7 +26,8 @@ import java.util.Random;
  */
 public class SimpleMusicService extends Service
         implements MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnCompletionListener
+        MediaPlayer.OnCompletionListener,
+        MediaPlayer.OnErrorListener
 {
 
     private String TAG="DAVE:SimpleMusicService";
@@ -314,6 +316,13 @@ public class SimpleMusicService extends Service
             player.start();
             currentState = PLAYING;
         }
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        Log.d(TAG,"Media plazer error: what="+what+", extra="+extra);
+        mp.reset();
+        return false;
     }
 
 }
