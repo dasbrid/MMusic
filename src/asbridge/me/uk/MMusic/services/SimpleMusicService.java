@@ -39,8 +39,11 @@ public class SimpleMusicService extends Service
     private ArrayList<Song> songs = null;
     private Random rand;
 
-    private int currentSongIndex = -1;
-    private int nextSongIndex=-1;
+//    private int currentSongIndex = -1;
+//    private int nextSongIndex=-1;
+
+    private ArrayList<Song> playQueue;
+    private Song currentSong;
 
     private int currentPos = 0;
 
@@ -92,17 +95,19 @@ public class SimpleMusicService extends Service
 
     // returns the current playing song
     public Song getCurrentSong() {
-        if (songs == null || songs.size() == 0 || currentSongIndex == -1)
-            return null;
-        return songs.get(currentSongIndex);
+        return currentSong;
     }
-
+/*
     // returns the next song to play
     // in future this can be a list of n songs
     public Song getNextSong() {
         if (songs == null || songs.size() == 0 || nextSongIndex == -1)
             return null;
         return songs.get(nextSongIndex);
+    }
+*/
+    public ArrayList<Song> getPlayQueue() {
+        return playQueue;
     }
 
     /**
@@ -167,6 +172,9 @@ public class SimpleMusicService extends Service
         registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK));
         if (becomingNoisyListener == null) becomingNoisyListener = new NoisyAudioStreamReceiver();
         registerReceiver(becomingNoisyListener, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+
+        currentSong = null;
+        playQueue = new ArrayList<>();
     }
 
     private void initialiseMediaPlayer() {
@@ -189,7 +197,6 @@ public class SimpleMusicService extends Service
         // start playback
         mp.start();
         currentState = PLAYING;
-        Song currentSong = songs.get(currentSongIndex);
 
         // Broadcast the fact that a new song is now playing
         // can be used by the activity to update its textview
@@ -263,7 +270,9 @@ public class SimpleMusicService extends Service
     }
 
     public void changeNextSong() {
-        nextSongIndex = getRandomSongIndex(nextSongIndex);
+        int nextSongIndex = getRandomSongIndex(-1);
+        playQueue.clear();
+        playQueue.add(songs.get(nextSongIndex));
         // broadcast that the play queue has changed
         // can be used by the activity to update its textview
         Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
@@ -280,20 +289,21 @@ public class SimpleMusicService extends Service
             return;
         }
 
-        if (nextSongIndex == -1) {
+        if (playQueue.size() == 0) {
             // nothing in the queue, so initialise
-            nextSongIndex = getRandomSongIndex(-1);
+            changeNextSong();
         }
         // get the next song to play (from the queue)
-        currentSongIndex = nextSongIndex;
+        currentSong = playQueue.get(0);
 
         // add a song into the queue
-        nextSongIndex = getRandomSongIndex(currentSongIndex);
+        changeNextSong();
 
-        Song theSong = this.songs.get(currentSongIndex);
-        long theSongId = theSong.getID();
 
-        Log.d(TAG, "song="+theSong.getTitle()+" id="+ theSongId);
+
+        long theSongId = currentSong.getID();
+
+        Log.d(TAG, "song="+currentSong.getTitle()+" id="+ theSongId);
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, theSongId);
         try{

@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
@@ -30,6 +32,10 @@ public class PlayAllActivivy extends Activity {
     private TextView tvNowPlaying;
     private TextView tvPlayingNext;
 
+    private ListView lvPlayQueue;
+    private ArrayList<Song> playQueue;
+    private SongAdapter playQueueAdapter;
+
     private SongPlayingReceiver songPlayingReceiver;
     // When the service starts playing a song it will broadcast the title
     private class SongPlayingReceiver extends BroadcastReceiver {
@@ -39,14 +45,21 @@ public class PlayAllActivivy extends Activity {
                 String songTitle = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_TITLE);
                 String songArtist = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_ARTIST);
                 updateNowPlaying(songArtist, songTitle);
-
-                if (serviceReference != null) {
-                    Song nextPlayingSong = serviceReference.getNextSong();
-                    if (nextPlayingSong != null) {
-                        updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
-                    }
-                }
+                updatePlayQueue();
             }
+        }
+    }
+
+    private void updatePlayQueue() {
+        if (serviceReference != null) {
+            //Song nextPlayingSong = serviceReference.getNextSong();
+            ArrayList<Song> newPlayQueue = serviceReference.getPlayQueue();
+            playQueue.clear();
+            playQueue.addAll(newPlayQueue);
+            //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
+            //playQueue.add(nextPlayingSong);
+            playQueueAdapter.notifyDataSetChanged();
+
         }
     }
 
@@ -56,12 +69,7 @@ public class PlayAllActivivy extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED)) {
-                if (serviceReference != null) {
-                    Song nextPlayingSong = serviceReference.getNextSong();
-                    if (nextPlayingSong != null) {
-                        updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
-                    }
-                }
+                updatePlayQueue();
             }
         }
     }
@@ -105,9 +113,12 @@ public class PlayAllActivivy extends Activity {
             Song currentSong = serviceReference.getCurrentSong();
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
-            Song nextPlayingSong = serviceReference.getNextSong();
-            if (nextPlayingSong != null)
-                updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
+            ArrayList <Song> newPlayQueue = serviceReference.getPlayQueue();
+            playQueue.clear();
+            playQueue.addAll(newPlayQueue);
+            //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
+            //playQueue.add(nextPlayingSong);
+            playQueueAdapter.notifyDataSetChanged();
         }
         /* restore the paused state (see onPause)
         if(paused){
@@ -124,6 +135,13 @@ public class PlayAllActivivy extends Activity {
 
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
         tvPlayingNext = (TextView) findViewById(R.id.tvPlayingNext);
+
+        lvPlayQueue = (ListView) findViewById(R.id.lvPlayQueue);
+        playQueue = new ArrayList<>();
+        playQueueAdapter = new SongAdapter(this, playQueue);
+
+        lvPlayQueue.setAdapter(playQueueAdapter);
+
 
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         startService(playIntent);
