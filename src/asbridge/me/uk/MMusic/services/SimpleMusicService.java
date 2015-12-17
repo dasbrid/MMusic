@@ -45,6 +45,20 @@ public class SimpleMusicService extends Service
     private static final int PLAYING = 2;
     private int currentState = STOPPED;
 
+
+    private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    // broadcast receiver to kill audio when headphones unplugged
+    private NoisyAudioStreamReceiver becomingNoisyListener;
+    private class NoisyAudioStreamReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                Log.d(TAG, "NoisyAudioStreamReceiver:OnReceive"+intent.getAction());
+                pausePlayback();
+            }
+        }
+    }
+
     // broadcast receeiver receives actions from notification
     private MusicControlListener musicControlListener;
     public class MusicControlListener extends BroadcastReceiver {
@@ -52,13 +66,10 @@ public class SimpleMusicService extends Service
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
             if (intent.getAction().equals(AppConstants.INTENT_ACTION_STOP_PLAYBACK)) {
-                Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
                 stopPlayback();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG)) {
-                Log.d(TAG, "SwitchButtonListener:OnReceive:NEXT_EVENT");
                 playRandomSong();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK)) {
-                Log.d(TAG, "SwitchButtonListener:OnReceive:PAUSEORRESUME_PLAYBACK_EVENT");
                 pauseOrResumePlayack();
             }
         }
@@ -67,6 +78,7 @@ public class SimpleMusicService extends Service
     @Override
     public void onDestroy() {
         if (musicControlListener != null) unregisterReceiver(musicControlListener);
+        if (becomingNoisyListener != null) unregisterReceiver(becomingNoisyListener);
         super.onDestroy();
     }
     // called from activity to set the songs to play
@@ -141,6 +153,8 @@ public class SimpleMusicService extends Service
         registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG));
         registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_STOP_PLAYBACK));
         registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK));
+        if (becomingNoisyListener == null) becomingNoisyListener = new NoisyAudioStreamReceiver();
+        registerReceiver(becomingNoisyListener, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
     }
 
     private void initialiseMediaPlayer() {
@@ -164,7 +178,7 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService onPrepared");
         // start playback
         mp.start();
-        currentState = PLAYING; // stopped = false;
+        currentState = PLAYING;
         Song currentSong = songs.get(currentSongIndex);
 
         // Broadcast the fact that a new song is now playing
