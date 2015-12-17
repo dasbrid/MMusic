@@ -11,7 +11,6 @@ import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.Content;
@@ -182,7 +181,7 @@ public class PlayAllActivivy extends Activity {
 
     private  void changeNextSong() {
         if (isBound)
-            serviceReference.changeNextSong();
+            serviceReference.changePlayQueue();
     }
 
     public void btnNextClicked(View v) {

@@ -11,7 +11,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
-import android.widget.MediaController;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -38,9 +37,6 @@ public class SimpleMusicService extends Service
     //song list
     private ArrayList<Song> songs = null;
     private Random rand;
-
-//    private int currentSongIndex = -1;
-//    private int nextSongIndex=-1;
 
     private ArrayList<Song> playQueue;
     private Song currentSong;
@@ -97,15 +93,7 @@ public class SimpleMusicService extends Service
     public Song getCurrentSong() {
         return currentSong;
     }
-/*
-    // returns the next song to play
-    // in future this can be a list of n songs
-    public Song getNextSong() {
-        if (songs == null || songs.size() == 0 || nextSongIndex == -1)
-            return null;
-        return songs.get(nextSongIndex);
-    }
-*/
+
     public ArrayList<Song> getPlayQueue() {
         return playQueue;
     }
@@ -269,10 +257,12 @@ public class SimpleMusicService extends Service
         return songIndex;
     }
 
-    public void changeNextSong() {
-        int nextSongIndex = getRandomSongIndex(-1);
-        playQueue.clear();
-        playQueue.add(songs.get(nextSongIndex));
+    public void changePlayQueue() {
+        int i = playQueue.size();
+        for (; i< AppConstants.PLAY_QUEUE_SIZE ; i++) {
+            int nextSongIndex = getRandomSongIndex(-1);
+            playQueue.add(songs.get(nextSongIndex));
+        }
         // broadcast that the play queue has changed
         // can be used by the activity to update its textview
         Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
@@ -289,15 +279,18 @@ public class SimpleMusicService extends Service
             return;
         }
 
-        if (playQueue.size() == 0) {
+
+
+        if (playQueue.size() < AppConstants.PLAY_QUEUE_SIZE) {
             // nothing in the queue, so initialise
-            changeNextSong();
+            changePlayQueue();
         }
         // get the next song to play (from the queue)
-        currentSong = playQueue.get(0);
+        currentSong = playQueue.get(AppConstants.PLAY_QUEUE_SIZE-1);
+        playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
 
         // add a song into the queue
-        changeNextSong();
+        changePlayQueue();
 
 
 
