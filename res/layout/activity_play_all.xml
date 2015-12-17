@@ -4,27 +4,28 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <Button
+    <ImageButton
             android:id="@+id/btnPlayPause"
-            android:text="Play/Pause"
+            android:src="@drawable/playpause"
             android:onClick="btnPlayPauseClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    <Button
+    <ImageButton
             android:id="@+id/btnNext"
-            android:onClick="btnNextClicked"
+            android:src="@drawable/next"
             android:text="Next Song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    <Button
+    <ImageButton
             android:id="@+id/btnStop"
-            android:text="Stop"
+            android:src="@drawable/stop"
             android:onClick="btnStopClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     <Button
             android:id="@+id/btnExit"
             android:text="Exit"
+            android:src="@drawable/end"
             android:onClick="btnExitClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
