@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.Content;
@@ -22,10 +23,6 @@ import java.util.ArrayList;
 public class PlayAllActivivy extends Activity {
 
     private String TAG = "DAVE:PlayAllActivivy";
-    private boolean musicBound;
-    private ArrayList<Song> songList;
-    private SimpleMusicService musicSrv;
-
     ///////
     private boolean isBound;
     private SimpleMusicService serviceReference;
@@ -103,18 +100,6 @@ public class PlayAllActivivy extends Activity {
         doBindService();
     }
 
-    /* if we include this then closing the activity unbinds and stops the service ...
-    ... not what we want
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-        Log.d(TAG, "unBindService");
-        Intent bindIntent = new Intent(this, SimpleMusicService.class);
-        unbindService(myConnection);
-        isBound = false;
-    }
-*/
     // Don't stop the playback when the backbutton is pressed
     @Override
     public void onBackPressed() {
@@ -137,13 +122,12 @@ public class PlayAllActivivy extends Activity {
 
     public void btnNextClicked(View v) {
         Log.d(TAG, "btnNextClicked");
-        playSong();
+        playNextSong();
     }
 
-    public void playSong() {
+    public void playNextSong() {
         if (isBound)
-            serviceReference.playSong();
-
+            serviceReference.playRandomSong();
     }
 
     public void btnStopClicked(View v) {
@@ -153,17 +137,27 @@ public class PlayAllActivivy extends Activity {
 
     private void stopPlayback() {
         if (isBound)
-            serviceReference.stopPlay();
+            serviceReference.stopPlayback();
     }
 
-    public void btnPauseClicked(View v) {
+    public void btnPlayPauseClicked(View v) {
         Log.d(TAG, "btnPauseClicked");
-        pausePlayback();
+        pauseOrResumePlayack();
     }
 
-    private void pausePlayback() {
+    private void pauseOrResumePlayack() {
         if (isBound)
-            serviceReference.pausePlay();
+            serviceReference.pauseOrResumePlayack();
+
+    }
+
+    public void btnExitClicked(View v) {
+        Log.d(TAG, "btnExitClicked");
+        // TODO: cancel notification
+        Intent playIntent = new Intent(this, SimpleMusicService.class);
+        stopService(playIntent);
+        serviceReference=null;
+        System.exit(0);
     }
 
     //connect to the service

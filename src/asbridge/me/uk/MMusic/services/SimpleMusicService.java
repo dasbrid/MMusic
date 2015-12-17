@@ -39,7 +39,11 @@ public class SimpleMusicService extends Service
 
     private int currentSongIndex = -1;
     private int currentPos = 0;
-    private boolean stopped = true;
+
+    private static final int STOPPED = 0;
+    private static final int PAUSED = 1;
+    private static final int PLAYING = 2;
+    private int currentState = STOPPED;
 
     // broadcast receeiver receives actions from notification
     private MusicControlListener musicControlListener;
@@ -47,12 +51,15 @@ public class SimpleMusicService extends Service
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
-            if (intent.getAction().equals(AppConstants.INTENT_ACTION_STOP)) {
+            if (intent.getAction().equals(AppConstants.INTENT_ACTION_STOP_PLAYBACK)) {
                 Log.d(TAG, "SwitchButtonListener:OnReceive:STOP_EVENT");
-                stopPlay();
-            } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_NEXT)) {
+                stopPlayback();
+            } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG)) {
                 Log.d(TAG, "SwitchButtonListener:OnReceive:NEXT_EVENT");
-                playSong();
+                playRandomSong();
+            } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK)) {
+                Log.d(TAG, "SwitchButtonListener:OnReceive:PAUSEORRESUME_PLAYBACK_EVENT");
+                pauseOrResumePlayack();
             }
         }
     }
@@ -131,8 +138,9 @@ public class SimpleMusicService extends Service
         initialiseMediaPlayer();
         // set up the listener for the broadcast from the notification (play next and stop buttons)
         if (musicControlListener == null) musicControlListener = new MusicControlListener();
-        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_NEXT));
-        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_STOP));
+        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG));
+        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_STOP_PLAYBACK));
+        registerReceiver(musicControlListener, new IntentFilter(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK));
     }
 
     private void initialiseMediaPlayer() {
@@ -156,7 +164,7 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService onPrepared");
         // start playback
         mp.start();
-        stopped = false;
+        currentState = PLAYING; // stopped = false;
         Song currentSong = songs.get(currentSongIndex);
 
         // Broadcast the fact that a new song is now playing
@@ -175,15 +183,18 @@ public class SimpleMusicService extends Service
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //this is the intent that is supposed to be called when the button is clicked
-        Intent stopIntent = new Intent(AppConstants.INTENT_ACTION_STOP);
+        Intent stopIntent = new Intent(AppConstants.INTENT_ACTION_STOP_PLAYBACK);
         PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
-        Intent nextIntent = new Intent(AppConstants.INTENT_ACTION_NEXT);
-        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
+        Intent playnextIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG);
+        PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, playnextIntent, 0);
+        Intent pauseorresumePlaybackIntent = new Intent(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK);
+        PendingIntent pendingpauseorresumeIntent = PendingIntent.getBroadcast(this, 0, pauseorresumePlaybackIntent, 0);
 
 
         Notification.Builder builder = new Notification.Builder(this);
 
         builder.setContentIntent(pendInt)
+                .addAction(R.drawable.ic_launcher, "Pause/Play", pendingpauseorresumeIntent)
                 .addAction(R.drawable.ic_launcher, "Stop", pendingStopIntent)
                 .addAction(R.drawable.ic_launcher, "Next", pendingNextIntent)
                 .setSmallIcon(R.drawable.play)
@@ -197,26 +208,28 @@ public class SimpleMusicService extends Service
         startForeground(NOTIFY_ID, not);
     }
 
+    // callback from media player when song finishes
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d(TAG, "SimpleMusicService onCompletion");
         if(player.getCurrentPosition() > 0){
             mp.reset();
-            playNext();
+            playRandomSong();
         }
     }
 
     // can be called from outside the service (e.g. from next button in the activity)
     public void playSong() {
         Log.d(TAG, "SimpleMusicService playNextSong");
-        if (stopped)
-            playNext();
-        else
-            resumePlaying();
+        if (currentState == STOPPED) { // if we are not playing anything, then play a random song
+            playRandomSong();
+        } else {
+            resumePlaying(); // otherwise resume playing the current song
+        }
     }
 
     // play button pressed in the activity start playing the song
-    private void playNext() {
+    public void playRandomSong() {
         Log.d(TAG, "SimpleMusicService playNext");
         player.reset();
         //get a song
@@ -247,24 +260,46 @@ public class SimpleMusicService extends Service
     }
 
     // stop button pressed in activity pause the player
-    public void stopPlay() {
-        Log.d(TAG, "SimpleMusicService stopPlay");
+    public void stopPlayback() {
+        Log.d(TAG, "SimpleMusicService stopPlayback");
         //TODO: Cancel notification
         player.reset();
-        stopped = true;
+        currentState = STOPPED;
     }
 
-    // stop button pressed in activity pause the player
-    public void pausePlay() {
-        Log.d(TAG, "SimpleMusicService pausePlay");
-        // TODO: set pause flag and resume afterwards
-        player.pause();
-        currentPos = player.getCurrentPosition();
+    // pause or resume (depending on the current state)
+    public void pauseOrResumePlayack() {
+        Log.d(TAG, "SimpleMusicService pauseOrResumePlayack");
+
+        switch (currentState) {
+            case (STOPPED):
+                playRandomSong();
+                break;
+            case (PLAYING):
+                pausePlayback();
+                break;
+            case (PAUSED):
+                resumePlaying();
+                break;
+        }
+    }
+
+    private void pausePlayback() {
+        Log.d(TAG, "pausePlayback");
+        if (currentState == PLAYING) {
+            player.pause();
+            currentPos = player.getCurrentPosition();
+            currentState = PAUSED;
+        }
     }
 
     public void resumePlaying() {
-        player.seekTo(currentPos);
-        player.start();
+        Log.d(TAG, "resumePlaying");
+        if (currentState == PAUSED) {
+            player.seekTo(currentPos);
+            player.start();
+            currentState = PLAYING;
+        }
     }
 
 }

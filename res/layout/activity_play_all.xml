@@ -5,15 +5,15 @@
               android:layout_height="match_parent">
 
     <Button
-            android:id="@+id/btnPlay"
-            android:onClick="btnNextClicked"
-            android:text="Next"
+            android:id="@+id/btnPlayPause"
+            android:text="Play/Pause"
+            android:onClick="btnPlayPauseClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     <Button
-            android:id="@+id/btnPause"
-            android:text="Pause"
-            android:onClick="btnPauseClicked"
+            android:id="@+id/btnNext"
+            android:onClick="btnNextClicked"
+            android:text="Next Song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     <Button
@@ -22,10 +22,15 @@
             android:onClick="btnStopClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+    <Button
+            android:id="@+id/btnExit"
+            android:text="Exit"
+            android:onClick="btnExitClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     <TextView
             android:id="@+id/tvPlaying"
             android:text="Now Playing"
-            android:onClick="btnStopClicked"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
 

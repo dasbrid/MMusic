@@ -5,8 +5,9 @@ package asbridge.me.uk.MMusic.utils;
  */
 public class AppConstants {
 
-    public static final String INTENT_ACTION_NEXT = "asbridge.me.uk.MMusic.ACTION_NEXT";
-    public static final String INTENT_ACTION_STOP = "asbridge.me.uk.MMusic.ACTION_STOP";
+    public static final String INTENT_ACTION_PLAY_NEXT_SONG = "asbridge.me.uk.MMusic.ACTION_PLAY_NEXT_SONG";
+    public static final String INTENT_ACTION_STOP_PLAYBACK = "asbridge.me.uk.MMusic.ACTION_STOP_PLAYBACK";
+    public static final String INTENT_ACTION_PAUSEORRESUME_PLAYBACK = "asbridge.me.uk.MMusic.ACTION_PAUSEORRESUME_PLAYBACK";
 
     public static final String INTENT_ACTION_SONG_PLAYING = "asbridge.me.uk.MMusic.SONG_PLAYING";
     public static final String INTENT_EXTRA_SONG_TITLE = "asbridge.me.uk.MMusic.SONG_TITLE";
