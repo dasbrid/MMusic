@@ -16,8 +16,7 @@ import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by David on 13/12/2015.
@@ -38,7 +37,8 @@ public class SimpleMusicService extends Service
     private ArrayList<Song> songs = null;
     private Random rand;
 
-    private ArrayList<Song> playQueue;
+//    private ArrayList<Song> playQueue;
+    private Queue<Song> playQueue;
     private Song currentSong;
 
     private int currentPos = 0;
@@ -95,7 +95,7 @@ public class SimpleMusicService extends Service
     }
 
     public ArrayList<Song> getPlayQueue() {
-        return playQueue;
+        return new ArrayList<Song> (playQueue);
     }
 
     /**
@@ -162,7 +162,7 @@ public class SimpleMusicService extends Service
         registerReceiver(becomingNoisyListener, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
         currentSong = null;
-        playQueue = new ArrayList<>();
+        playQueue = new LinkedList<>(); //ArrayList<>();
     }
 
     private void initialiseMediaPlayer() {
@@ -279,20 +279,16 @@ public class SimpleMusicService extends Service
             return;
         }
 
-
-
         if (playQueue.size() < AppConstants.PLAY_QUEUE_SIZE) {
             // nothing in the queue, so initialise
             changePlayQueue();
         }
         // get the next song to play (from the queue)
-        currentSong = playQueue.get(AppConstants.PLAY_QUEUE_SIZE-1);
-        playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
+        currentSong = playQueue.remove(); //get(AppConstants.PLAY_QUEUE_SIZE-1);
+        //playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
 
         // add a song into the queue
         changePlayQueue();
-
-
 
         long theSongId = currentSong.getID();
 
@@ -301,9 +297,11 @@ public class SimpleMusicService extends Service
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, theSongId);
         try{
             player.setDataSource(getApplicationContext(), trackUri);
+            Log.d(TAG, "song="+currentSong.getTitle()+" id="+ trackUri);
+
         }
         catch(Exception e){
-            Log.e("MUSIC SERVICE", "Error setting data source", e);
+            Log.d("MUSIC SERVICE", "Error setting data source", e);
         }
         // prepare the player asynchronously and then the callback onPrepared will be called
         player.prepareAsync();
