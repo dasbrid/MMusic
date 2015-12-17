@@ -28,6 +28,7 @@ public class PlayAllActivivy extends Activity {
     private SimpleMusicService serviceReference;
 
     private TextView tvNowPlaying;
+    private TextView tvPlayingNext;
 
     private SongPlayingReceiver songPlayingReceiver;
     // When the service starts playing a song it will broadcast the title
@@ -38,6 +39,29 @@ public class PlayAllActivivy extends Activity {
                 String songTitle = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_TITLE);
                 String songArtist = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_ARTIST);
                 updateNowPlaying(songArtist, songTitle);
+
+                if (serviceReference != null) {
+                    Song nextPlayingSong = serviceReference.getNextSong();
+                    if (nextPlayingSong != null) {
+                        updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
+                    }
+                }
+            }
+        }
+    }
+
+    private NextSongChangedReceiver nextSongChangedReceiver;
+    // When the service starts playing a song it will broadcast the title
+    private class NextSongChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED)) {
+                if (serviceReference != null) {
+                    Song nextPlayingSong = serviceReference.getNextSong();
+                    if (nextPlayingSong != null) {
+                        updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
+                    }
+                }
             }
         }
     }
@@ -46,12 +70,17 @@ public class PlayAllActivivy extends Activity {
         tvNowPlaying.setText(songArtist + "-" + songTitle);
     }
 
+    private void updatePlayingNext(String songArtist, String songTitle) {
+        tvPlayingNext.setText(songArtist + "-" + songTitle);
+    }
+
     // used to save paused state so it can be resumed
     @Override
     protected void onPause(){
         super.onPause();
         Log.d(TAG, "onPause");
         if (songPlayingReceiver != null) unregisterReceiver(songPlayingReceiver);
+        if (nextSongChangedReceiver != null) unregisterReceiver(nextSongChangedReceiver);
 
         // paused=true; // TODO: used to remember the paused state (see onResume)
     }
@@ -68,10 +97,17 @@ public class PlayAllActivivy extends Activity {
         IntentFilter intentFilter = new IntentFilter(AppConstants.INTENT_ACTION_SONG_PLAYING);
         registerReceiver(songPlayingReceiver, intentFilter);
 
+        // set up the listener for broadcast from the service for play queue changes
+        if (nextSongChangedReceiver == null) nextSongChangedReceiver = new NextSongChangedReceiver();
+        registerReceiver(nextSongChangedReceiver, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED));
+
         if (serviceReference != null) {
             Song currentSong = serviceReference.getCurrentSong();
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
+            Song nextPlayingSong = serviceReference.getNextSong();
+            if (nextPlayingSong != null)
+                updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
         }
         /* restore the paused state (see onPause)
         if(paused){
@@ -87,6 +123,7 @@ public class PlayAllActivivy extends Activity {
         setContentView(R.layout.activity_play_all);
 
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
+        tvPlayingNext = (TextView) findViewById(R.id.tvPlayingNext);
 
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         startService(playIntent);
@@ -118,6 +155,16 @@ public class PlayAllActivivy extends Activity {
             stopService(intentStopService);
             unbindService(myConnection); ///???
         }
+    }
+
+    public void btnChangeNextClicked(View v) {
+        Log.d(TAG, "btnChangeClicked");
+        changeNextSong();
+    }
+
+    private  void changeNextSong() {
+        if (isBound)
+            serviceReference.changeNextSong();
     }
 
     public void btnNextClicked(View v) {

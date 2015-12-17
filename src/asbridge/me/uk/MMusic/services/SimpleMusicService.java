@@ -40,6 +40,8 @@ public class SimpleMusicService extends Service
     private Random rand;
 
     private int currentSongIndex = -1;
+    private int nextSongIndex=-1;
+
     private int currentPos = 0;
 
     private static final int STOPPED = 0;
@@ -93,6 +95,14 @@ public class SimpleMusicService extends Service
         if (songs == null || songs.size() == 0 || currentSongIndex == -1)
             return null;
         return songs.get(currentSongIndex);
+    }
+
+    // returns the next song to play
+    // in future this can be a list of n songs
+    public Song getNextSong() {
+        if (songs == null || songs.size() == 0 || nextSongIndex == -1)
+            return null;
+        return songs.get(nextSongIndex);
     }
 
     /**
@@ -168,9 +178,7 @@ public class SimpleMusicService extends Service
         // set callback from prepareAsync
         player.setOnPreparedListener(this);
         player.setOnCompletionListener(this);
-        /*
         player.setOnErrorListener(this);
-        */
     }
 
     // required by interface MediaPlayer.OnPreparedListener
@@ -244,6 +252,24 @@ public class SimpleMusicService extends Service
         }
     }
 
+    // choose a random song (index) from the list
+    // should NOT be the same as currentIndex
+    private int getRandomSongIndex(int currentIndex) {
+        int songIndex = currentIndex;
+        while(songIndex == currentIndex){
+            songIndex=rand.nextInt(songs.size());
+        }
+        return songIndex;
+    }
+
+    public void changeNextSong() {
+        nextSongIndex = getRandomSongIndex(nextSongIndex);
+        // broadcast that the play queue has changed
+        // can be used by the activity to update its textview
+        Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
+        sendBroadcast(changeNextSongIntent);
+    }
+
     // play button pressed in the activity start playing the song
     public void playRandomSong() {
         Log.d(TAG, "SimpleMusicService playNext");
@@ -254,11 +280,16 @@ public class SimpleMusicService extends Service
             return;
         }
 
-        int newSongIndex = currentSongIndex;
-        while(newSongIndex == currentSongIndex){
-            newSongIndex=rand.nextInt(songs.size());
+        if (nextSongIndex == -1) {
+            // nothing in the queue, so initialise
+            nextSongIndex = getRandomSongIndex(-1);
         }
-        currentSongIndex = newSongIndex;
+        // get the next song to play (from the queue)
+        currentSongIndex = nextSongIndex;
+
+        // add a song into the queue
+        nextSongIndex = getRandomSongIndex(currentSongIndex);
+
         Song theSong = this.songs.get(currentSongIndex);
         long theSongId = theSong.getID();
 
