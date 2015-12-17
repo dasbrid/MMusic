@@ -13,7 +13,7 @@
     <ImageButton
             android:id="@+id/btnNext"
             android:src="@drawable/next"
-            android:text="Next Song"
+            android:onClick="btnNextClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     <ImageButton
@@ -22,9 +22,8 @@
             android:onClick="btnStopClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    <Button
+    <ImageButton
             android:id="@+id/btnExit"
-            android:text="Exit"
             android:src="@drawable/end"
             android:onClick="btnExitClicked"
             android:layout_width="wrap_content"
