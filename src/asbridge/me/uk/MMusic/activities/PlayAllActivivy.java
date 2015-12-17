@@ -180,8 +180,10 @@ public class PlayAllActivivy extends Activity {
 
     private  void removeNextSong() {
         if (isBound) {
-            long songId = playQueue.get(0).getID();
-            serviceReference.removeSongFromPlayQueue(songId);
+            if (playQueue != null && playQueue.size() > 0) {
+                long songId = playQueue.get(0).getID();
+                serviceReference.removeSongFromPlayQueue(songId);
+            }
         }
     }
 
