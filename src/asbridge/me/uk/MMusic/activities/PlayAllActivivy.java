@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
 import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -38,7 +39,7 @@ public class PlayAllActivivy extends Activity {
 
     private ListView lvPlayQueue;
     private ArrayList<Song> playQueue;
-    private SongAdapter playQueueAdapter;
+    private PlayQueueAdapter playQueueAdapter;
 
     private RetainFragment retainFragment;
 
@@ -157,7 +158,7 @@ public class PlayAllActivivy extends Activity {
 
         lvPlayQueue = (ListView) findViewById(R.id.lvPlayQueue);
         playQueue = new ArrayList<>();
-        playQueueAdapter = new SongAdapter(this, playQueue);
+        playQueueAdapter = new PlayQueueAdapter(this, playQueue);
 
         lvPlayQueue.setAdapter(playQueueAdapter);
 
@@ -257,5 +258,26 @@ public class PlayAllActivivy extends Activity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private  void removeSongbyID(long songId) {
+        if (retainFragment.isBound) {
+            if (playQueue != null && playQueue.size() > 0) {
+                retainFragment.serviceReference.removeSongFromPlayQueue(songId);
+            }
+        }
+    }
+
+    // when user clicks on song in the list
+    public void btnRemoveSongClicked(View view){
+        Log.d(TAG, "picked view "+ (view==null?"null":"not null"));
+        if (view!=null) {
+            Object viewTag = view.getTag();
+            Log.d(TAG, "picked viewTag " + (viewTag == null ? "null" : viewTag.toString()));
+            if (viewTag != null) {
+                long pickedSongID = Long.parseLong(view.getTag().toString());
+                removeSongbyID(pickedSongID);
+            }
+        }
     }
 }
