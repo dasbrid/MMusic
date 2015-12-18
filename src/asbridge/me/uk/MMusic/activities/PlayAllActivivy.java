@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.activities;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -10,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.SongAdapter;
+import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -25,8 +27,8 @@ public class PlayAllActivivy extends Activity {
 
     private String TAG = "DAVE:PlayAllActivivy";
     ///////
-    private boolean isBound;
-    private SimpleMusicService serviceReference;
+//    private boolean isBound;
+//    private SimpleMusicService serviceReference;
 
     private TextView tvNowPlaying;
     private TextView tvPlayingNext;
@@ -34,6 +36,8 @@ public class PlayAllActivivy extends Activity {
     private ListView lvPlayQueue;
     private ArrayList<Song> playQueue;
     private SongAdapter playQueueAdapter;
+
+    private RetainFragment retainFragment;
 
     private SongPlayingReceiver songPlayingReceiver;
     // When the service starts playing a song it will broadcast the title
@@ -50,9 +54,9 @@ public class PlayAllActivivy extends Activity {
     }
 
     private void updatePlayQueue() {
-        if (serviceReference != null) {
+        if (retainFragment.serviceReference != null) {
             //Song nextPlayingSong = serviceReference.getNextSong();
-            ArrayList<Song> newPlayQueue = serviceReference.getPlayQueue();
+            ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             playQueue.clear();
             playQueue.addAll(newPlayQueue);
             //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
@@ -108,11 +112,11 @@ public class PlayAllActivivy extends Activity {
         if (nextSongChangedReceiver == null) nextSongChangedReceiver = new NextSongChangedReceiver();
         registerReceiver(nextSongChangedReceiver, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED));
 
-        if (serviceReference != null) {
-            Song currentSong = serviceReference.getCurrentSong();
+        if (retainFragment.serviceReference != null) {
+            Song currentSong = retainFragment.serviceReference.getCurrentSong();
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
-            ArrayList <Song> newPlayQueue = serviceReference.getPlayQueue();
+            ArrayList <Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             playQueue.clear();
             playQueue.addAll(newPlayQueue);
             //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
@@ -126,11 +130,25 @@ public class PlayAllActivivy extends Activity {
         */
     }
 
+
+    private static final String TAG_RETAIN_FRAGMENT = "retain_fragment";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_play_all);
+
+        FragmentManager fm = getFragmentManager();
+        retainFragment = (RetainFragment) fm.findFragmentByTag(TAG_RETAIN_FRAGMENT);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (retainFragment == null) {
+            Log.d(TAG, "creating and adding retain Fragment");
+            retainFragment = new RetainFragment();
+            fm.beginTransaction().add(retainFragment, TAG_RETAIN_FRAGMENT).commit();
+        }
 
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
 
@@ -140,17 +158,17 @@ public class PlayAllActivivy extends Activity {
 
         lvPlayQueue.setAdapter(playQueueAdapter);
 
-
+        Log.d(TAG, "starting the service");
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         startService(playIntent);
     }
 
-    //start the Service instance when the Activity instance starts
+    // bind to the Service instance when the Activity instance starts
     @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
-        doBindService();
+        retainFragment.doBindService();
     }
 
     // Don't stop the playback when the backbutton is pressed
@@ -169,7 +187,7 @@ public class PlayAllActivivy extends Activity {
             // genuinely finishing, not orientation change etc
             Intent intentStopService = new Intent (this, SimpleMusicService.class);
             stopService(intentStopService);
-            unbindService(myConnection); ///???
+            retainFragment.doUnbindService();
         }
     }
 
@@ -179,10 +197,10 @@ public class PlayAllActivivy extends Activity {
     }
 
     private  void removeNextSong() {
-        if (isBound) {
+        if (retainFragment.isBound) {
             if (playQueue != null && playQueue.size() > 0) {
                 long songId = playQueue.get(0).getID();
-                serviceReference.removeSongFromPlayQueue(songId);
+                retainFragment.serviceReference.removeSongFromPlayQueue(songId);
             }
         }
     }
@@ -193,8 +211,8 @@ public class PlayAllActivivy extends Activity {
     }
 
     public void playNextSong() {
-        if (isBound)
-            serviceReference.playRandomSong();
+        if (retainFragment.isBound)
+            retainFragment.serviceReference.playRandomSong();
     }
 
     public void btnStopClicked(View v) {
@@ -203,8 +221,8 @@ public class PlayAllActivivy extends Activity {
     }
 
     private void stopPlayback() {
-        if (isBound)
-            serviceReference.stopPlayback();
+        if (retainFragment.isBound)
+            retainFragment.serviceReference.stopPlayback();
     }
 
     public void btnPlayPauseClicked(View v) {
@@ -213,8 +231,8 @@ public class PlayAllActivivy extends Activity {
     }
 
     private void pauseOrResumePlayack() {
-        if (isBound)
-            serviceReference.pauseOrResumePlayack();
+        if (retainFragment.isBound)
+            retainFragment.serviceReference.pauseOrResumePlayack();
 
     }
 
@@ -223,10 +241,10 @@ public class PlayAllActivivy extends Activity {
         // TODO: cancel notification
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         stopService(playIntent);
-        serviceReference=null;
+        retainFragment.serviceReference=null;
         System.exit(0);
     }
-
+/*
     //connect to the service
     private ServiceConnection myConnection = new ServiceConnection(){
 
@@ -236,12 +254,11 @@ public class PlayAllActivivy extends Activity {
             SimpleMusicService.SimpleMusicBinder binder = (SimpleMusicService.SimpleMusicBinder)service;
             //get service
             serviceReference = binder.getService();
-
+            retainFragment.setServiceReference(serviceReference);
             // set the list of songs in the service
             ArrayList<Song> songList = new ArrayList<>();
             Content.getAllSongs(getApplicationContext(), songList);
             serviceReference.setSongList(songList);
-
             isBound = true;
         }
 
@@ -252,37 +269,5 @@ public class PlayAllActivivy extends Activity {
             isBound = false;
         }
     };
-
-    private void doBindService() {
-        Log.d(TAG, "BindService");
-        if (!isBound) {
-            Log.d(TAG, "binding");
-            Intent bindIntent = new Intent(this, SimpleMusicService.class);
-            isBound = bindService(bindIntent, myConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
-/*
-    //connect to the service
-    private ServiceConnection musicConnection = new ServiceConnection(){
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected");
-            SimpleMusicService.SimpleMusicBinder binder = (SimpleMusicService.SimpleMusicBinder)service;
-            //get service
-            musicSrv = binder.getService();
-            //pass list
-            //musicSrv.setList(songList);
-
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected");
-            musicBound = false;
-        }
-    };
-
-    */
+*/
 }

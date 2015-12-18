@@ -1,21 +1,18 @@
 package asbridge.me.uk.MMusic.activities;
 
-import android.app.Activity;
 import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.MusicTabsAdapter;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.fragments.ArtistFragment;
-import asbridge.me.uk.MMusic.fragments.MusicPlayerFragment;
+import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
+import asbridge.me.uk.MMusic.GUIfragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.utils.Content;
 

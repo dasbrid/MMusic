@@ -7,10 +7,9 @@ package asbridge.me.uk.MMusic.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 import android.view.ViewGroup;
-import asbridge.me.uk.MMusic.fragments.ArtistFragment;
-import asbridge.me.uk.MMusic.fragments.MusicPlayerFragment;
+import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
+import asbridge.me.uk.MMusic.GUIfragments.MusicPlayerFragment;
 
 /**
  * Created by David on 02/12/2015.
