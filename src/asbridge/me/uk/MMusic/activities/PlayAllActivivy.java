@@ -6,6 +6,9 @@ import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -236,38 +239,23 @@ public class PlayAllActivivy extends Activity {
 
     }
 
-    public void btnExitClicked(View v) {
-        Log.d(TAG, "btnExitClicked");
-        // TODO: cancel notification
-        Intent playIntent = new Intent(this, SimpleMusicService.class);
-        stopService(playIntent);
-        retainFragment.serviceReference=null;
-        System.exit(0);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
     }
-/*
-    //connect to the service
-    private ServiceConnection myConnection = new ServiceConnection(){
 
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "Service Connected");
-            SimpleMusicService.SimpleMusicBinder binder = (SimpleMusicService.SimpleMusicBinder)service;
-            //get service
-            serviceReference = binder.getService();
-            retainFragment.setServiceReference(serviceReference);
-            // set the list of songs in the service
-            ArrayList<Song> songList = new ArrayList<>();
-            Content.getAllSongs(getApplicationContext(), songList);
-            serviceReference.setSongList(songList);
-            isBound = true;
+    // handle user interaction with the menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_end:
+                Intent playIntent = new Intent(this, SimpleMusicService.class);
+                stopService(playIntent);
+                retainFragment.serviceReference=null;
+                System.exit(0);
+                break;
         }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected");
-            serviceReference = null;
-            isBound = false;
-        }
-    };
-*/
+        return super.onOptionsItemSelected(item);
+    }
 }

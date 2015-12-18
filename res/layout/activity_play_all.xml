@@ -39,14 +39,6 @@
             android:layout_toRightOf="@id/btnStop"
 
     />
-    <ImageButton
-            android:id="@+id/btnExit"
-            android:src="@drawable/end"
-            android:onClick="btnExitClicked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-    />
 </RelativeLayout>
     <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
             android:orientation="vertical"
