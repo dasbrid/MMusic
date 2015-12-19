@@ -304,6 +304,21 @@ public class SimpleMusicService extends Service
         }
     }
 
+    public void playThisSongNext(long songID) {
+        Log.d(TAG, "SimpleMusicService playThisSongNext:id="+songID);
+        for (Song s : playQueue) {
+            Log.d(TAG, "s="+s.getID());
+            if (s.getID() == songID) {
+                Log.d(TAG, "found");
+                playQueue.remove(s);
+                playQueue.add(s);
+                fillPlayQueue();
+                break;
+            }
+        }
+
+    }
+
     // play button pressed in the activity start playing the song
     public void playRandomSong() {
         Log.d(TAG, "SimpleMusicService playNext");

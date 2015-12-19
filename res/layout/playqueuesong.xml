@@ -32,4 +32,12 @@
             android:contentDescription="remove from playqueue"
             android:onClick="btnRemoveSongClicked"
             android:src="@android:drawable/ic_menu_delete" />
+    <ImageButton
+            android:id="@+id/pqbtnMoveToTop"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_gravity="right"
+            android:contentDescription="Play next"
+            android:onClick="btnMoveToTopClicked"
+            android:src="@android:drawable/ic_menu_upload" />
 </LinearLayout>

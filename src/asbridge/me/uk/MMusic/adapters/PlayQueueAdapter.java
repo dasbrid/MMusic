@@ -62,6 +62,8 @@ public class PlayQueueAdapter extends BaseAdapter {
         //set position as tag
         ImageButton btnRemoveSong = (ImageButton)songLay.findViewById(R.id.pqbtnRemoveSong);
         btnRemoveSong.setTag(Long.toString(currSong.getID()));
+        ImageButton btnMoveToTop = (ImageButton)songLay.findViewById(R.id.pqbtnMoveToTop);
+        btnMoveToTop.setTag(Long.toString(currSong.getID()));
         return songLay;
     }
 

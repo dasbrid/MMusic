@@ -194,20 +194,6 @@ public class PlayAllActivivy extends Activity {
         }
     }
 
-    public void btnRemoveNextClicked(View v) {
-        Log.d(TAG, "btnRemoveNextClicked");
-        removeNextSong();
-    }
-
-    private  void removeNextSong() {
-        if (retainFragment.isBound) {
-            if (playQueue != null && playQueue.size() > 0) {
-                long songId = playQueue.get(0).getID();
-                retainFragment.serviceReference.removeSongFromPlayQueue(songId);
-            }
-        }
-    }
-
     public void btnNextClicked(View v) {
         Log.d(TAG, "btnNextClicked");
         playNextSong();
@@ -271,6 +257,14 @@ public class PlayAllActivivy extends Activity {
         }
     }
 
+    private  void moveSongToTop(long songId) {
+        if (retainFragment.isBound) {
+            if (playQueue != null && playQueue.size() > 0) {
+                retainFragment.serviceReference.playThisSongNext(songId);
+            }
+        }
+    }
+
     // when user clicks on song in the list
     public void btnRemoveSongClicked(View view){
         Log.d(TAG, "picked view "+ (view==null?"null":"not null"));
@@ -280,6 +274,19 @@ public class PlayAllActivivy extends Activity {
             if (viewTag != null) {
                 long pickedSongID = Long.parseLong(view.getTag().toString());
                 removeSongbyID(pickedSongID);
+            }
+        }
+    }
+
+    // when user clicks on song in the list
+    public void btnMoveToTopClicked(View view){
+        Log.d(TAG, "picked view to move to top "+ (view==null?"null":"not null"));
+        if (view!=null) {
+            Object viewTag = view.getTag();
+            Log.d(TAG, "picked viewTag " + (viewTag == null ? "null" : viewTag.toString()));
+            if (viewTag != null) {
+                long pickedSongID = Long.parseLong(view.getTag().toString());
+                moveSongToTop(pickedSongID);
             }
         }
     }
