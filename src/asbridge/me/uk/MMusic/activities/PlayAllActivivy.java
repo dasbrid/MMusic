@@ -17,6 +17,7 @@ import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.RearrangeableListView;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
+import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -282,6 +283,10 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
             case R.id.action_end:
                 Intent playIntent = new Intent(this, SimpleMusicService.class);
                 stopService(playIntent);

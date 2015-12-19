@@ -15,6 +15,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
+import asbridge.me.uk.MMusic.utils.Settings;
 
 import java.util.*;
 
@@ -271,7 +272,7 @@ public class SimpleMusicService extends Service
 
     public void fillPlayQueue() {
         int i = playQueue.size();
-        for (; i< AppConstants.PLAY_QUEUE_SIZE ; i++) {
+        for (; i< Settings.getPlayQueueSize(getApplicationContext()) ; i++) {
             int nextSongIndex;
             if (shuffleOn) {
                 Log.d(TAG, "choosing random song");
@@ -329,7 +330,7 @@ public class SimpleMusicService extends Service
             return;
         }
 
-        if (playQueue.size() < AppConstants.PLAY_QUEUE_SIZE) {
+        if (playQueue.size() < Settings.getPlayQueueSize(getApplicationContext())) {
             // nothing in the queue, so initialise
             fillPlayQueue();
         }

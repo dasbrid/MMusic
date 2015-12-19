@@ -16,6 +16,7 @@ import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.GUIfragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
+import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.Content;
 import android.support.v4.app.FragmentActivity;
 
@@ -292,7 +293,7 @@ public class MusicPlayerActivity extends FragmentActivity
         switch (item.getItemId()) {
             case R.id.action_shuffle:
                 musicSrv.setShuffle();
-                break;
+                return true;
             case R.id.action_end:
                 stopService(playIntent);
                 musicSrv=null;

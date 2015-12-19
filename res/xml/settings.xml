@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+            android:key="playqueuesize"
+            android:summary="Number of songs in play queue"
+            android:title="Play queue size" />
+</PreferenceScreen>
