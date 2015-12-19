@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.*;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,12 +13,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
-import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.controls.RearrangeableListView;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.utils.AppConstants;
-import asbridge.me.uk.MMusic.utils.Content;
 
 import java.util.ArrayList;
 
@@ -27,7 +25,7 @@ import java.util.ArrayList;
  * Created by David on 13/12/2015.
  http://www.101apps.co.za/index.php/articles/binding-to-a-service-a-tutorial.html
  */
-public class PlayAllActivivy extends Activity {
+public class PlayAllActivivy extends Activity implements RearrangeableListView.RearrangeListener {
 
     private String TAG = "DAVE:PlayAllActivivy";
 
@@ -35,12 +33,57 @@ public class PlayAllActivivy extends Activity {
     private TextView tvPlayingNext;
 
     private ListView lvPlayQueue;
+    private RearrangeableListView rlvPlayQueue;
+
     private ArrayList<Song> playQueue;
     private PlayQueueAdapter playQueueAdapter;
 
     private RetainFragment retainFragment;
 
     private boolean shuffleOn = false;
+
+    // from list view rearange
+    // https://blogactivity.wordpress.com/2011/10/02/rearranging-items-in-a-listview/
+    @Override
+    public void onGrab(int index) {
+        Log.d(TAG, "onGrab "+index);
+        /*
+        getItem(index).doSomething();
+        notifyDataSetChanged();
+        */
+    }
+
+    @Override
+    public boolean onRearrangeRequested(int fromIndex, int toIndex) {
+        Log.d(TAG, "onRearrangeRequested "+fromIndex+ " to " +toIndex);
+/*
+        retainFragment.serviceReference.playThisSongNext(fromSongID);
+
+
+        if (toIndex >= 0 && toIndex < getCount()) {
+            Object item = getItem(fromIndex);
+
+            remove(item);
+            insert(item, toIndex);
+            notifyDataSetChanged();
+
+            return true;
+        }
+        */
+        return true;
+    }
+
+    @Override
+    public void onDrop() {
+        Log.d(TAG, "onDrop");
+        /*
+        doSomethingElse();
+        notifyDataSetChanged();
+        */
+    }
+
+
+
 
     private SongPlayingReceiver songPlayingReceiver;
     // When the service starts playing a song it will broadcast the title
@@ -155,11 +198,15 @@ public class PlayAllActivivy extends Activity {
 
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
 
-        lvPlayQueue = (ListView) findViewById(R.id.lvPlayQueue);
+//        lvPlayQueue = (ListView) findViewById(R.id.lvPlayQueue);
+        rlvPlayQueue = (RearrangeableListView) findViewById(R.id.lvrearangablePlayQueue);
+        rlvPlayQueue.setRearrangeListener(this);
+        //rlvPlayQueue.setRearrangeEnabled(true);
         playQueue = new ArrayList<>();
         playQueueAdapter = new PlayQueueAdapter(this, playQueue);
 
-        lvPlayQueue.setAdapter(playQueueAdapter);
+//        lvPlayQueue.setAdapter(playQueueAdapter);
+        rlvPlayQueue.setAdapter(playQueueAdapter);
 
         Log.d(TAG, "starting the service");
         Intent playIntent = new Intent(this, SimpleMusicService.class);
@@ -242,10 +289,21 @@ public class PlayAllActivivy extends Activity {
                 System.exit(0);
                 break;
             case R.id.action_shuffle:
-                shuffleOn = !shuffleOn;
+                if(shuffleOn){
+                    shuffleOn = false;
+                    //change your view and sort it by Alphabet
+                    item.setIcon(R.drawable.shuffle_off);
+                    item.setTitle("Turn Shuffle On");
+                }else{
+                    shuffleOn = true;
+                    //change your view and sort it by Alphabet
+                    item.setIcon(R.drawable.shuffle_on);
+                    item.setTitle("Turn Shuffle Off");
+                }
                 Log.d(TAG, "shuffle turned "+ (shuffleOn?"on":"off"));
                 retainFragment.serviceReference.setShuffleState(shuffleOn);
-                break;        }
+
+        }
         return super.onOptionsItemSelected(item);
     }
 

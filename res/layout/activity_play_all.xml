@@ -54,7 +54,11 @@
                 android:background="#33FF0000"
                 android:layout_height="wrap_content" >
         </ListView>
-
+        <asbridge.me.uk.MMusic.controls.RearrangeableListView
+                android:id="@+id/lvrearangablePlayQueue"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
+        </asbridge.me.uk.MMusic.controls.RearrangeableListView>
     </LinearLayout>
 
 </LinearLayout>
