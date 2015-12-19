@@ -37,7 +37,7 @@ public class SimpleMusicService extends Service
     private ArrayList<Song> songs = null;
     private Random rand;
 
-    private Queue<Song> playQueue;
+    private LinkedList<Song> playQueue;
     private Song currentSong;
 
     // current position in playing song
@@ -283,7 +283,7 @@ public class SimpleMusicService extends Service
                 if (currentPickedSong >= songs.size()) currentPickedSong = 0;
                 nextSongIndex = currentPickedSong;
             }
-            playQueue.add(songs.get(nextSongIndex));
+            playQueue.add(songs.get(nextSongIndex)); // Adds at the END
         }
         // broadcast that the play queue has changed
         // can be used by the activity to update its playqueue
@@ -311,7 +311,7 @@ public class SimpleMusicService extends Service
             if (s.getID() == songID) {
                 Log.d(TAG, "found");
                 playQueue.remove(s);
-                playQueue.add(s);
+                playQueue.add(0,s); // Add at the BEGINNING of the list
                 fillPlayQueue();
                 break;
             }
@@ -334,7 +334,7 @@ public class SimpleMusicService extends Service
             fillPlayQueue();
         }
         // get the next song to play (from the queue)
-        currentSong = playQueue.remove(); //get(AppConstants.PLAY_QUEUE_SIZE-1);
+        currentSong = playQueue.remove(); // retrieve and remove
         //playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
 
         // add a song into the queue
