@@ -20,7 +20,7 @@ public class Content {
     public static void getArtists(Context context, ArrayList<String> artistList) {
         //retrieve song info
         ContentResolver musicResolver = context.getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = {
                 MediaStore.Audio.Media.ARTIST,
@@ -33,7 +33,7 @@ public class Content {
         if(musicCursor!=null && musicCursor.moveToFirst()){
             //get columns
             int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
+                    (MediaStore.Audio.Media.ARTIST);
             //add items to list
             do {
                 String thisArtist = musicCursor.getString(artistColumn);
@@ -48,7 +48,7 @@ public class Content {
     public static void getAllSongs(Context context, ArrayList<Song> songList) {
         String selection = null;
         String[] selectionargs = null;
-        String sortOrder = MediaStore.Audio.Media.ARTIST + " ASC";
+        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
         getSongs(context, selection, selectionargs, sortOrder, songList);
     }
 
@@ -82,7 +82,7 @@ public class Content {
     public static void getSongs(Context context, String selection, String[] selectionArgs, String sortOrder, ArrayList<Song> songList) {
         //retrieve song info
         ContentResolver musicResolver = context.getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = {
                 MediaStore.Audio.Media.TITLE,
@@ -98,11 +98,11 @@ public class Content {
         if(musicCursor!=null && musicCursor.moveToFirst()){
             //get columns
             int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
+                    (MediaStore.Audio.Media.TITLE);
             int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
+                    (MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
+                    (MediaStore.Audio.Media.ARTIST);
             int albumColumn = musicCursor.getColumnIndex
                     (MediaStore.Audio.Media.ALBUM);
             //add songs to list

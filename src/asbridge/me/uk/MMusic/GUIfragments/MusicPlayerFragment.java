@@ -1,6 +1,5 @@
-package asbridge.me.uk.MMusic.fragments;
+package asbridge.me.uk.MMusic.GUIfragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,7 +14,6 @@ import asbridge.me.uk.MMusic.adapters.SongAdapter;
 import asbridge.me.uk.MMusic.classes.Song;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by David on 09/12/2015.

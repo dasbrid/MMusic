@@ -1,4 +1,4 @@
-package asbridge.me.uk.MMusic.fragments;
+package asbridge.me.uk.MMusic.GUIfragments;
 
 import android.os.Bundle;
 import android.util.Log;

@@ -13,9 +13,9 @@ import android.view.View;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.fragments.MusicPlayerFragment;
+import asbridge.me.uk.MMusic.GUIfragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.services.MusicService;
-import asbridge.me.uk.MMusic.fragments.ArtistFragment;
+import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.utils.Content;
 import android.support.v4.app.FragmentActivity;
 

@@ -40,7 +40,11 @@ public class SimpleMusicService extends Service
     private Queue<Song> playQueue;
     private Song currentSong;
 
+    // current position in playing song
     private int currentPos = 0;
+
+    private boolean shuffleOn = false;
+    private int currentPickedSong = -1;
 
     private static final int STOPPED = 0;
     private static final int PAUSED = 1;
@@ -75,6 +79,15 @@ public class SimpleMusicService extends Service
                 pauseOrResumePlayack();
             }
         }
+    }
+
+    public boolean getShuffleState() {
+        return shuffleOn;
+    }
+
+    public void setShuffleState(boolean newState) {
+        shuffleOn = newState;
+        Log.d(TAG, "shuffle set "+ (shuffleOn?"on":"off"));
     }
 
     @Override
@@ -259,7 +272,17 @@ public class SimpleMusicService extends Service
     public void fillPlayQueue() {
         int i = playQueue.size();
         for (; i< AppConstants.PLAY_QUEUE_SIZE ; i++) {
-            int nextSongIndex = getRandomSongIndex(-1);
+            int nextSongIndex;
+            if (shuffleOn) {
+                Log.d(TAG, "choosing random song");
+                nextSongIndex = getRandomSongIndex(-1);
+
+            } else {
+                Log.d(TAG, "choosing next ordered song");
+                currentPickedSong++;
+                if (currentPickedSong >= songs.size()) currentPickedSong = 0;
+                nextSongIndex = currentPickedSong;
+            }
             playQueue.add(songs.get(nextSongIndex));
         }
         // broadcast that the play queue has changed
