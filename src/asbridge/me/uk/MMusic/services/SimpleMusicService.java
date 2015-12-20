@@ -98,6 +98,8 @@ public class SimpleMusicService extends Service
     public void onDestroy() {
         if (musicControlListener != null) unregisterReceiver(musicControlListener);
         if (becomingNoisyListener != null) unregisterReceiver(becomingNoisyListener);
+        Log.d(TAG, "stored shuffle " + (shuffleOn?"on":"off"));
+        Settings.setShuffleState(getApplicationContext(), shuffleOn);
         super.onDestroy();
     }
     // called from activity to set the songs to play
@@ -161,7 +163,8 @@ public class SimpleMusicService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SimpleMusicService onStartCommand");
-        SharedPreferences mySharedPreferences = getApplicationContext().getSharedPreferences("preferences", Activity.MODE_PRIVATE);
+        shuffleOn = Settings.getShuffleState(getApplicationContext());
+        Log.d(TAG, "shuffle is " + (shuffleOn?"on":"off"));
         return START_STICKY; // Ensures that onStartCommand is called if the Service needs to restart after being killed by the system
     }
 
