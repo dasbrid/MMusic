@@ -24,6 +24,12 @@ public class RetainFragment extends Fragment {
 
     private static final String TAG = "DAVE:RetainFragment";
 
+
+    private RetainFragmentListener listener;
+    public interface RetainFragmentListener {
+        public void onMusicServiceReady();
+    }
+
     // public variables for accessing the service which are retained
     // during configuration changes
     public SimpleMusicService serviceReference;
@@ -39,6 +45,15 @@ public class RetainFragment extends Fragment {
     public void onAttach(Activity activity) {
         Log.d(TAG, "onAttach");
         super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            listener = (RetainFragmentListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement RetainFragmentListener");
+        }
     }
 
     /**
@@ -96,6 +111,7 @@ public class RetainFragment extends Fragment {
             serviceReference.setSongList(songList);
             serviceReference.fillPlayQueue();
             isBound = true;
+            listener.onMusicServiceReady();
         }
 
         @Override

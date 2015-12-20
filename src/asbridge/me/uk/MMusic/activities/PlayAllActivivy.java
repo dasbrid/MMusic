@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
@@ -26,12 +27,14 @@ import java.util.ArrayList;
  * Created by David on 13/12/2015.
  http://www.101apps.co.za/index.php/articles/binding-to-a-service-a-tutorial.html
  */
-public class PlayAllActivivy extends Activity implements RearrangeableListView.RearrangeListener {
+public class PlayAllActivivy extends Activity
+        implements RearrangeableListView.RearrangeListener
+        , RetainFragment.RetainFragmentListener
+{
 
     private String TAG = "DAVE:PlayAllActivivy";
 
     private TextView tvNowPlaying;
-    private TextView tvPlayingNext;
 
     private ListView lvPlayQueue;
     private RearrangeableListView rlvPlayQueue;
@@ -42,6 +45,13 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
     private RetainFragment retainFragment;
 
     private boolean shuffleOn = true;
+
+    @Override
+    public void onMusicServiceReady() {
+        Log.d(TAG, "Music Service Ready");
+        shuffleOn = retainFragment.serviceReference.getShuffleState();
+        //TODO: here we can enable controls
+    }
 
     // from list view rearange
     // https://blogactivity.wordpress.com/2011/10/02/rearranging-items-in-a-listview/
@@ -128,10 +138,6 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
 
     private void updateNowPlaying(String songArtist, String songTitle) {
         tvNowPlaying.setText(songArtist + "-" + songTitle);
-    }
-
-    private void updatePlayingNext(String songArtist, String songTitle) {
-        tvPlayingNext.setText(songArtist + "-" + songTitle);
     }
 
     // used to save paused state so it can be resumed
@@ -282,8 +288,19 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+
+        MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
+        if(shuffleOn){
+            shuffleMenuItem.setIcon(R.drawable.shuffle_on);
+            shuffleMenuItem.setTitle("Turn Shuffle Off");
+        }else{
+            shuffleMenuItem.setIcon(R.drawable.shuffle_off);
+            shuffleMenuItem.setTitle("Turn Shuffle On");
+        }
+
         return true;
     }
 

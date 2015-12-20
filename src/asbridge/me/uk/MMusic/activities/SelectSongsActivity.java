@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
@@ -18,11 +19,20 @@ import java.util.ArrayList;
 /**
  * Created by David on 20/12/2015.
  */
-public class SelectSongsActivity extends FragmentActivity implements ArtistFragment.OnArtistsChangedListener{
+public class SelectSongsActivity extends FragmentActivity
+        implements ArtistFragment.OnArtistsChangedListener
+        , RetainFragment.RetainFragmentListener
+{
     private static final String TAG = "SelectSongsActivity";
 
     private RetainFragment retainFragment = null;
     private ArtistFragment artistsFragment = null;
+
+    @Override
+    public void onMusicServiceReady() {
+        Toast.makeText(this, "Music Service Ready", Toast.LENGTH_SHORT).show();
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
