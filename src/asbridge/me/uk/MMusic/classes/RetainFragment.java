@@ -89,12 +89,11 @@ public class RetainFragment extends Fragment {
             //get service
             serviceReference = binder.getService();
 
-
             // set the list of songs in the service
             ArrayList<Song> songList = new ArrayList<>();
             Content.getAllSongs(getActivity().getApplicationContext(), songList);
             serviceReference.setSongList(songList);
-
+            serviceReference.fillPlayQueue();
             isBound = true;
         }
 

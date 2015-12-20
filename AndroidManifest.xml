@@ -20,6 +20,7 @@
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent-filter>
         </activity>
+        <activity android:name=".activities.SelectSongsActivity" android:label="Select songs"/>
         <service android:enabled="true" android:name=".services.MusicService" />
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
     </application>

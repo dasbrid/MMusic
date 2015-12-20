@@ -5,6 +5,8 @@ package asbridge.me.uk.MMusic.utils;
  */
 public class AppConstants {
 
+    public static final String TAG_RETAIN_FRAGMENT = "retain_fragment";
+
     public static final String INTENT_ACTION_PLAY_NEXT_SONG = "asbridge.me.uk.MMusic.ACTION_PLAY_NEXT_SONG";
     public static final String INTENT_ACTION_STOP_PLAYBACK = "asbridge.me.uk.MMusic.ACTION_STOP_PLAYBACK";
     public static final String INTENT_ACTION_PAUSEORRESUME_PLAYBACK = "asbridge.me.uk.MMusic.ACTION_PAUSEORRESUME_PLAYBACK";
@@ -14,4 +16,6 @@ public class AppConstants {
     public static final String INTENT_EXTRA_SONG_ARTIST = "asbridge.me.uk.MMusic.SONG_ARTIST";
 
     public static final String INTENT_ACTION_PLAY_QUEUE_CHANGED = "asbridge.me.uk.MMusic.ACTION_PLAY_QUEUE_CHANGED";
+
+
 }

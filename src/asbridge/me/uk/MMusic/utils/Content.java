@@ -112,7 +112,7 @@ public class Content {
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisAlbum = musicCursor.getString(albumColumn);
                 // Log.d(TAG, "adding song, title = " + thisTitle);
-                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum));
+                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1));
             }
             while (musicCursor.moveToNext());
         }

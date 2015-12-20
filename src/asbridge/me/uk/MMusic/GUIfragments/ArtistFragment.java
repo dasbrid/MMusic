@@ -6,7 +6,10 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ListView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistAdapter;
 import asbridge.me.uk.MMusic.utils.Content;
@@ -56,6 +59,8 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         }
     }
 
+    // the changeartist button is clicked
+    // Update the services list of artists
     public void changeArtist() {
         Log.d(TAG, "changeArtist");
         ArrayList<String> artists = getSelectedArtists();

@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 public class Settings {
 
     public static int getPlayQueueSize(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences("Asbridge.Me.Uk.MMusic", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences("myapp",Context.MODE_PRIVATE);
         int pqs = sharedPref.getInt("playqueuesize", 8);
         return pqs;
     }

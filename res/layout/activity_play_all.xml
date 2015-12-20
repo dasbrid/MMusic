@@ -30,6 +30,14 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/btnNext"
     />
+    <Button
+            android:id="@+id/btnChooseSongs"
+            android:text="songs"
+            android:onClick="btnChooseSongsClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/btnStop"
+    />
 </RelativeLayout>
     <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
             android:orientation="vertical"

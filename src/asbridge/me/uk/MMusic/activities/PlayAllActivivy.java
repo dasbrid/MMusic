@@ -101,9 +101,10 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
     }
 
     private void updatePlayQueue() {
+        Log.d(TAG, "updatePlayQueue");
         if (retainFragment.serviceReference != null) {
-            //Song nextPlayingSong = serviceReference.getNextSong();
             ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
+            Log.d(TAG, "new play queue="+newPlayQueue.size());
             playQueue.clear();
             playQueue.addAll(newPlayQueue);
             //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
@@ -119,6 +120,7 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED)) {
+                Log.d(TAG, "NextSongChangedReceiver");
                 updatePlayQueue();
             }
         }
@@ -160,6 +162,7 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
         registerReceiver(nextSongChangedReceiver, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED));
 
         if (retainFragment.serviceReference != null) {
+            Log.d(TAG, "servicereference is not null");
             Song currentSong = retainFragment.serviceReference.getCurrentSong();
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
@@ -178,8 +181,6 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
     }
 
 
-    private static final String TAG_RETAIN_FRAGMENT = "retain_fragment";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,14 +188,14 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
         setContentView(R.layout.activity_play_all);
 
         FragmentManager fm = getFragmentManager();
-        retainFragment = (RetainFragment) fm.findFragmentByTag(TAG_RETAIN_FRAGMENT);
+        retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (retainFragment == null) {
             Log.d(TAG, "creating and adding retain Fragment");
             retainFragment = new RetainFragment();
-            fm.beginTransaction().add(retainFragment, TAG_RETAIN_FRAGMENT).commit();
+            fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
 
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
@@ -273,6 +274,12 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
 
     }
 
+    public void btnChooseSongsClicked(View v) {
+        Log.d(TAG, "btnChooseSongs");
+        Intent intent = new Intent(this, SelectSongsActivity.class);
+        startActivity(intent);
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
@@ -312,44 +319,44 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
         return super.onOptionsItemSelected(item);
     }
 
-    private  void removeSongbyID(long songId) {
+    private  void removeSongbyID(int songPID) {
         if (retainFragment.isBound) {
             if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.removeSongFromPlayQueue(songId);
+                retainFragment.serviceReference.removeSongFromPlayQueue(songPID);
             }
         }
     }
 
-    private  void moveSongToTop(long songId) {
+    private  void moveSongToTop(int songPID) {
         if (retainFragment.isBound) {
             if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.playThisSongNext(songId);
+                retainFragment.serviceReference.playThisSongNext(songPID);
             }
         }
     }
 
-    // when user clicks on song in the list
+    // when user clicks the remove button on a song in the playqueue
     public void btnRemoveSongClicked(View view){
         Log.d(TAG, "picked view "+ (view==null?"null":"not null"));
         if (view!=null) {
             Object viewTag = view.getTag();
             Log.d(TAG, "picked viewTag " + (viewTag == null ? "null" : viewTag.toString()));
             if (viewTag != null) {
-                long pickedSongID = Long.parseLong(view.getTag().toString());
-                removeSongbyID(pickedSongID);
+                int pickedSongPID = Integer.parseInt(viewTag.toString());
+                removeSongbyID(pickedSongPID);
             }
         }
     }
 
-    // when user clicks on song in the list
+    // when user clicks the up button on a song in the playqueue
     public void btnMoveToTopClicked(View view){
         Log.d(TAG, "picked view to move to top "+ (view==null?"null":"not null"));
         if (view!=null) {
             Object viewTag = view.getTag();
             Log.d(TAG, "picked viewTag " + (viewTag == null ? "null" : viewTag.toString()));
             if (viewTag != null) {
-                long pickedSongID = Long.parseLong(view.getTag().toString());
-                moveSongToTop(pickedSongID);
+                int pickedSongPID = Integer.parseInt(viewTag.toString());
+                moveSongToTop(pickedSongPID);
             }
         }
     }
