@@ -2,8 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
             android:key="playqueuesize"
-            android:summary="Number of songs in play queue"
+            android:summary="Set the number of songs in the play queue"
             android:title="Play queue size"
-
+            android:numeric="integer"
+            android:maxLength="2"
+            android:defaultValue="10"
     />
 </PreferenceScreen>
