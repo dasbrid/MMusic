@@ -213,6 +213,7 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
         Log.d(TAG, "starting the service");
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         startService(playIntent);
+
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -232,15 +233,15 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Log.d(TAG, "onDestroy");
-        if (isFinishing()) {
+//        if (isFinishing()) {
             Log.d(TAG, "isFinishing");
             // genuinely finishing, not orientation change etc
-            Intent intentStopService = new Intent (this, SimpleMusicService.class);
-            stopService(intentStopService);
-            retainFragment.doUnbindService();
-        }
+//            Intent intentStopService = new Intent (this, SimpleMusicService.class);
+//            stopService(intentStopService);
+//            retainFragment.doUnbindService();
+//        }
+        super.onDestroy();
     }
 
     public void btnNextClicked(View v) {
@@ -298,7 +299,7 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
                 Intent playIntent = new Intent(this, SimpleMusicService.class);
                 stopService(playIntent);
                 retainFragment.serviceReference=null;
-                System.exit(0);
+                finish();
                 break;
             case R.id.action_shuffle:
                 if(shuffleOn){
