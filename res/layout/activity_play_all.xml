@@ -55,13 +55,6 @@
                 android:text="Play queue:"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
-        <ListView
-                android:id="@+id/lvPlayQueue"
-                android:layout_width="fill_parent"
-                android:background="#33FF0000"
-                android:layout_height="wrap_content" >
-        </ListView>
         <asbridge.me.uk.MMusic.controls.RearrangeableListView
                 android:id="@+id/lvrearangablePlayQueue"
                 android:layout_width="fill_parent"

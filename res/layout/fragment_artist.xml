@@ -5,11 +5,17 @@
               android:layout_height="match_parent"
               android:background="#44771111"
 >
+    <Button
+            android:text="update song list"
+            android:id="@+id/btnArtist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    >
+    </Button>
     <CheckBox
       android:id="@+id/cbCheckAll"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginLeft="40dp"
       android:layout_marginTop="10dp"
       android:checked="false"
     />
@@ -20,11 +26,4 @@
             android:choiceMode="multipleChoice"
     >
     </ListView>
-    <Button
-            android:text="artist"
-            android:id="@+id/btnArtist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-    >
-    </Button>
 </LinearLayout>

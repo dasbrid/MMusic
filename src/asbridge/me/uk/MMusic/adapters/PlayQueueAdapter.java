@@ -63,15 +63,13 @@ public class PlayQueueAdapter extends BaseAdapter {
             /****** Inflate tabitem.xml file for each row ( Defined below ) *******/
             vi = songInf.inflate(R.layout.playqueuesong, null);
 
-            /****** View Holder Object to contain tabitem.xml file elements ******/
-
+            /****** View Holder Object to contain xml file elements ******/
             holder = new ViewHolder();
             holder.songTitle = (TextView) vi.findViewById(R.id.pqsong_title);
             holder.songArtist =(TextView)vi.findViewById(R.id.pqsong_artist);
             holder.btnRemoveSong =(ImageButton)vi.findViewById(R.id.pqbtnRemoveSong);
             holder.btnMoveToTop =(ImageButton)vi.findViewById(R.id.pqbtnMoveToTop);
 
-            /************  Set holder with LayoutInflater ************/
             vi.setTag( holder );
         } else {
             holder=(ViewHolder)vi.getTag();

@@ -45,7 +45,7 @@ public class SimpleMusicService extends Service
     // current position in playing song
     private int currentPos = 0;
 
-    private boolean shuffleOn = false;
+    private boolean shuffleOn = true;
     private int currentPickedSong = -1;
 
     private int nextSongPID = 0;

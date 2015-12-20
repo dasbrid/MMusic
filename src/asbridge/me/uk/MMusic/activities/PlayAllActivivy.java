@@ -41,7 +41,7 @@ public class PlayAllActivivy extends Activity implements RearrangeableListView.R
 
     private RetainFragment retainFragment;
 
-    private boolean shuffleOn = false;
+    private boolean shuffleOn = true;
 
     // from list view rearange
     // https://blogactivity.wordpress.com/2011/10/02/rearranging-items-in-a-listview/
