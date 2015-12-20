@@ -3,5 +3,7 @@
     <EditTextPreference
             android:key="playqueuesize"
             android:summary="Number of songs in play queue"
-            android:title="Play queue size" />
+            android:title="Play queue size"
+
+    />
 </PreferenceScreen>
