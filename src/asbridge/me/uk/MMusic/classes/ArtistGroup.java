@@ -18,6 +18,20 @@ public class ArtistGroup {
         }
     }
 
+    public void doSelectNone() {
+        for (SelectedSong ss : songs) {
+            ss.selected = false;
+        }
+    }
+
+    public void doSelectAll() {
+        for (SelectedSong ss : songs) {
+            ss.selected = true;
+        }
+    }
+
+
+
     // returns:
     // 2 if ALL the artists songs are selected
     // 0 if none selected

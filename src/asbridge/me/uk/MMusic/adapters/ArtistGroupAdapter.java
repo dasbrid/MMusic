@@ -1,12 +1,15 @@
 package asbridge.me.uk.MMusic.adapters;
 
 import android.app.Activity;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.ImageButton;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 
@@ -15,6 +18,8 @@ import asbridge.me.uk.MMusic.classes.ArtistGroup;
  * Created by AsbridgeD on 21/12/2015.
  */
 public class ArtistGroupAdapter extends BaseExpandableListAdapter {
+
+    private final static String TAG = "ArtistGroupAdapter";
 
     private final SparseArray<ArtistGroup> groups;
     public LayoutInflater inflater;
@@ -114,10 +119,50 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         }
         ArtistGroup group = (ArtistGroup) getGroup(groupPosition);
 
-        ((CheckedTextView) convertView).setText(group.artistName + " " + group.getSelectedState());
-        ((CheckedTextView) convertView).setChecked(isExpanded);
+        int selectedState = group.getSelectedState();
+
+        CheckedTextView ctv = (CheckedTextView) convertView.findViewById(R.id.textView1);
+        ctv.setText(group.artistName + " " + selectedState);
+        ctv.setChecked(isExpanded);
+
+        Button btnAgSelectNone = (Button) convertView.findViewById(R.id.btnAgSelectNone);
+        btnAgSelectNone.setOnClickListener(new OnArtistClickListener(groupPosition));
+        btnAgSelectNone.setText(getSelectedStateString(selectedState));
+
         return convertView;
     }
+
+    public String getSelectedStateString(int selectedState) {
+        if  (selectedState == 2)
+            return "None";
+        else
+            return "All";
+
+    }
+
+    class OnArtistClickListener implements View.OnClickListener {
+
+        int groupPosition;
+
+        // constructor
+        public OnArtistClickListener(int groupPosition) {
+            this.groupPosition = groupPosition;
+        }
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG,"artistremoveclicked");
+            // checkbox clicked
+            final ArtistGroup artistGroup = (ArtistGroup) getGroup(groupPosition);
+            int selectedState = artistGroup.getSelectedState();
+            if (selectedState == 2)
+                artistGroup.doSelectNone();
+            else
+                artistGroup.doSelectAll();
+
+            notifyDataSetChanged();
+        }
+    }
+
 
     @Override
     public boolean hasStableIds() {
