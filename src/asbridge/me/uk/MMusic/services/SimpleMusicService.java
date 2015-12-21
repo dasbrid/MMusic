@@ -1,5 +1,6 @@
 package asbridge.me.uk.MMusic.services;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,6 +16,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
+import asbridge.me.uk.MMusic.utils.Settings;
 
 import java.util.*;
 
@@ -37,10 +39,16 @@ public class SimpleMusicService extends Service
     private ArrayList<Song> songs = null;
     private Random rand;
 
-    private Queue<Song> playQueue;
+    private LinkedList<Song> playQueue;
     private Song currentSong;
 
+    // current position in playing song
     private int currentPos = 0;
+
+    private boolean shuffleOn = true;
+    private int currentPickedSong = -1;
+
+    private int nextSongPID = 0;
 
     private static final int STOPPED = 0;
     private static final int PAUSED = 1;
@@ -77,14 +85,26 @@ public class SimpleMusicService extends Service
         }
     }
 
+    public boolean getShuffleState() {
+        return shuffleOn;
+    }
+
+    public void setShuffleState(boolean newState) {
+        shuffleOn = newState;
+        Log.d(TAG, "shuffle set "+ (shuffleOn?"on":"off"));
+    }
+
     @Override
     public void onDestroy() {
         if (musicControlListener != null) unregisterReceiver(musicControlListener);
         if (becomingNoisyListener != null) unregisterReceiver(becomingNoisyListener);
+        Log.d(TAG, "stored shuffle " + (shuffleOn?"on":"off"));
+        Settings.setShuffleState(getApplicationContext(), shuffleOn);
         super.onDestroy();
     }
     // called from activity to set the songs to play
     public void setSongList(ArrayList<Song> songList) {
+        Log.d(TAG, "setSongList");
         this.songs = songList;
     }
 
@@ -94,6 +114,7 @@ public class SimpleMusicService extends Service
     }
 
     public ArrayList<Song> getPlayQueue() {
+        Log.d(TAG, "getPlayQueue="+playQueue.size());
         return new ArrayList<Song> (playQueue);
     }
 
@@ -142,6 +163,8 @@ public class SimpleMusicService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SimpleMusicService onStartCommand");
+        shuffleOn = Settings.getShuffleState(getApplicationContext());
+        Log.d(TAG, "shuffle is " + (shuffleOn?"on":"off"));
         return START_STICKY; // Ensures that onStartCommand is called if the Service needs to restart after being killed by the system
     }
 
@@ -258,9 +281,22 @@ public class SimpleMusicService extends Service
 
     public void fillPlayQueue() {
         int i = playQueue.size();
-        for (; i< AppConstants.PLAY_QUEUE_SIZE ; i++) {
-            int nextSongIndex = getRandomSongIndex(-1);
-            playQueue.add(songs.get(nextSongIndex));
+        for (; i< Settings.getPlayQueueSize(getApplicationContext()) ; i++) {
+            int nextSongIndex;
+            if (shuffleOn) {
+                Log.d(TAG, "choosing random song");
+                nextSongIndex = getRandomSongIndex(-1);
+
+            } else {
+                Log.d(TAG, "choosing next ordered song");
+                currentPickedSong++;
+                if (currentPickedSong >= songs.size()) currentPickedSong = 0;
+                nextSongIndex = currentPickedSong;
+            }
+
+            if (nextSongPID++ > 100) nextSongPID = 0;
+            Song pqSong = new Song(songs.get(nextSongIndex), nextSongPID);
+            playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
         }
         // broadcast that the play queue has changed
         // can be used by the activity to update its playqueue
@@ -268,17 +304,32 @@ public class SimpleMusicService extends Service
         sendBroadcast(changeNextSongIntent);
     }
 
-    public void removeSongFromPlayQueue(long songID) {
-        Log.d(TAG, "SimpleMusicService removeSongFromPlayQueue:id="+songID+" size="+playQueue.size());
+    public void removeSongFromPlayQueue(int songPID) {
+        Log.d(TAG, "SimpleMusicService removeSongFromPlayQueue:id="+songPID+" size="+playQueue.size());
         for (Song s : playQueue) {
-            Log.d(TAG, "s="+s.getID());
-            if (s.getID() == songID) {
+            Log.d(TAG, "s, id="+s.getID()+",PID="+s.getPID());
+            if (s.getPID() == songPID) {
                 Log.d(TAG, "found");
                 playQueue.remove(s);
                 fillPlayQueue();
                 break;
             }
         }
+    }
+
+    public void playThisSongNext(int songPID) {
+        Log.d(TAG, "SimpleMusicService playThisSongNext:id="+songPID);
+        for (Song s : playQueue) {
+            Log.d(TAG, "s, id="+s.getID()+",PID="+s.getPID());
+            if (s.getPID() == songPID) {
+                Log.d(TAG, "found");
+                playQueue.remove(s);
+                playQueue.add(0,s); // Add at the BEGINNING of the list
+                fillPlayQueue();
+                break;
+            }
+        }
+
     }
 
     // play button pressed in the activity start playing the song
@@ -291,12 +342,12 @@ public class SimpleMusicService extends Service
             return;
         }
 
-        if (playQueue.size() < AppConstants.PLAY_QUEUE_SIZE) {
+        if (playQueue.size() < Settings.getPlayQueueSize(getApplicationContext())) {
             // nothing in the queue, so initialise
             fillPlayQueue();
         }
         // get the next song to play (from the queue)
-        currentSong = playQueue.remove(); //get(AppConstants.PLAY_QUEUE_SIZE-1);
+        currentSong = playQueue.remove(); // retrieve and remove
         //playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
 
         // add a song into the queue

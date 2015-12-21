@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import asbridge.me.uk.MMusic.R;
 
 import java.util.ArrayList;
 
@@ -45,19 +46,44 @@ public class ArtistAdapter extends BaseAdapter {
         return index;
     }
 
+    /********* Create a holder Class to contain inflated xml file elements *********/
+    public static class ViewHolder{
+        public TextView tvArtist;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View vi = convertView;
+        ViewHolder holder;
+
+        if(convertView==null) {
+            /****** Inflate tabitem.xml file for each row ( Defined below ) *******/
+            vi = artistInf.inflate(android.R.layout.simple_list_item_multiple_choice, null);
+            holder = new ViewHolder();
+            holder.tvArtist = (TextView) vi.findViewById(android.R.id.text1);
+
+            vi.setTag( holder );
+        } else {
+            holder=(ViewHolder)vi.getTag();
+        }
+        //get album using position
+        String currArtist = artists.get(position);
+        holder.tvArtist.setText(currArtist);
+/*
         //get album using position
         String currArtist = artists.get(position);
 
         // using standard android layout, but could copy anc customise, but must be a checked text view...
-        CheckedTextView songLay = (CheckedTextView)artistInf.inflate(android.R.layout.simple_list_item_multiple_choice/*R.layout.bucket_in_list_android*/, parent, false);
+        CheckedTextView songLay = (CheckedTextView)artistInf.inflate(android.R.layout.simple_list_item_multiple_choice, parent, false);
         TextView tvArtist = (TextView)songLay.findViewById(android.R.id.text1);
         tvArtist.setText(currArtist);
 
         //set position as tag
         songLay.setTag(position);
+
         return songLay;
+*/
+        return vi;
     }
 
 }

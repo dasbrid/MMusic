@@ -1,0 +1,85 @@
+package asbridge.me.uk.MMusic.activities;
+
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.widget.Toast;
+import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
+import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.classes.RetainFragment;
+import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.utils.AppConstants;
+import asbridge.me.uk.MMusic.utils.Content;
+
+import java.util.ArrayList;
+
+/**
+ * Created by David on 20/12/2015.
+ */
+public class SelectSongsActivity extends FragmentActivity
+        implements ArtistFragment.OnArtistsChangedListener
+        , RetainFragment.RetainFragmentListener
+{
+    private static final String TAG = "SelectSongsActivity";
+
+    private RetainFragment retainFragment = null;
+    private ArtistFragment artistsFragment = null;
+
+    @Override
+    public void onMusicServiceReady() {
+        Toast.makeText(this, "Music Service Ready", Toast.LENGTH_SHORT).show();
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_select_songs);
+
+        FragmentManager fm = getFragmentManager();
+        retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (retainFragment == null) {
+            Log.d(TAG, "creating and adding retain Fragment");
+            retainFragment = new RetainFragment();
+            fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
+        }
+
+        artistsFragment = (ArtistFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
+        if (artistsFragment != null)
+        {
+            artistsFragment.setOnArtistsChangedListener(this);
+        }
+    }
+
+    // bind to the Service instance when the Activity instance starts
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+        retainFragment.doBindService();
+    }
+
+    @Override
+    public void onArtistsChanged(ArrayList<String> artists) {
+        Log.d(TAG, "onArtistsChanged");
+        Log.d(TAG, "retain fragment is " + (retainFragment==null?"null":"not null"));
+        if (retainFragment != null) {
+            Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
+            if (retainFragment.serviceReference != null) {
+
+                ArrayList<Song> songsForArtists = new ArrayList<Song>();
+                Content.getSongsForGivenArtistList(this, artistsFragment.getSelectedArtists() ,songsForArtists);
+                Log.d(TAG, "setting list: "+ songsForArtists.size() + " songs");
+
+                retainFragment.serviceReference.setSongList(songsForArtists);
+            }
+        }
+    }
+
+}

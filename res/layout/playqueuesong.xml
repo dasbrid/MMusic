@@ -5,31 +5,47 @@
               android:layout_height="wrap_content"
               android:orientation="horizontal"
               android:padding="5dp" >
-    <TextView
-            android:id="@+id/pqsong_title"
-            android:text="title"
-            android:layout_width="0sp"
-            android:layout_weight="2"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textColor="#FFFFFF99"
-            android:textSize="6sp"
-            android:textStyle="bold" />
+        <RelativeLayout android:layout_width="wrap_content" android:layout_height="fill_parent"
 
-    <TextView
-            android:id="@+id/pqsong_artist"
-            android:text="artist"
-            android:layout_width="0sp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#FFFFFF99"
-            android:textSize="7sp" />
-    <ImageButton
-            android:id="@+id/pqbtnRemoveSong"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:contentDescription="remove from playqueue"
-            android:onClick="btnRemoveSongClicked"
-            android:src="@android:drawable/ic_menu_delete" />
+        >
+                <TextView
+                        android:id="@+id/pqsong_title"
+                        android:text="title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF99"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_alignParentLeft="true"
+                />
+
+                <TextView
+                        android:id="@+id/pqsong_artist"
+                        android:text="artist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:textColor="#FFFFFF99"
+                        android:textSize="16sp"
+                        android:layout_below="@id/pqsong_title"
+
+                />
+                <ImageButton
+                        android:id="@+id/pqbtnRemoveSong"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="remove from playqueue"
+                        android:onClick="btnRemoveSongClicked"
+                        android:src="@android:drawable/ic_menu_delete"
+                        android:layout_toLeftOf="@+id/pqbtnMoveToTop"
+                />
+                <ImageButton
+                android:id="@+id/pqbtnMoveToTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Play next"
+                android:onClick="btnMoveToTopClicked"
+                android:src="@android:drawable/ic_menu_upload"
+                android:layout_alignParentRight="true"
+        />
+        </RelativeLayout>
 </LinearLayout>
