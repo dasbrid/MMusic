@@ -1,6 +1,5 @@
 package asbridge.me.uk.MMusic.services;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -78,7 +77,7 @@ public class SimpleMusicService extends Service
             if (intent.getAction().equals(AppConstants.INTENT_ACTION_STOP_PLAYBACK)) {
                 stopPlayback();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG)) {
-                playRandomSong();
+                playNextSongInPlayQueue();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PAUSEORRESUME_PLAYBACK)) {
                 pauseOrResumePlayack();
             }
@@ -92,6 +91,26 @@ public class SimpleMusicService extends Service
     public void setShuffleState(boolean newState) {
         shuffleOn = newState;
         Log.d(TAG, "shuffle set "+ (shuffleOn?"on":"off"));
+    }
+
+    private Calendar sleepTime = null;
+
+    public void setSleepTimer(int mins) {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MINUTE, mins);
+        sleepTime = c;
+    }
+
+    public long getTimeTillSleep() {
+        if (sleepTime == null) return -1;
+        Calendar currentTime = Calendar.getInstance();
+        long diff = sleepTime.getTimeInMillis() - currentTime.getTimeInMillis();
+        long mins = diff / 1000 / 60;
+        return mins;
+    }
+
+    public void cancelSleepTimer() {
+        sleepTime = null;
     }
 
     @Override
@@ -262,15 +281,23 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService onCompletion");
         if(player.getCurrentPosition() > 0){
             mp.reset();
-            playRandomSong();
+            playNextSongInPlayQueue();
         }
     }
 
+    private boolean timeToGoToSleep() {
+        if (sleepTime == null)
+            return false; // no sleep timer set
+        Calendar currentTime = Calendar.getInstance();
+        if (currentTime.after(sleepTime))
+            return true;
+        return false;
+    }
     // can be called from outside the service (e.g. from next button in the activity)
     public void playSong() {
         Log.d(TAG, "SimpleMusicService playNextSong");
         if (currentState == STOPPED) { // if we are not playing anything, then play a random song
-            playRandomSong();
+            playNextSongInPlayQueue();
         } else {
             resumePlaying(); // otherwise resume playing the current song
         }
@@ -340,8 +367,15 @@ public class SimpleMusicService extends Service
     }
 
     // play button pressed in the activity start playing the song
-    public void playRandomSong() {
+    public void playNextSongInPlayQueue() {
         Log.d(TAG, "SimpleMusicService playNext");
+        if (timeToGoToSleep()) {
+            // if we have reached (passed) the sleep timer.
+            // turn the sleep timer off and don't play any more songs
+            sleepTime = null;
+            return;
+        }
+
         player.reset();
         //get a song
         if (this.songs == null || this.songs.size() < 1) {
@@ -355,7 +389,6 @@ public class SimpleMusicService extends Service
         }
         // get the next song to play (from the queue)
         currentSong = playQueue.remove(); // retrieve and remove
-        //playQueue.remove(AppConstants.PLAY_QUEUE_SIZE-1);
 
         // add a song into the queue
         fillPlayQueue();
@@ -391,7 +424,7 @@ public class SimpleMusicService extends Service
 
         switch (currentState) {
             case (STOPPED):
-                playRandomSong();
+                playNextSongInPlayQueue();
                 break;
             case (PLAYING):
                 pausePlayback();

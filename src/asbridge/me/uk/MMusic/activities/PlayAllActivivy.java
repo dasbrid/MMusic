@@ -11,12 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.RearrangeableListView;
+import asbridge.me.uk.MMusic.dialogs.SetTimerDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -31,6 +31,7 @@ public class PlayAllActivivy extends Activity
         implements RearrangeableListView.RearrangeListener
         , RetainFragment.RetainFragmentListener
         , PlayQueueAdapter.PlayQueueActionsListener // buttons remove and  move to top in play queue
+        , SetTimerDialog.SetSleepTimerListener
 {
 
     private String TAG = "DAVE:PlayAllActivivy";
@@ -46,6 +47,13 @@ public class PlayAllActivivy extends Activity
     private RetainFragment retainFragment;
 
     private boolean shuffleOn = true;
+
+    @Override
+    public void onSleepTimerChanged(int mins) {
+        if (retainFragment.serviceReference != null) {
+            retainFragment.serviceReference.setSleepTimer(mins);
+        }
+    }
 
     @Override
     public void onMusicServiceReady() {
@@ -258,7 +266,7 @@ public class PlayAllActivivy extends Activity
 
     public void playNextSong() {
         if (retainFragment.isBound)
-            retainFragment.serviceReference.playRandomSong();
+            retainFragment.serviceReference.playNextSongInPlayQueue();
     }
 
     public void btnStopClicked(View v) {
@@ -313,6 +321,9 @@ public class PlayAllActivivy extends Activity
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.action_timer:
+                showSetTimerDialog();
+                return true;
             case R.id.action_end:
                 Intent playIntent = new Intent(this, SimpleMusicService.class);
                 stopService(playIntent);
@@ -336,6 +347,20 @@ public class PlayAllActivivy extends Activity
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showSetTimerDialog() {
+        long timeTillSleep = -1;
+        if (retainFragment != null && retainFragment.serviceReference != null) {
+            timeTillSleep = retainFragment.serviceReference.getTimeTillSleep();
+        }
+        if (timeTillSleep < 0) {
+            FragmentManager fm = getFragmentManager();
+            SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
+            setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
+        } else {
+            retainFragment.serviceReference.cancelSleepTimer();
+        }
     }
 
     // callback from the playqueue adapter
