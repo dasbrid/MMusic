@@ -102,10 +102,17 @@ public class SimpleMusicService extends Service
         Settings.setShuffleState(getApplicationContext(), shuffleOn);
         super.onDestroy();
     }
+
     // called from activity to set the songs to play
     public void setSongList(ArrayList<Song> songList) {
         Log.d(TAG, "setSongList");
         this.songs = songList;
+    }
+
+    // called from activity to set the songs to play
+    public ArrayList<Song> getSongList() {
+        Log.d(TAG, "getSongList "+songs.size());
+        return songs;
     }
 
     // returns the current playing song

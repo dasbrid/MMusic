@@ -69,20 +69,7 @@ public class ArtistAdapter extends BaseAdapter {
         //get album using position
         String currArtist = artists.get(position);
         holder.tvArtist.setText(currArtist);
-/*
-        //get album using position
-        String currArtist = artists.get(position);
 
-        // using standard android layout, but could copy anc customise, but must be a checked text view...
-        CheckedTextView songLay = (CheckedTextView)artistInf.inflate(android.R.layout.simple_list_item_multiple_choice, parent, false);
-        TextView tvArtist = (TextView)songLay.findViewById(android.R.id.text1);
-        tvArtist.setText(currArtist);
-
-        //set position as tag
-        songLay.setTag(position);
-
-        return songLay;
-*/
         return vi;
     }
 

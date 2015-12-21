@@ -1,12 +1,9 @@
 package asbridge.me.uk.MMusic.activities;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
@@ -20,7 +17,7 @@ import java.util.ArrayList;
  * Created by David on 20/12/2015.
  */
 public class SelectSongsActivity extends FragmentActivity
-        implements ArtistFragment.OnArtistsChangedListener
+        implements ArtistFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
 {
     private static final String TAG = "SelectSongsActivity";
@@ -30,12 +27,15 @@ public class SelectSongsActivity extends FragmentActivity
 
     @Override
     public void onMusicServiceReady() {
-        Toast.makeText(this, "Music Service Ready", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onMusicServiceReady");
+        ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
+        artistsFragment.setSongList(songList);
     }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_songs);
 
@@ -53,8 +53,9 @@ public class SelectSongsActivity extends FragmentActivity
         artistsFragment = (ArtistFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
         if (artistsFragment != null)
         {
-            artistsFragment.setOnArtistsChangedListener(this);
+            artistsFragment.setOnSongsChangedListener(this);
         }
+
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -66,18 +67,19 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     @Override
-    public void onArtistsChanged(ArrayList<String> artists) {
-        Log.d(TAG, "onArtistsChanged");
+    public void onSongsChanged() {
+        Log.d(TAG, "onSongsChanged");
         Log.d(TAG, "retain fragment is " + (retainFragment==null?"null":"not null"));
         if (retainFragment != null) {
             Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
             if (retainFragment.serviceReference != null) {
 
-                ArrayList<Song> songsForArtists = new ArrayList<Song>();
-                Content.getSongsForGivenArtistList(this, artistsFragment.getSelectedArtists() ,songsForArtists);
-                Log.d(TAG, "setting list: "+ songsForArtists.size() + " songs");
+                ArrayList<Song> selectedSongs = new ArrayList<Song>();
+                selectedSongs = artistsFragment.getSelectedSongs();
+                Content.getSongsForGivenArtistList(this, artistsFragment.getSelectedArtists() ,selectedSongs);
+                Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
 
-                retainFragment.serviceReference.setSongList(songsForArtists);
+                retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }
     }

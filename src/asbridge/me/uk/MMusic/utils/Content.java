@@ -48,7 +48,7 @@ public class Content {
     public static void getAllSongs(Context context, ArrayList<Song> songList) {
         String selection = null;
         String[] selectionargs = null;
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
+        String sortOrder = MediaStore.Audio.Media.ARTIST + " ASC";
         getSongs(context, selection, selectionargs, sortOrder, songList);
     }
 

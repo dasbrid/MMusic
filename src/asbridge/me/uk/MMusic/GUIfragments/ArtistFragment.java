@@ -2,19 +2,21 @@ package asbridge.me.uk.MMusic.GUIfragments;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ListView;
+import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistAdapter;
-import asbridge.me.uk.MMusic.utils.Content;
+import asbridge.me.uk.MMusic.adapters.ArtistGroupAdapter;
+import asbridge.me.uk.MMusic.classes.ArtistGroup;
+import asbridge.me.uk.MMusic.classes.Song;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import android.support.v4.app.Fragment;
 /**
  * Created by AsbridgeD on 08/12/2015.
@@ -25,12 +27,15 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
 
     private CheckBox cbCheckAll;
     private ArrayList<String> artistList;
+//    private ArrayList<Song> songs;
+    private SparseArray<ArtistGroup> artistGroups;
     ListView lvArtistList;
+    ExpandableListView elvArtistGroupList;
     ArtistAdapter artistAdapter;
-
-    private OnArtistsChangedListener listener = null;
-    public interface OnArtistsChangedListener{
-        public void onArtistsChanged(ArrayList<String> artists);
+    ArtistGroupAdapter artistGroupAdapter;
+    private OnSongsChangedListener listener = null;
+    public interface OnSongsChangedListener {
+        public void onSongsChanged();
     }
 
     @Override
@@ -46,7 +51,7 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         }
     }
 
-    public void setOnArtistsChangedListener(OnArtistsChangedListener l) {
+    public void setOnSongsChangedListener(OnSongsChangedListener l) {
         listener = l;
     }
 
@@ -65,10 +70,26 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         Log.d(TAG, "changeArtist");
         ArrayList<String> artists = getSelectedArtists();
         if (listener != null)
-            listener.onArtistsChanged(artists);
+            listener.onSongsChanged();
     }
 
+    public void setSongList(ArrayList<Song> songs) {
+        Log.d(TAG, "setSongList "+songs.size());
+        //Content.getArtists(getContext(), artistList);
+        //this.songs = songs;
 
+            String currentArtist = null;
+            int i=0;
+            ArtistGroup newGroup = null;
+            for (Song s : songs) {
+                if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
+                    newGroup = new ArtistGroup(s.getArtist());
+                    artistGroups.append(i++, newGroup);
+                }
+                newGroup.songs.add(new ArtistGroup.SelectedSong(s, true));
+            }
+        artistAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,18 +98,46 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
 
+        elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
         lvArtistList = (ListView)v.findViewById(R.id.lvArtistList);
         cbCheckAll = (CheckBox)v.findViewById(R.id.cbCheckAll);
         cbCheckAll.setOnCheckedChangeListener(this);
         lvArtistList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         artistList = new ArrayList<String>();
+        //this.songs = new ArrayList<>();
+//        Content.getArtists(getContext(), artistList);
 
-        Content.getArtists(getContext(), artistList);
+
 
         artistAdapter = new ArtistAdapter(getContext(), artistList);
         lvArtistList.setAdapter(artistAdapter);
+
+        artistGroups = new SparseArray<>();
+
+        artistGroupAdapter = new ArtistGroupAdapter(getActivity(), artistGroups);
+        elvArtistGroupList.setAdapter(artistGroupAdapter);
+
         return v;
+    }
+
+    public ArrayList<Song> getSelectedSongs() {
+        ArrayList<Song> selectedSongs = new ArrayList<>();
+        for(int i = 0; i < artistGroups.size(); i++) {
+            int key = artistGroups.keyAt(i);
+            // get the object by the key.
+            ArtistGroup ag = (ArtistGroup) artistGroups.get(key);
+            {
+                List<ArtistGroup.SelectedSong> songs = ag.songs;
+                for (ArtistGroup.SelectedSong ss : songs) {
+                    if (ss.selected) {
+                        selectedSongs.add(ss.song);
+                    }
+                }
+            }
+        }
+
+        return selectedSongs;
     }
 
     public ArrayList<String> getSelectedArtists() {

@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 public class PagerActivity extends FragmentActivity implements
         MusicPlayerFragment.MusicPlayerFragmentListener,
-        ArtistFragment.OnArtistsChangedListener
+        ArtistFragment.OnSongsChangedListener
 {
 
     private String TAG = "DAVE:FragActivity";
@@ -42,9 +42,10 @@ public class PagerActivity extends FragmentActivity implements
     private boolean mDualPane;
 
     // from artist fragment
-    public void onArtistsChanged(ArrayList<String > artists)
+    public void onSongsChanged()
     {
-        Log.d(TAG, "onArtistsChanged:"+artists.size());
+        /*
+        Log.d(TAG, "onSongsChanged:"+artists.size());
         if (artists.size()==0)
             return;
 
@@ -59,6 +60,7 @@ public class PagerActivity extends FragmentActivity implements
         mMusicPlayerFragment.setSongList(songList);
 //        songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
+        */
     }
 
     // from fragment music player
@@ -118,7 +120,7 @@ public class PagerActivity extends FragmentActivity implements
             viewPager.setAdapter(tabsAdapter);
         }
 
-        mArtistFragment.setOnArtistsChangedListener(this);
+        mArtistFragment.setOnSongsChangedListener(this);
         mMusicPlayerFragment.setListener(this);
 
         songList = new ArrayList<Song>();

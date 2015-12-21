@@ -16,14 +16,13 @@ import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.GUIfragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.services.MusicService;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
-import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.Content;
 import android.support.v4.app.FragmentActivity;
 
 import java.util.ArrayList;
 
 public class MusicPlayerActivity extends FragmentActivity
-        implements ArtistFragment.OnArtistsChangedListener,
+        implements ArtistFragment.OnSongsChangedListener,
                     MusicPlayerFragment.MusicPlayerFragmentListener,
                     View.OnClickListener {
 
@@ -55,9 +54,10 @@ public class MusicPlayerActivity extends FragmentActivity
 
 
 
-    public void onArtistsChanged(ArrayList<String > artists)
+    public void onSongsChanged()
     {
-        Log.d(TAG, "onArtistsChanged:"+artists.size());
+        /*
+        Log.d(TAG, "onSongsChanged:"+artists.size());
         if (artists.size()==0)
             return;
 
@@ -72,6 +72,7 @@ public class MusicPlayerActivity extends FragmentActivity
         mMusicPlayerFragment.setSongList(songList);
 //        songAdt.notifyDataSetChanged();
         musicSrv.playFirst();
+        */
     }
 
     // used to save paused state so it can be resumed
@@ -186,7 +187,7 @@ public class MusicPlayerActivity extends FragmentActivity
         mArtistFragment = new ArtistFragment();
         //Now you can set the fragment to be visible here
         setArtistFragment(mArtistFragment);
-        mArtistFragment.setOnArtistsChangedListener(this);
+        mArtistFragment.setOnSongsChangedListener(this);
 
         mMusicPlayerFragment = new MusicPlayerFragment();
         //Now you can set the fragment to be visible here
