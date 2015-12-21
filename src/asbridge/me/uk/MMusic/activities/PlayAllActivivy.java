@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public class PlayAllActivivy extends Activity
         implements RearrangeableListView.RearrangeListener
         , RetainFragment.RetainFragmentListener
+        , PlayQueueAdapter.PlayQueueActionsListener // buttons remove and  move to top in play queue
 {
 
     private String TAG = "DAVE:PlayAllActivivy";
@@ -337,44 +338,24 @@ public class PlayAllActivivy extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-    private  void removeSongbyID(int songPID) {
+    // callback from the playqueue adapter
+    @Override
+    public void onRemoveSongClicked(Song song) {
+        Log.d(TAG, "onRemoveSong "+song.getTitle());
         if (retainFragment.isBound) {
             if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.removeSongFromPlayQueue(songPID);
+                retainFragment.serviceReference.removeSongFromPlayQueue(song.getPID());
             }
         }
     }
 
-    private  void moveSongToTop(int songPID) {
+    // callback from the playqueue adapter
+    @Override
+    public void onMoveSongToTopClicked(Song song) {
+        Log.d(TAG, "onMoveSongToTopClicked "+song.getTitle());
         if (retainFragment.isBound) {
             if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.playThisSongNext(songPID);
-            }
-        }
-    }
-
-    // when user clicks the remove button on a song in the playqueue
-    public void btnRemoveSongClicked(View view){
-        Log.d(TAG, "picked view "+ (view==null?"null":"not null"));
-        if (view!=null) {
-            Object viewTag = view.getTag();
-            Log.d(TAG, "picked viewTag " + (viewTag == null ? "null" : viewTag.toString()));
-            if (viewTag != null) {
-                int pickedSongPID = Integer.parseInt(viewTag.toString());
-                removeSongbyID(pickedSongPID);
-            }
-        }
-    }
-
-    // when user clicks the up button on a song in the playqueue
-    public void btnMoveToTopClicked(View view){
-        Log.d(TAG, "picked view to move to top "+ (view==null?"null":"not null"));
-        if (view!=null) {
-            Object viewTag = view.getTag();
-            Log.d(TAG, "picked viewTag " + (viewTag == null ? "null" : viewTag.toString()));
-            if (viewTag != null) {
-                int pickedSongPID = Integer.parseInt(viewTag.toString());
-                moveSongToTop(pickedSongPID);
+                retainFragment.serviceReference.playThisSongNext(song.getPID());
             }
         }
     }

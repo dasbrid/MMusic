@@ -1,5 +1,6 @@
 package asbridge.me.uk.MMusic.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -22,11 +23,18 @@ public class PlayQueueAdapter extends BaseAdapter {
     private ArrayList<Song> songs;
     private LayoutInflater songInf;
 
+    private PlayQueueActionsListener playqueueActionsListener;
+    public interface PlayQueueActionsListener  {
+        void onRemoveSongClicked(Song song);
+        void onMoveSongToTopClicked(Song song);
+    }
+
 
     // Constructor
-    public PlayQueueAdapter(Context c, ArrayList<Song> theSongs){
+    public PlayQueueAdapter(Activity activity, ArrayList<Song> theSongs){
         songs=theSongs;
-        songInf=LayoutInflater.from(c);
+        songInf=LayoutInflater.from(activity);
+        playqueueActionsListener = (PlayQueueActionsListener)activity;
     }
 
     @Override
@@ -35,9 +43,8 @@ public class PlayQueueAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Object getItem(int position) {
+        return songs.get(position);
     }
 
     @Override
@@ -81,8 +88,42 @@ public class PlayQueueAdapter extends BaseAdapter {
         holder.songArtist.setText(currSong.getArtist());
         holder.btnRemoveSong.setTag(Integer.toString(currSong.getPID()));
         holder.btnMoveToTop.setTag(Integer.toString(currSong.getPID()));
+        holder.btnRemoveSong.setOnClickListener(new OnRemoveButtonClickListener(position));
+        holder.btnMoveToTop.setOnClickListener(new OnbtnMoveToTopClickListener(position));
+
 
         return vi;
     }
+
+    class OnbtnMoveToTopClickListener implements View.OnClickListener {
+        int songPosition;
+        // constructor
+        public OnbtnMoveToTopClickListener(int position) {
+            this.songPosition = position;
+        }
+        @Override
+        public void onClick(View v) {
+            // checkbox clicked
+            final Song song = (Song) getItem(songPosition);
+            Log.d(TAG, "move to top song "+song.getPID()+","+song.getTitle()+","+songPosition);
+            playqueueActionsListener.onMoveSongToTopClicked(song);
+        }
+    }
+
+    class OnRemoveButtonClickListener implements View.OnClickListener {
+        int songPosition;
+        // constructor
+        public OnRemoveButtonClickListener(int position) {
+            this.songPosition = position;
+        }
+        @Override
+        public void onClick(View v) {
+            // checkbox clicked
+            final Song song = (Song) getItem(songPosition);
+            Log.d(TAG, "remove song "+song.getPID()+","+song.getTitle()+","+songPosition);
+            playqueueActionsListener.onRemoveSongClicked(song);
+        }
+    }
+
 
 }

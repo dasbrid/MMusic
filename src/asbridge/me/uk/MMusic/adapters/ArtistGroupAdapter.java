@@ -142,9 +142,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     }
 
     class OnArtistClickListener implements View.OnClickListener {
-
         int groupPosition;
-
         // constructor
         public OnArtistClickListener(int groupPosition) {
             this.groupPosition = groupPosition;
