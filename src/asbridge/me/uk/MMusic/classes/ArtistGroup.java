@@ -9,7 +9,6 @@ import java.util.List;
 public class ArtistGroup {
 
     public static class SelectedSong {
-
         public Song song;
         public boolean selected;
 
@@ -18,6 +17,26 @@ public class ArtistGroup {
             selected = isSelected;
         }
     }
+
+    // returns:
+    // 2 if ALL the artists songs are selected
+    // 0 if none selected
+    // 1 if some selected
+    public int getSelectedState() {
+        int numselected = 0;
+        int numSongs = songs.size();
+        for (SelectedSong ss : songs) {
+            if (ss.selected) numselected++;
+        }
+        if (numselected == 0 )
+            return 0;
+        else if (numselected == numSongs)
+            return 2;
+        else
+            return 1;
+
+    }
+
     public String artistName;
     public final List<SelectedSong> songs = new ArrayList<>();
 

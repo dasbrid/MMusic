@@ -113,7 +113,8 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.artistrow_group, null);
         }
         ArtistGroup group = (ArtistGroup) getGroup(groupPosition);
-        ((CheckedTextView) convertView).setText(group.artistName);
+
+        ((CheckedTextView) convertView).setText(group.artistName + " " + group.getSelectedState());
         ((CheckedTextView) convertView).setChecked(isExpanded);
         return convertView;
     }
