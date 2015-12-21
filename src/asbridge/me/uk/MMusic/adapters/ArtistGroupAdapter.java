@@ -127,17 +127,18 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
 
         ImageButton btnAgSelectNone = (ImageButton) convertView.findViewById(R.id.btnAgSelectNone);
         btnAgSelectNone.setOnClickListener(new OnArtistClickListener(groupPosition));
-        //btnAgSelectNone.setText(getSelectedStateString(selectedState));
-
+        switch (selectedState) {
+            case 0:
+                btnAgSelectNone.setImageResource(R.drawable.ic_selectionbox_none);
+                break;
+            case 1:
+                btnAgSelectNone.setImageResource(R.drawable.ic_selectionbox_some);
+                break;
+            case 2:
+                btnAgSelectNone.setImageResource(R.drawable.ic_selectionbox_all);
+                break;
+        }
         return convertView;
-    }
-
-    public String getSelectedStateString(int selectedState) {
-        if  (selectedState == 2)
-            return "None";
-        else
-            return "All";
-
     }
 
     class OnArtistClickListener implements View.OnClickListener {
