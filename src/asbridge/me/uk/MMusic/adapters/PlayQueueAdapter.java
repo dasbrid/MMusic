@@ -86,8 +86,6 @@ public class PlayQueueAdapter extends BaseAdapter {
         Song currSong = songs.get(position);
         holder.songTitle.setText(currSong.getTitle());
         holder.songArtist.setText(currSong.getArtist());
-        holder.btnRemoveSong.setTag(Integer.toString(currSong.getPID()));
-        holder.btnMoveToTop.setTag(Integer.toString(currSong.getPID()));
         holder.btnRemoveSong.setOnClickListener(new OnRemoveButtonClickListener(position));
         holder.btnMoveToTop.setOnClickListener(new OnbtnMoveToTopClickListener(position));
 
