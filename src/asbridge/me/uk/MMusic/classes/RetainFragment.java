@@ -76,10 +76,17 @@ public class RetainFragment extends Fragment {
     @Override
     public void onDetach() {
         Log.d(TAG, "onDetach");
-        doUnbindService();
+        listener = null;
         super.onDetach();
     }
 
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        doUnbindService();
+        listener = null;
+        super.onDestroy();
+    }
 
     public void doUnbindService() {
         Log.d(TAG, "doUnbindService");

@@ -21,7 +21,6 @@ import android.support.v4.app.Fragment;
  */
 public class ArtistFragment extends Fragment implements
         View.OnClickListener
-        ,CompoundButton.OnCheckedChangeListener
 {
 
     private String TAG = "DAVE: ArtistFragment";
@@ -34,23 +33,6 @@ public class ArtistFragment extends Fragment implements
     private OnSongsChangedListener listener = null;
     public interface OnSongsChangedListener {
         public void onSongsChanged();
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Log.d(TAG, "OnCheckedChanged");
-        /*
-        if (buttonView.getId() == R.id.cbCheckAll) {
-            Log.d(TAG, "checkAll");
-            for(int i = 0; i < artistGroups.size(); i++) {
-                int key = artistGroups.keyAt(i);
-                // get the object by the key.
-                ArtistGroup ag = artistGroups.get(key);
-                ag.doSelectAll();
-            }
-            artistGroupAdapter.notifyDataSetChanged();
-        }
-        */
     }
 
     public void setOnSongsChangedListener(OnSongsChangedListener l) {
@@ -116,9 +98,6 @@ public class ArtistFragment extends Fragment implements
 
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
-
-        cbCheckAll = (CheckBox)v.findViewById(R.id.cbCheckAll);
-        cbCheckAll.setOnCheckedChangeListener(this);
 
         artistGroups = new SparseArray<>();
 

@@ -16,12 +16,12 @@
                  android:text="Test"
                  android:textSize="14sp"
                  android:textStyle="bold" />
-    <Button
-            android:text="none"
+    <ImageButton
             android:id="@+id/btnAgSelectNone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_selectionbox_all"
             android:focusable="false"
     >
-    </Button>
+    </ImageButton>
 </LinearLayout>

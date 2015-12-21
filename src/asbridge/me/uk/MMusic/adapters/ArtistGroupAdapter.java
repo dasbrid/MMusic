@@ -125,9 +125,9 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         ctv.setText(group.artistName + " " + selectedState);
         ctv.setChecked(isExpanded);
 
-        Button btnAgSelectNone = (Button) convertView.findViewById(R.id.btnAgSelectNone);
+        ImageButton btnAgSelectNone = (ImageButton) convertView.findViewById(R.id.btnAgSelectNone);
         btnAgSelectNone.setOnClickListener(new OnArtistClickListener(groupPosition));
-        btnAgSelectNone.setText(getSelectedStateString(selectedState));
+        //btnAgSelectNone.setText(getSelectedStateString(selectedState));
 
         return convertView;
     }
