@@ -19,6 +19,20 @@
       android:layout_marginTop="10dp"
       android:checked="false"
     />
+    <Button
+            android:text="all"
+            android:id="@+id/btnSongsSelectAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    >
+    </Button>
+    <Button
+            android:text="clear"
+            android:id="@+id/btnSongsSelectNone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    >
+    </Button>
     <ExpandableListView
             android:id="@+id/lvSongsByArtist"
             android:layout_width="match_parent"

@@ -36,20 +36,21 @@ public class ArtistFragment extends Fragment implements
         public void onSongsChanged();
     }
 
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         Log.d(TAG, "OnCheckedChanged");
+        /*
         if (buttonView.getId() == R.id.cbCheckAll) {
             Log.d(TAG, "checkAll");
-/*
-            cbCheckAll.setChecked(isChecked);
-            for (int i = 0; i < lvArtistList.getChildCount(); i++) {
-                lvArtistList.setItemChecked(i, isChecked);
+            for(int i = 0; i < artistGroups.size(); i++) {
+                int key = artistGroups.keyAt(i);
+                // get the object by the key.
+                ArtistGroup ag = artistGroups.get(key);
+                ag.doSelectAll();
             }
-            artistAdapter.notifyDataSetChanged();
-            */
+            artistGroupAdapter.notifyDataSetChanged();
         }
+        */
     }
 
     public void setOnSongsChangedListener(OnSongsChangedListener l) {
@@ -62,9 +63,24 @@ public class ArtistFragment extends Fragment implements
             case R.id.btnArtist:
                 changeArtist();
                 break;
+            case R.id.btnSongsSelectAll:
+                selectAllorNone(true);
+                break;
+            case R.id.btnSongsSelectNone:
+                selectAllorNone(false);
+                break;
         }
     }
 
+    private void selectAllorNone(boolean newState) {
+        for(int i = 0; i < artistGroups.size(); i++) {
+            int key = artistGroups.keyAt(i);
+            // get the object by the key.
+            ArtistGroup ag = artistGroups.get(key);
+            ag.changeStateofAllSongs(newState);
+        }
+        artistGroupAdapter.notifyDataSetChanged();
+    }
     // the changeartist button is clicked
     // Update the services list of artists
     public void changeArtist() {
@@ -93,6 +109,11 @@ public class ArtistFragment extends Fragment implements
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
+        Button btnSongsSelectAll = (Button) v.findViewById(R.id.btnSongsSelectAll);
+        btnSongsSelectAll.setOnClickListener(this);
+        Button btnSongsSelectNone = (Button) v.findViewById(R.id.btnSongsSelectNone);
+        btnSongsSelectNone.setOnClickListener(this);
+
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 

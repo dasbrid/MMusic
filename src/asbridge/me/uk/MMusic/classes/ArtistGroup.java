@@ -30,9 +30,13 @@ public class ArtistGroup {
         }
     }
 
+    public void changeStateofAllSongs(boolean newState) {
+        for (SelectedSong ss : songs) {
+            ss.selected = newState;
+        }
+    }
 
-
-    // returns:
+      // returns:
     // 2 if ALL the artists songs are selected
     // 0 if none selected
     // 1 if some selected
