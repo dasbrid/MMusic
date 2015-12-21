@@ -122,7 +122,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         int selectedState = group.getSelectedState();
 
         CheckedTextView ctv = (CheckedTextView) convertView.findViewById(R.id.textView1);
-        ctv.setText(group.artistName + " " + selectedState);
+        ctv.setText(group.artistName);
         ctv.setChecked(isExpanded);
 
         ImageButton btnAgSelectNone = (ImageButton) convertView.findViewById(R.id.btnAgSelectNone);
