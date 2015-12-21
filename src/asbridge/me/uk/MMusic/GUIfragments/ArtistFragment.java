@@ -21,33 +21,36 @@ import android.support.v4.app.Fragment;
 /**
  * Created by AsbridgeD on 08/12/2015.
  */
-public class ArtistFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class ArtistFragment extends Fragment implements
+        View.OnClickListener
+        ,CompoundButton.OnCheckedChangeListener
+{
 
     private String TAG = "DAVE: ArtistFragment";
 
     private CheckBox cbCheckAll;
-    private ArrayList<String> artistList;
-//    private ArrayList<Song> songs;
     private SparseArray<ArtistGroup> artistGroups;
-    ListView lvArtistList;
     ExpandableListView elvArtistGroupList;
-    ArtistAdapter artistAdapter;
     ArtistGroupAdapter artistGroupAdapter;
+
     private OnSongsChangedListener listener = null;
     public interface OnSongsChangedListener {
         public void onSongsChanged();
     }
+
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         Log.d(TAG, "OnCheckedChanged");
         if (buttonView.getId() == R.id.cbCheckAll) {
             Log.d(TAG, "checkAll");
+/*
             cbCheckAll.setChecked(isChecked);
             for (int i = 0; i < lvArtistList.getChildCount(); i++) {
                 lvArtistList.setItemChecked(i, isChecked);
             }
             artistAdapter.notifyDataSetChanged();
+            */
         }
     }
 
@@ -68,17 +71,12 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
     // Update the services list of artists
     public void changeArtist() {
         Log.d(TAG, "changeArtist");
-        ArrayList<String> artists = getSelectedArtists();
         if (listener != null)
             listener.onSongsChanged();
     }
 
     public void setSongList(ArrayList<Song> songs) {
         Log.d(TAG, "setSongList "+songs.size());
-        //Content.getArtists(getContext(), artistList);
-        //this.songs = songs;
-
-            String currentArtist = null;
             int i=0;
             ArtistGroup newGroup = null;
             for (Song s : songs) {
@@ -88,7 +86,7 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
                 }
                 newGroup.songs.add(new ArtistGroup.SelectedSong(s, true));
             }
-        artistAdapter.notifyDataSetChanged();
+        artistGroupAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -99,19 +97,9 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         btnArtist.setOnClickListener(this);
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
-        lvArtistList = (ListView)v.findViewById(R.id.lvArtistList);
+
         cbCheckAll = (CheckBox)v.findViewById(R.id.cbCheckAll);
         cbCheckAll.setOnCheckedChangeListener(this);
-        lvArtistList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-        artistList = new ArrayList<String>();
-        //this.songs = new ArrayList<>();
-//        Content.getArtists(getContext(), artistList);
-
-
-
-        artistAdapter = new ArtistAdapter(getContext(), artistList);
-        lvArtistList.setAdapter(artistAdapter);
 
         artistGroups = new SparseArray<>();
 
@@ -126,7 +114,7 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         for(int i = 0; i < artistGroups.size(); i++) {
             int key = artistGroups.keyAt(i);
             // get the object by the key.
-            ArtistGroup ag = (ArtistGroup) artistGroups.get(key);
+            ArtistGroup ag = artistGroups.get(key);
             {
                 List<ArtistGroup.SelectedSong> songs = ag.songs;
                 for (ArtistGroup.SelectedSong ss : songs) {
@@ -138,21 +126,5 @@ public class ArtistFragment extends Fragment implements CompoundButton.OnChecked
         }
 
         return selectedSongs;
-    }
-
-    public ArrayList<String> getSelectedArtists() {
-        SparseBooleanArray checked = lvArtistList.getCheckedItemPositions();
-        ArrayList<String> selectedItems = new ArrayList<String>();
-        ArrayList<String> selectedBucketIDs = new ArrayList<String>();
-        for (int i = 0; i < checked.size(); i++) {
-            // Item position in adapter
-            int position = checked.keyAt(i);
-            if (checked.valueAt(i)) {
-                String selectedItem = artistAdapter.getArtist(position);
-                selectedItems.add(selectedItem);
-            }
-        }
-
-        return selectedItems;
     }
 }

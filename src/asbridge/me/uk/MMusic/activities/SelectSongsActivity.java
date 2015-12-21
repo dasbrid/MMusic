@@ -9,7 +9,6 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
-import asbridge.me.uk.MMusic.utils.Content;
 
 import java.util.ArrayList;
 
@@ -73,12 +72,9 @@ public class SelectSongsActivity extends FragmentActivity
         if (retainFragment != null) {
             Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
             if (retainFragment.serviceReference != null) {
-
                 ArrayList<Song> selectedSongs = new ArrayList<Song>();
                 selectedSongs = artistsFragment.getSelectedSongs();
-                Content.getSongsForGivenArtistList(this, artistsFragment.getSelectedArtists() ,selectedSongs);
                 Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
-
                 retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }

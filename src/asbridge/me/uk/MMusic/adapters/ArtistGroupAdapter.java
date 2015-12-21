@@ -7,8 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckedTextView;
-import android.widget.TextView;
-import android.widget.Toast;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 
@@ -50,19 +48,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         text.setText(checkedSong.song.getTitle());
         text.setChecked(checkedSong.selected);
         text.setOnClickListener(new OnSongClickListener(groupPosition,childPosition));
-/*
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CheckedTextView text = (CheckedTextView) v.findViewById(R.id.textView1);
-                text.setChecked(!checkedSong.selected);
 
-                Toast.makeText(activity, checkedSong.song,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        */
         return convertView;
     }
 
