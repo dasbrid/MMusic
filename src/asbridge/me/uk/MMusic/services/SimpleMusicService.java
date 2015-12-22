@@ -13,6 +13,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
+import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.Settings;
@@ -242,7 +243,7 @@ public class SimpleMusicService extends Service
         sendBroadcast(songPlayingIntent);
 
         // we can broadcast song started and set notification
-        Intent notIntent = new Intent(this, PlayAllActivivy.class);
+        Intent notIntent = new Intent(this, PlayQueueActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // pending intent to go back to the activity
