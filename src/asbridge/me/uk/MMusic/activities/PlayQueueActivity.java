@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -105,19 +106,18 @@ public class PlayQueueActivity extends FragmentActivity
             /*
             playqueueFragment.playQueue.clear();
             playqueueFragment.playQueue.addAll(newPlayQueue);
-            //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
-            //playQueue.add(nextPlayingSong);
             playqueueFragment.playQueueAdapter.notifyDataSetChanged();
             */
             //or
-            /*
+
             playqueueFragment.updatePlayQueue(newPlayQueue);
-            */
+
 
         }
     }
 
     private void updateNowPlaying(String songArtist, String songTitle) {
+        Log.d(TAG, "updateNowPlaying " + songTitle);
         tvNowPlaying.setText(songArtist + "-" + songTitle);
     }
 
@@ -130,6 +130,30 @@ public class PlayQueueActivity extends FragmentActivity
         if (nextSongChangedReceiver != null) unregisterReceiver(nextSongChangedReceiver);
 
         // paused=true; // TODO: used to remember the paused state (see onResume)
+    }
+
+    // uses the saved paused state
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d(TAG, "onResume");
+        // set up the listener for broadcast from the service for new song playing
+        if (songPlayingReceiver == null) songPlayingReceiver = new SongPlayingReceiver();
+        IntentFilter intentFilter = new IntentFilter(AppConstants.INTENT_ACTION_SONG_PLAYING);
+        registerReceiver(songPlayingReceiver, intentFilter);
+
+        // set up the listener for broadcast from the service for play queue changes
+        if (nextSongChangedReceiver == null) nextSongChangedReceiver = new NextSongChangedReceiver();
+        registerReceiver(nextSongChangedReceiver, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED));
+
+        if (retainFragment.serviceReference != null) {
+            Log.d(TAG, "servicereference is not null");
+            Song currentSong = retainFragment.serviceReference.getCurrentSong();
+            if (currentSong != null)
+                updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
+            ArrayList <Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
+            playqueueFragment.updatePlayQueue(newPlayQueue);
+        }
     }
 
     @Override

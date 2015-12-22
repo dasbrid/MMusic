@@ -5,7 +5,7 @@
               android:layout_height="match_parent">
     <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
     <ImageButton
             android:id="@+id/pqa_btnPlayPause"
             android:src="@drawable/playpause"
@@ -30,7 +30,7 @@
     />
     <Button
             android:id="@+id/pqa_btnChooseSongs"
-            android:text="songs"
+            android:text="library"
             android:onClick="btnChooseSongsClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

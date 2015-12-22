@@ -35,10 +35,6 @@ public class PlayQueueFragment extends Fragment {
     private ArrayList<Song> playQueue;
     private PlayQueueAdapter playQueueAdapter;
 
-    private RetainFragment retainFragment;
-
-    private boolean shuffleOn = true;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
@@ -62,5 +58,11 @@ public class PlayQueueFragment extends Fragment {
         return v;
     }
 
+    public void updatePlayQueue(ArrayList<Song> newPlayQueue) {
+        Log.d(TAG, "updatePlayQueue");
+        playQueue.clear();
+        playQueue.addAll(newPlayQueue);
+        playQueueAdapter.notifyDataSetChanged();
+    }
 
 }
