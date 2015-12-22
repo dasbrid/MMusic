@@ -15,12 +15,14 @@
         <activity android:name=".settings.SettingsActivity">
         </activity>
         <activity android:name=".activities.PlayAllActivivy" android:label="Play All Music" android:launchMode="singleTop">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
-            <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
-        </activity>
+         </activity>
         <activity android:name=".activities.SelectSongsActivity" android:label="Select songs"/>
+        <activity android:name=".activities.PlayQueueActivity" android:label="PlayQueue">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
         <service android:enabled="true" android:name=".services.MusicService" />
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
     </application>
