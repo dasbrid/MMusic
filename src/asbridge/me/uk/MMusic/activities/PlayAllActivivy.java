@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class PlayAllActivivy extends Activity
         implements RearrangeableListView.RearrangeListener
         , RetainFragment.RetainFragmentListener
-        , PlayQueueAdapter.PlayQueueActionsListener // buttons remove and  move to top in play queue
+// handled by fragment        , PlayQueueAdapter.PlayQueueActionsListener // buttons remove and  move to top in play queue
         , SetTimerDialog.SetSleepTimerListener
 {
 
@@ -127,7 +127,6 @@ public class PlayAllActivivy extends Activity
             //updatePlayingNext(nextPlayingSong.getArtist(), nextPlayingSong.getTitle());
             //playQueue.add(nextPlayingSong);
             playQueueAdapter.notifyDataSetChanged();
-
         }
     }
 
@@ -403,25 +402,4 @@ public class PlayAllActivivy extends Activity
         }
     }
 
-    // callback from the playqueue adapter
-    @Override
-    public void onRemoveSongClicked(Song song) {
-        Log.d(TAG, "onRemoveSong "+song.getTitle());
-        if (retainFragment.isBound) {
-            if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.removeSongFromPlayQueue(song.getPID());
-            }
-        }
-    }
-
-    // callback from the playqueue adapter
-    @Override
-    public void onMoveSongToTopClicked(Song song) {
-        Log.d(TAG, "onMoveSongToTopClicked "+song.getTitle());
-        if (retainFragment.isBound) {
-            if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(song.getPID());
-            }
-        }
-    }
 }

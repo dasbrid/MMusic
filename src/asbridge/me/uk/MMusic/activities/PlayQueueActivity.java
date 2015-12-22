@@ -31,8 +31,9 @@ import java.util.ArrayList;
  * Created by AsbridgeD on 22/12/2015.
  */
 public class PlayQueueActivity extends FragmentActivity
-    implements RetainFragment.RetainFragmentListener,
-        PlayQueueAdapter.PlayQueueActionsListener
+    implements
+        RetainFragment.RetainFragmentListener
+        ,PlayQueueFragment.OnPlayQueueListener
 {
 
     private static final String TAG = "PlayQueueActivity";
@@ -65,7 +66,7 @@ public class PlayQueueActivity extends FragmentActivity
         if (playqueueFragment != null)
         {
             // set listenter for callbacks from the fragment
-            // playqueueFragment.setOnSongsChangedListener(this);
+            playqueueFragment.setOnPlayQueueListener(this);
         }
     }
 
@@ -111,16 +112,7 @@ public class PlayQueueActivity extends FragmentActivity
         if (retainFragment.serviceReference != null) {
             ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             Log.d(TAG, "new play queue="+newPlayQueue.size());
-            /*
-            playqueueFragment.playQueue.clear();
-            playqueueFragment.playQueue.addAll(newPlayQueue);
-            playqueueFragment.playQueueAdapter.notifyDataSetChanged();
-            */
-            //or
-
             playqueueFragment.updatePlayQueue(newPlayQueue);
-
-
         }
     }
 
@@ -288,43 +280,21 @@ public class PlayQueueActivity extends FragmentActivity
     }
     ///////////////////////////
 
-
-
-
-
-
-
-
-    //TODO: play queue button click refactoring
-    /*******************************
-    these implement methods in called from the playlistadapter
-     button presses in the list should go to the FRAGMENT not the
-     activity. Button click needs refactoring
-     */
-    // callback from the playqueue adapter
+    // callback from the playqueue fragment
     @Override
     public void onRemoveSongClicked(Song song) {
         Log.d(TAG, "onRemoveSong "+song.getTitle());
-        /*
         if (retainFragment.isBound) {
-            if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.removeSongFromPlayQueue(song.getPID());
-            }
+            retainFragment.serviceReference.removeSongFromPlayQueue(song.getPID());
         }
-        */
     }
 
-    // callback from the playqueue adapter
+    // callback from the playqueue fragment
     @Override
     public void onMoveSongToTopClicked(Song song) {
         Log.d(TAG, "onMoveSongToTopClicked "+song.getTitle());
-        /*
         if (retainFragment.isBound) {
-            if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(song.getPID());
-            }
+            retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(song.getPID());
         }
-        */
     }
-    /********************************/
 }

@@ -24,7 +24,9 @@ import java.util.ArrayList;
 /**
  * Created by AsbridgeD on 22/12/2015.
  */
-public class PlayQueueFragment extends Fragment {
+public class PlayQueueFragment extends Fragment
+    implements PlayQueueAdapter.PlayQueueActionsListener
+{
 
     private String TAG = "DAVE: PlayQueueFragment";
 
@@ -35,7 +37,17 @@ public class PlayQueueFragment extends Fragment {
     private ArrayList<Song> playQueue;
     private PlayQueueAdapter playQueueAdapter;
 
-    @Override
+    private OnPlayQueueListener listener = null;
+    public interface OnPlayQueueListener {
+        void onRemoveSongClicked(Song s);;
+        void onMoveSongToTopClicked(Song s);;
+    }
+
+    public void setOnPlayQueueListener(OnPlayQueueListener l) {
+        listener = l;
+    }
+
+        @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_playqueue, container, false);
@@ -45,15 +57,9 @@ public class PlayQueueFragment extends Fragment {
         lvPlayQueue = (ListView) v.findViewById(R.id.frag_lvrearangablePlayQueue);
 
         playQueue = new ArrayList<>();
-        playQueueAdapter = new PlayQueueAdapter(getActivity(), playQueue);
+        playQueueAdapter = new PlayQueueAdapter(getActivity(), this, playQueue);
 
         lvPlayQueue.setAdapter(playQueueAdapter);
-
-        /* don't think we need to do this ??
-        Log.d(TAG, "starting the service");
-        Intent playIntent = new Intent(this, SimpleMusicService.class);
-        startService(playIntent);
-        */
 
         return v;
     }
@@ -65,4 +71,23 @@ public class PlayQueueFragment extends Fragment {
         playQueueAdapter.notifyDataSetChanged();
     }
 
+    // callback from the playqueue adapter
+    @Override
+    public void onRemoveSongClicked(Song song) {
+        Log.d(TAG, "onRemoveSong "+song.getTitle());
+        if (playQueue != null && playQueue.size() > 0) {
+            if (listener != null)
+                listener.onRemoveSongClicked(song);
+        }
+    }
+
+    // callback from the playqueue adapter
+    @Override
+    public void onMoveSongToTopClicked(Song song) {
+        Log.d(TAG, "onMoveSongToTopClicked "+song.getTitle());
+        if (playQueue != null && playQueue.size() > 0) {
+            if (listener != null)
+                listener.onMoveSongToTopClicked(song);
+        }
+    }
 }

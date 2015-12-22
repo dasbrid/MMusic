@@ -23,7 +23,7 @@ public class PlayQueueAdapter extends BaseAdapter {
     private ArrayList<Song> songs;
     private LayoutInflater songInf;
 
-    private PlayQueueActionsListener playqueueActionsListener;
+    private PlayQueueActionsListener playqueueActionsListener = null;
     public interface PlayQueueActionsListener  {
         void onRemoveSongClicked(Song song);
         void onMoveSongToTopClicked(Song song);
@@ -35,6 +35,14 @@ public class PlayQueueAdapter extends BaseAdapter {
         songs=theSongs;
         songInf=LayoutInflater.from(activity);
         playqueueActionsListener = (PlayQueueActionsListener)activity;
+    }
+
+
+    // Constructor
+    public PlayQueueAdapter(Activity activity, PlayQueueActionsListener listener, ArrayList<Song> theSongs){
+        songs=theSongs;
+        songInf=LayoutInflater.from(activity);
+        playqueueActionsListener = listener;
     }
 
     @Override
@@ -104,7 +112,8 @@ public class PlayQueueAdapter extends BaseAdapter {
             // checkbox clicked
             final Song song = (Song) getItem(songPosition);
             Log.d(TAG, "move to top song "+song.getPID()+","+song.getTitle()+","+songPosition);
-            playqueueActionsListener.onMoveSongToTopClicked(song);
+            if (playqueueActionsListener != null)
+                playqueueActionsListener.onMoveSongToTopClicked(song);
         }
     }
 
@@ -119,7 +128,8 @@ public class PlayQueueAdapter extends BaseAdapter {
             // checkbox clicked
             final Song song = (Song) getItem(songPosition);
             Log.d(TAG, "remove song "+song.getPID()+","+song.getTitle()+","+songPosition);
-            playqueueActionsListener.onRemoveSongClicked(song);
+            if (playqueueActionsListener != null)
+                playqueueActionsListener.onRemoveSongClicked(song);
         }
     }
 
