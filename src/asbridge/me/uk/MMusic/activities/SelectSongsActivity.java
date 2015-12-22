@@ -65,6 +65,35 @@ public class SelectSongsActivity extends FragmentActivity
         retainFragment.doBindService();
     }
 
+
+    /* listener from the artistFragment */
+    @Override
+    public void playThisSongNext(Song s) {
+        if (retainFragment != null) {
+            if (retainFragment.serviceReference != null) {
+                retainFragment.serviceReference.insertThisSongAtTopOfPlayQueue(s);
+            }
+        }
+    }
+
+    /* listener from the artistFragment */
+    public void addThisSongToPlayQueue(Song s) {
+        if (retainFragment != null) {
+            if (retainFragment.serviceReference != null) {
+                retainFragment.serviceReference.insertThisSongIntoPlayQueue(s);
+            }
+        }
+    }
+
+    public void playThisSongNow(Song s) {
+        if (retainFragment != null) {
+            if (retainFragment.serviceReference != null) {
+                retainFragment.serviceReference.playThisSongNow(s);
+            }
+        }
+    }
+
+
     @Override
     public void onSongsChanged() {
         Log.d(TAG, "onSongsChanged");

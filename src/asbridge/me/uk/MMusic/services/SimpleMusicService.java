@@ -351,8 +351,8 @@ public class SimpleMusicService extends Service
         }
     }
 
-    public void playThisSongNext(int songPID) {
-        Log.d(TAG, "SimpleMusicService playThisSongNext:id="+songPID);
+    public void moveThisSongToTopOfPlayQueue(int songPID) {
+        Log.d(TAG, "SimpleMusicService moveThisSongToTopOfPlayQueue:id="+songPID);
         for (Song s : playQueue) {
             Log.d(TAG, "s, id="+s.getID()+",PID="+s.getPID());
             if (s.getPID() == songPID) {
@@ -363,7 +363,15 @@ public class SimpleMusicService extends Service
                 break;
             }
         }
+    }
 
+    public void insertThisSongAtTopOfPlayQueue(Song s) {
+        playQueue.add(0,s); // Add at the BEGINNING of the list
+    }
+
+    public void insertThisSongIntoPlayQueue(Song s) {
+        int pqi = rand.nextInt(playQueue.size());
+        playQueue.add(pqi,s);
     }
 
     // play button pressed in the activity start playing the song
@@ -388,19 +396,23 @@ public class SimpleMusicService extends Service
             fillPlayQueue();
         }
         // get the next song to play (from the queue)
-        currentSong = playQueue.remove(); // retrieve and remove
+        Song nextSong = playQueue.remove(); // retrieve and remove
 
         // add a song into the queue
         fillPlayQueue();
+        playThisSongNow(nextSong);
+    }
 
-        long theSongId = currentSong.getID();
+    public void playThisSongNow(Song songToPlay) {
+        currentSong = songToPlay;
+        long theSongId = songToPlay.getID();
 
-        Log.d(TAG, "song="+currentSong.getTitle()+" id="+ theSongId);
+        Log.d(TAG, "song="+songToPlay.getTitle()+" id="+ theSongId);
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, theSongId);
         try{
             player.setDataSource(getApplicationContext(), trackUri);
-            Log.d(TAG, "song="+currentSong.getTitle()+" id="+ trackUri);
+            Log.d(TAG, "song="+songToPlay.getTitle()+" id="+ trackUri);
 
         }
         catch(Exception e){

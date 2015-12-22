@@ -5,10 +5,8 @@ import android.app.FragmentManager;
 import android.content.*;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
@@ -39,7 +37,7 @@ public class PlayAllActivivy extends Activity
     private TextView tvNowPlaying;
 
     private ListView lvPlayQueue;
-    private RearrangeableListView rlvPlayQueue;
+//    private RearrangeableListView rlvPlayQueue;
 
     private ArrayList<Song> playQueue;
     private PlayQueueAdapter playQueueAdapter;
@@ -77,7 +75,7 @@ public class PlayAllActivivy extends Activity
     public boolean onRearrangeRequested(int fromIndex, int toIndex) {
         Log.d(TAG, "onRearrangeRequested "+fromIndex+ " to " +toIndex);
 /*
-        retainFragment.serviceReference.playThisSongNext(fromSongID);
+        retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(fromSongID);
 
 
         if (toIndex >= 0 && toIndex < getCount()) {
@@ -216,19 +214,61 @@ public class PlayAllActivivy extends Activity
         tvNowPlaying = (TextView) findViewById(R.id.tvPlaying);
 
 //        lvPlayQueue = (ListView) findViewById(R.id.lvPlayQueue);
-        rlvPlayQueue = (RearrangeableListView) findViewById(R.id.lvrearangablePlayQueue);
-        rlvPlayQueue.setRearrangeListener(this);
+        lvPlayQueue = (ListView) findViewById(R.id.lvrearangablePlayQueue);
+        //lvPlayQueue.setRearrangeListener(this);
         //rlvPlayQueue.setRearrangeEnabled(true);
+
+        /*
+        lvPlayQueue.setLongClickable(true);
+        lvPlayQueue.setOnItemLongClickListener(new PlayQueueLongClickListener());
+        */
+        /*
+        registerForContextMenu(lvPlayQueue);
+        */
         playQueue = new ArrayList<>();
         playQueueAdapter = new PlayQueueAdapter(this, playQueue);
 
-//        lvPlayQueue.setAdapter(playQueueAdapter);
-        rlvPlayQueue.setAdapter(playQueueAdapter);
+
+        lvPlayQueue.setAdapter(playQueueAdapter);
 
         Log.d(TAG, "starting the service");
         Intent playIntent = new Intent(this, SimpleMusicService.class);
         startService(playIntent);
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId()==R.id.lvrearangablePlayQueue) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_song_long_click, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch(item.getItemId()) {
+            case R.id.menu_song_long_click_playnext:
+                // add stuff here
+                Log.d(TAG,"onContextItemSelected,menu_song_long_click_playnext");
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    private class PlayQueueLongClickListener implements AdapterView.OnItemLongClickListener {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id) {
+            return onLongListItemClick(v,pos,id);
+        }
+    }
+
+    protected boolean onLongListItemClick(View v, int pos, long id) {
+        Log.i(TAG, "onLongListItemClick id=" + id + " pos=" + pos);
+        return true;
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -380,7 +420,7 @@ public class PlayAllActivivy extends Activity
         Log.d(TAG, "onMoveSongToTopClicked "+song.getTitle());
         if (retainFragment.isBound) {
             if (playQueue != null && playQueue.size() > 0) {
-                retainFragment.serviceReference.playThisSongNext(song.getPID());
+                retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(song.getPID());
             }
         }
     }

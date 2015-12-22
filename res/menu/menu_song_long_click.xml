@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/menu_song_long_click_playnext"
+            android:orderInCategory="2"
+            android:showAsAction="always"
+            android:title="Play Next"/>
+
+    <item
+            android:id="@+id/menu_song_long_click_addtoqueue"
+            android:orderInCategory="2"
+            android:showAsAction="always"
+            android:title="Add to playqueue"/>
+
+    <item
+            android:id="@+id/menu_song_long_click_playnow"
+            android:orderInCategory="3"
+            android:showAsAction="always"
+            android:title="Play now"/>
+
+</menu>

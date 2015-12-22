@@ -3,9 +3,7 @@ package asbridge.me.uk.MMusic.GUIfragments;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistGroupAdapter;
@@ -32,7 +30,11 @@ public class ArtistFragment extends Fragment implements
 
     private OnSongsChangedListener listener = null;
     public interface OnSongsChangedListener {
-        public void onSongsChanged();
+        void onSongsChanged();
+        void playThisSongNext(Song s);
+        void addThisSongToPlayQueue(Song s);
+        void playThisSongNow(Song s);
+
     }
 
     public void setOnSongsChangedListener(OnSongsChangedListener l) {
@@ -86,6 +88,54 @@ public class ArtistFragment extends Fragment implements
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.menu_song_long_click, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        ExpandableListView.ExpandableListContextMenuInfo menuInfo = (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
+        int type = ExpandableListView.getPackedPositionType(menuInfo.packedPosition);
+        int groupPos = -1;
+        int childPos = -1;
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+            childPos = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
+            Log.d(TAG, ": Child " + childPos + " clicked in group " + groupPos);
+
+            int key = artistGroups.keyAt(groupPos);
+            // get the object by the key.
+            ArtistGroup ag = artistGroups.get(key);
+            Song s = ag.songs.get(childPos).song;
+
+            switch (item.getItemId()) {
+                case R.id.menu_song_long_click_playnext:
+                    Log.d(TAG, "menu_song_long_click_playnext");
+                    listener.playThisSongNext(s);
+                    return true;
+                case R.id.menu_song_long_click_addtoqueue:
+                    Log.d(TAG, "menu_song_long_click_addtoqueue");
+                    listener.addThisSongToPlayQueue(s);
+                    return true;
+                case R.id.menu_song_long_click_playnow:
+                    Log.d(TAG, "menu_song_long_click_playnow");
+                    listener.playThisSongNow(s);
+                    return true;
+            }
+
+        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+            Log.d(TAG, ": Group " + groupPos + " clicked");
+        }
+
+
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
@@ -96,13 +146,13 @@ public class ArtistFragment extends Fragment implements
         Button btnSongsSelectNone = (Button) v.findViewById(R.id.btnSongsSelectNone);
         btnSongsSelectNone.setOnClickListener(this);
 
-
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 
         artistGroups = new SparseArray<>();
 
         artistGroupAdapter = new ArtistGroupAdapter(getActivity(), artistGroups);
         elvArtistGroupList.setAdapter(artistGroupAdapter);
+        registerForContextMenu(elvArtistGroupList);
 
         return v;
     }

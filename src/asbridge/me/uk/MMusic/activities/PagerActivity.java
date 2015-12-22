@@ -22,8 +22,8 @@ import java.util.ArrayList;
  * Created by David on 12/12/2015.
  */
 public class PagerActivity extends FragmentActivity implements
-        MusicPlayerFragment.MusicPlayerFragmentListener,
-        ArtistFragment.OnSongsChangedListener
+        MusicPlayerFragment.MusicPlayerFragmentListener
+        //,ArtistFragment.OnSongsChangedListener
 {
 
     private String TAG = "DAVE:FragActivity";
@@ -120,7 +120,7 @@ public class PagerActivity extends FragmentActivity implements
             viewPager.setAdapter(tabsAdapter);
         }
 
-        mArtistFragment.setOnSongsChangedListener(this);
+        //mArtistFragment.setOnSongsChangedListener(this);
         mMusicPlayerFragment.setListener(this);
 
         songList = new ArrayList<Song>();

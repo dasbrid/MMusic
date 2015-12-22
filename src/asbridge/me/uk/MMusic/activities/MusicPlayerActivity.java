@@ -22,7 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import java.util.ArrayList;
 
 public class MusicPlayerActivity extends FragmentActivity
-        implements ArtistFragment.OnSongsChangedListener,
+        implements //ArtistFragment.OnSongsChangedListener,
                     MusicPlayerFragment.MusicPlayerFragmentListener,
                     View.OnClickListener {
 
@@ -187,7 +187,7 @@ public class MusicPlayerActivity extends FragmentActivity
         mArtistFragment = new ArtistFragment();
         //Now you can set the fragment to be visible here
         setArtistFragment(mArtistFragment);
-        mArtistFragment.setOnSongsChangedListener(this);
+//        mArtistFragment.setOnSongsChangedListener(this);
 
         mMusicPlayerFragment = new MusicPlayerFragment();
         //Now you can set the fragment to be visible here
