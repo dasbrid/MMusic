@@ -9,6 +9,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
@@ -17,6 +20,9 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.dialogs.SetTimerDialog;
+import asbridge.me.uk.MMusic.services.SimpleMusicService;
+import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -34,6 +40,8 @@ public class PlayQueueActivity extends FragmentActivity
     private RetainFragment retainFragment = null;
     private PlayQueueFragment playqueueFragment = null;
     private TextView tvNowPlaying;
+
+    private boolean shuffleOn = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -159,6 +167,8 @@ public class PlayQueueActivity extends FragmentActivity
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
+        shuffleOn = retainFragment.serviceReference.getShuffleState();
+        //TODO:????
         // music service is bound and ready.
         ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
         //playqueueFragment.setSongList(songList);
@@ -175,6 +185,73 @@ public class PlayQueueActivity extends FragmentActivity
     public void onBackPressed() {
         Log.d(TAG, "onbackpressed");
         moveTaskToBack(true);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+
+        MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
+        if(shuffleOn){
+            shuffleMenuItem.setIcon(R.drawable.shuffle_on);
+            shuffleMenuItem.setTitle("Turn Shuffle Off");
+        }else{
+            shuffleMenuItem.setIcon(R.drawable.shuffle_off);
+            shuffleMenuItem.setTitle("Turn Shuffle On");
+        }
+
+        return true;
+    }
+
+    // handle user interaction with the menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_timer:
+                showSetTimerDialog();
+                return true;
+            case R.id.action_end:
+                Intent playIntent = new Intent(this, SimpleMusicService.class);
+                stopService(playIntent);
+                retainFragment.serviceReference=null;
+                finish();
+                break;
+            case R.id.action_shuffle:
+                if(shuffleOn){
+                    shuffleOn = false;
+                    //change your view and sort it by Alphabet
+                    item.setIcon(R.drawable.shuffle_off);
+                    item.setTitle("Turn Shuffle On");
+                }else{
+                    shuffleOn = true;
+                    //change your view and sort it by Alphabet
+                    item.setIcon(R.drawable.shuffle_on);
+                    item.setTitle("Turn Shuffle Off");
+                }
+                Log.d(TAG, "shuffle turned "+ (shuffleOn?"on":"off"));
+                retainFragment.serviceReference.setShuffleState(shuffleOn);
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void showSetTimerDialog() {
+        long timeTillSleep = -1;
+        if (retainFragment != null && retainFragment.serviceReference != null) {
+            timeTillSleep = retainFragment.serviceReference.getTimeTillSleep();
+        }
+        if (timeTillSleep < 0) {
+            FragmentManager fm = getFragmentManager();
+            SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
+            setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
+        } else {
+            retainFragment.serviceReference.cancelSleepTimer();
+        }
     }
 
     ///////////////////////////
