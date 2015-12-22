@@ -370,8 +370,14 @@ public class SimpleMusicService extends Service
     }
 
     public void insertThisSongIntoPlayQueue(Song s) {
-        int pqi = rand.nextInt(playQueue.size());
-        playQueue.add(pqi,s);
+        int playQueueIndex = 0;
+        if (playQueue.size() > 0)
+            playQueueIndex = rand.nextInt(playQueue.size());
+        playQueue.add(playQueueIndex,s);
+    }
+
+    public void clearPlayQueue() {
+        playQueue.clear();
     }
 
     // play button pressed in the activity start playing the song

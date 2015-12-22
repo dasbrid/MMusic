@@ -78,6 +78,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
+    @Override
     public void addThisSongToPlayQueue(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -87,6 +88,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
+    @Override
     public void playThisSongNow(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -96,6 +98,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
+    @Override
     public void addArtistsSongsToPlayQueue(ArtistGroup ag) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -106,7 +109,22 @@ public class SelectSongsActivity extends FragmentActivity
         }
     }
 
+    /* listener from the artistFragment */
+    @Override
+    public void clearPlayQueueAndaddArtistsSongsToPlayQueue(ArtistGroup ag) {
+        if (ag.songs.size() == 0)
+            return;
+        if (retainFragment != null) {
+            if (retainFragment.serviceReference != null) {
+                retainFragment.serviceReference.clearPlayQueue();
+                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                    retainFragment.serviceReference.insertThisSongIntoPlayQueue(ss.song);
+                }
+            }
+        }
+    }
 
+    /* listener from the artistFragment */
     @Override
     public void onSongsChanged() {
         Log.d(TAG, "onSongsChanged");
@@ -114,7 +132,7 @@ public class SelectSongsActivity extends FragmentActivity
         if (retainFragment != null) {
             Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
             if (retainFragment.serviceReference != null) {
-                ArrayList<Song> selectedSongs = new ArrayList<Song>();
+                ArrayList<Song> selectedSongs;
                 selectedSongs = artistsFragment.getSelectedSongs();
                 Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
                 retainFragment.serviceReference.setSongList(selectedSongs);

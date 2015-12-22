@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/menu_artist_long_click_addsongstoqueue"
+            android:orderInCategory="2"
+            android:showAsAction="always"
+            android:title="Add to playqueue"/>
+
+    <item
+            android:id="@+id/menu_artist_long_click_clearandaddsongstoqueue"
+            android:orderInCategory="3"
+            android:showAsAction="always"
+            android:title="Clear playqueue and add songs"/>
+</menu>

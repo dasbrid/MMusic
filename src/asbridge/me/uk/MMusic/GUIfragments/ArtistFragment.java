@@ -35,6 +35,7 @@ public class ArtistFragment extends Fragment implements
         void addThisSongToPlayQueue(Song s);
         void playThisSongNow(Song s);
         void addArtistsSongsToPlayQueue(ArtistGroup ag);
+        void clearPlayQueueAndaddArtistsSongsToPlayQueue(ArtistGroup ag);
     }
 
     public void setOnSongsChangedListener(OnSongsChangedListener l) {
@@ -90,8 +91,15 @@ public class ArtistFragment extends Fragment implements
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        Log.d(TAG, "onCreateContextMenu v="+v.toString()+","+v.getId());
+        ExpandableListView.ExpandableListContextMenuInfo elvcmi = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView.getPackedPositionType(elvcmi.packedPosition);
         MenuInflater menuInflater = getActivity().getMenuInflater();
-        menuInflater.inflate(R.menu.menu_song_long_click, menu);
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            menuInflater.inflate(R.menu.menu_song_long_click, menu);
+        } else {
+            menuInflater.inflate(R.menu.menu_artist_long_click, menu);
+        }
     }
 
     @Override
@@ -135,9 +143,16 @@ public class ArtistFragment extends Fragment implements
             ArtistGroup ag = artistGroups.get(key);
 
             switch (item.getItemId()) {
-                case R.id.menu_song_long_click_addtoqueue:
+                case R.id.menu_artist_long_click_addsongstoqueue:
                     Log.d(TAG, "menu_song_long_click_addtoqueue");
                     listener.addArtistsSongsToPlayQueue(ag);
+                    return true;
+            }
+
+            switch (item.getItemId()) {
+                case R.id.menu_artist_long_click_clearandaddsongstoqueue:
+                    Log.d(TAG, "menu_song_long_click_addtoqueue");
+                    listener.clearPlayQueueAndaddArtistsSongsToPlayQueue(ag);
                     return true;
             }
         }
