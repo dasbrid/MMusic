@@ -30,8 +30,6 @@ public class PlayQueueFragment extends Fragment
 
     private String TAG = "DAVE: PlayQueueFragment";
 
-    private TextView tvNowPlaying;
-
     private ListView lvPlayQueue;
 
     private ArrayList<Song> playQueue;
@@ -52,23 +50,30 @@ public class PlayQueueFragment extends Fragment
         Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_playqueue, container, false);
 
-        tvNowPlaying = (TextView) v.findViewById(R.id.pqa_tvPlaying);
-
         lvPlayQueue = (ListView) v.findViewById(R.id.frag_lvrearangablePlayQueue);
 
         playQueue = new ArrayList<>();
         playQueueAdapter = new PlayQueueAdapter(getActivity(), this, playQueue);
 
         lvPlayQueue.setAdapter(playQueueAdapter);
-
+        Log.d(TAG, "size "+ playQueue.size());
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume size "+ playQueue.size());
+        //playQueue = new ArrayList<>();
+        super.onResume();
     }
 
     public void updatePlayQueue(ArrayList<Song> newPlayQueue) {
         Log.d(TAG, "updatePlayQueue");
+        // This crashes when rotating screen
         playQueue.clear();
         playQueue.addAll(newPlayQueue);
         playQueueAdapter.notifyDataSetChanged();
+
     }
 
     // callback from the playqueue adapter

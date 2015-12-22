@@ -3,7 +3,6 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#44771111"
 >
     <Button
             android:text="update song list"
@@ -12,8 +11,15 @@
             android:layout_height="wrap_content"
     >
     </Button>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+    >
     <Button
             android:text="all"
+            android:textSize="12sp"
             android:id="@+id/btnSongsSelectAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,11 +27,14 @@
     </Button>
     <Button
             android:text="clear"
+            android:textSize="12sp"
             android:id="@+id/btnSongsSelectNone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/btnSongsSelectAll"
     >
     </Button>
+    </RelativeLayout>
     <ExpandableListView
             android:id="@+id/lvSongsByArtist"
             android:layout_width="match_parent"
