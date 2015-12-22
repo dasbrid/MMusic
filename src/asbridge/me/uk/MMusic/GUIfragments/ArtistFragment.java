@@ -34,7 +34,7 @@ public class ArtistFragment extends Fragment implements
         void playThisSongNext(Song s);
         void addThisSongToPlayQueue(Song s);
         void playThisSongNow(Song s);
-
+        void addArtistsSongsToPlayQueue(ArtistGroup ag);
     }
 
     public void setOnSongsChangedListener(OnSongsChangedListener l) {
@@ -129,6 +129,17 @@ public class ArtistFragment extends Fragment implements
         } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
             Log.d(TAG, ": Group " + groupPos + " clicked");
+
+            int key = artistGroups.keyAt(groupPos);
+            // get the object by the key.
+            ArtistGroup ag = artistGroups.get(key);
+
+            switch (item.getItemId()) {
+                case R.id.menu_song_long_click_addtoqueue:
+                    Log.d(TAG, "menu_song_long_click_addtoqueue");
+                    listener.addArtistsSongsToPlayQueue(ag);
+                    return true;
+            }
         }
 
 

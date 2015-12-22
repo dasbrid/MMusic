@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -85,10 +86,22 @@ public class SelectSongsActivity extends FragmentActivity
         }
     }
 
+    /* listener from the artistFragment */
     public void playThisSongNow(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
                 retainFragment.serviceReference.playThisSongNow(s);
+            }
+        }
+    }
+
+    /* listener from the artistFragment */
+    public void addArtistsSongsToPlayQueue(ArtistGroup ag) {
+        if (retainFragment != null) {
+            if (retainFragment.serviceReference != null) {
+                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                    retainFragment.serviceReference.insertThisSongIntoPlayQueue(ss.song);
+                }
             }
         }
     }
