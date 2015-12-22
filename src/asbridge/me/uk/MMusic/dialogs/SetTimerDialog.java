@@ -16,14 +16,19 @@ public class SetTimerDialog extends DialogFragment {
 
     private NumberPicker numberPicker;
 
-    public interface SetSleepTimerListener {
+    public interface OnSetSleepTimerListener {
         void onSleepTimerChanged(int x);
     }
 
+    private OnSetSleepTimerListener listener = null;
+    public void setOnSetSleepTimerListener(OnSetSleepTimerListener l) {
+        listener = l;
+    }
+
     private void btnOKClicked() {
-        SetSleepTimerListener activity = (SetSleepTimerListener) getActivity();
         int value = numberPicker.getValue();
-        activity.onSleepTimerChanged(value);
+        if (listener != null)
+            listener.onSleepTimerChanged(value);
 
         dismiss();
     }

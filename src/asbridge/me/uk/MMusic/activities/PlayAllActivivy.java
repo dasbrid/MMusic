@@ -29,7 +29,7 @@ public class PlayAllActivivy extends Activity
         implements RearrangeableListView.RearrangeListener
         , RetainFragment.RetainFragmentListener
 // handled by fragment        , PlayQueueAdapter.PlayQueueActionsListener // buttons remove and  move to top in play queue
-        , SetTimerDialog.SetSleepTimerListener
+        , SetTimerDialog.OnSetSleepTimerListener
 {
 
     private String TAG = "DAVE:PlayAllActivivy";
@@ -396,6 +396,7 @@ public class PlayAllActivivy extends Activity
         if (timeTillSleep < 0) {
             FragmentManager fm = getFragmentManager();
             SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
+            setSleepTimerDialog.setOnSetSleepTimerListener(this);
             setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
         } else {
             retainFragment.serviceReference.cancelSleepTimer();
