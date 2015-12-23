@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
-import asbridge.me.uk.MMusic.GUIfragments.MusicPlayerFragment;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
 
 /**

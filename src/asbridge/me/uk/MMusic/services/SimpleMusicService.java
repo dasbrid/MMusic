@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.activities.PlayAllActivivy;
 import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
