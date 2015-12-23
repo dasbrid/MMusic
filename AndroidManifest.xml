@@ -13,12 +13,12 @@
          </activity>
         <activity android:name=".activities.SelectSongsActivity" android:label="Select songs"/>
         <activity android:name=".activities.PlayQueueActivity" android:label="PlayQueue">
-        </activity>
-        <activity android:name=".activities.MMusicActivity" android:label="MMusic">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter>        </activity>
+        <activity android:name=".activities.MMusicActivity" android:label="MMusic">
+
         </activity>
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
     </application>

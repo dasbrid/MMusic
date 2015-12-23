@@ -45,18 +45,17 @@
             android:text="Now Playing:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFFF2299"
+            android:textColor="#FFFFFF99"
             android:textSize="16sp"
     />
     <TextView
             android:id="@+id/pqa_tvPlaying"
-            android:textColor="#FFFF2299"
+            android:textColor="#FFFFFF99"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="Song Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/pqa_labelNowPlaying"
+            android:layout_below="@id/pqa_labelNowPlaying"
     />
     </RelativeLayout>
     <fragment android:name="asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment"
