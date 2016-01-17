@@ -17,7 +17,7 @@ import android.widget.TextView;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.adapters.NewTabsAdapter;
+import asbridge.me.uk.MMusic.adapters.MusicFragmentsAdapter;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 /**
  * Created by AsbridgeD on 22/12/2015.
  */
-public class NewTabsActivity extends FragmentActivity
+public class BothFragmentsActivity extends FragmentActivity
         implements
         RetainFragment.RetainFragmentListener
         ,PlayQueueFragment.OnPlayQueueListener
@@ -45,16 +45,14 @@ public class NewTabsActivity extends FragmentActivity
 
     private boolean shuffleOn = true;
 
-//    private NewTabsAdapter tabsAdapter;
-
-   // private PlayQueueFragment mMusicPlayerFragment = null;
-    //private ArtistFragment artistsFragment = null;
+    private PlayQueueFragment mMusicPlayerFragment = null;
+    private ArtistFragment artistsFragment = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setContentView(R.layout.activity_mmusic);
+        setContentView(R.layout.activity_both_fragments);
 
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
@@ -68,19 +66,13 @@ public class NewTabsActivity extends FragmentActivity
         }
 
         tvNowPlaying = (TextView) findViewById(R.id.pqa_tvPlaying);
-/*
-        mMusicPlayerFragment = new PlayQueueFragment();
+
+        mMusicPlayerFragment = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayqueue);
         mMusicPlayerFragment.setOnPlayQueueListener(this);
-*/
-        /*
-        artistsFragment = new ArtistFragment();
+
+        artistsFragment = (ArtistFragment) getSupportFragmentManager().findFragmentById(R.id.fragArtists);
         artistsFragment.setOnSongsChangedListener(this);
-*/
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pagertabs);
-        if (retainFragment.tabsAdapter== null) {
-            retainFragment.tabsAdapter = new NewTabsAdapter(getSupportFragmentManager(), this);
-            viewPager.setAdapter(retainFragment.tabsAdapter);
-        }
+
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -124,13 +116,7 @@ public class NewTabsActivity extends FragmentActivity
         if (retainFragment.serviceReference != null) {
             ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             Log.d(TAG, "new play queue="+newPlayQueue.size());
-
-            //= (PlayQueueFragment)tabsAdapter.getCurrentFragment();//(PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_playqueue);
-            PlayQueueFragment pqf = retainFragment.tabsAdapter.getPlayQueueFragment();
-            Log.d(TAG, "pqf is " + (pqf==null?"null":"not null"));
-            if (pqf != null)
-                pqf.updatePlayQueue(newPlayQueue);
-////////            mMusicPlayerFragment.updatePlayQueue(newPlayQueue);
+            mMusicPlayerFragment.updatePlayQueue(newPlayQueue);
         }
     }
 
@@ -170,11 +156,7 @@ public class NewTabsActivity extends FragmentActivity
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
             ArrayList <Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
-
-            PlayQueueFragment pqf = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_playqueue);
-            Log.d(TAG, "pqf is " + (pqf==null?"null":"not null"));
-            if (pqf != null)
-                pqf.updatePlayQueue(newPlayQueue);
+            mMusicPlayerFragment.updatePlayQueue(newPlayQueue);
         }
     }
 
@@ -184,7 +166,7 @@ public class NewTabsActivity extends FragmentActivity
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
         ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-/// can't do this here, fragment isn't created yet        artistsFragment.setSongList(songList);
+        artistsFragment.setSongList(songList);
     }
 
     public void btnChooseSongsClicked(View v) {
@@ -386,10 +368,9 @@ public class NewTabsActivity extends FragmentActivity
             Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
             if (retainFragment.serviceReference != null) {
                 ArrayList<Song> selectedSongs;
-                // fragment might not be displayed...
-                //selectedSongs = artistsFragment.getSelectedSongs();
-                //Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
-                //retainFragment.serviceReference.setSongList(selectedSongs);
+                selectedSongs = artistsFragment.getSelectedSongs();
+                Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
+                retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }
     }

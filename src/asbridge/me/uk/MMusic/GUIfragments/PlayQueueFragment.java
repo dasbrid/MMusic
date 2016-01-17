@@ -53,17 +53,16 @@ public class PlayQueueFragment extends Fragment
         lvPlayQueue = (ListView) v.findViewById(R.id.frag_lvrearangablePlayQueue);
 
         playQueue = new ArrayList<>();
-        playQueueAdapter = new PlayQueueAdapter(getActivity(), this, playQueue);
 
+        playQueueAdapter = new PlayQueueAdapter(getActivity(), this, playQueue);
         lvPlayQueue.setAdapter(playQueueAdapter);
-        Log.d(TAG, "size "+ playQueue.size());
+
         return v;
     }
 
     @Override
     public void onResume() {
         Log.d(TAG, "onResume size "+ playQueue.size());
-        //playQueue = new ArrayList<>();
         super.onResume();
     }
 
@@ -73,7 +72,6 @@ public class PlayQueueFragment extends Fragment
         playQueue.clear();
         playQueue.addAll(newPlayQueue);
         playQueueAdapter.notifyDataSetChanged();
-
     }
 
     // callback from the playqueue adapter

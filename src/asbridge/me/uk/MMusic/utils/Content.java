@@ -29,18 +29,22 @@ public class Content {
         String sortOrder = MediaStore.Audio.Media.ARTIST + " ASC";
         String groupBy = "1) GROUP BY (1"; // this is really WHERE (1) GROUP BY (1)
         Cursor musicCursor = musicResolver.query(musicUri, projection, groupBy, null, sortOrder);
-        Log.d(TAG, "got artists from ContentResolver, count = " + (musicCursor == null ? null : musicCursor.getCount()));
-        if(musicCursor!=null && musicCursor.moveToFirst()){
-            //get columns
-            int artistColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ARTIST);
-            //add items to list
-            do {
-                String thisArtist = musicCursor.getString(artistColumn);
-                // Log.d(TAG, "adding song, title = " + thisTitle);
-                artistList.add(thisArtist);
+
+        try {
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int artistColumn = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ARTIST);
+                //add items to list
+                do {
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    // Log.d(TAG, "adding song, title = " + thisTitle);
+                    artistList.add(thisArtist);
+                }
+                while (musicCursor.moveToNext());
             }
-            while (musicCursor.moveToNext());
+        } finally {
+            musicCursor.close();
         }
     }
 
@@ -94,27 +98,31 @@ public class Content {
         };
 
         Cursor musicCursor = musicResolver.query(musicUri, projection, selection, selectionArgs, sortOrder);
-        Log.d(TAG, "got songs from ContentResolver, count = " + (musicCursor == null ? null : musicCursor.getCount()));
-        if(musicCursor!=null && musicCursor.moveToFirst()){
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ARTIST);
-            int albumColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ALBUM);
-            //add songs to list
-            do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                String thisAlbum = musicCursor.getString(albumColumn);
-                // Log.d(TAG, "adding song, title = " + thisTitle);
-                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1));
+
+        try {
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ARTIST);
+                int albumColumn = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ALBUM);
+                //add songs to list
+                do {
+                    long thisId = musicCursor.getLong(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    String thisAlbum = musicCursor.getString(albumColumn);
+                    // Log.d(TAG, "adding song, title = " + thisTitle);
+                    songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1));
+                }
+                while (musicCursor.moveToNext());
             }
-            while (musicCursor.moveToNext());
+        } finally {
+            musicCursor.close();
         }
     }
 

@@ -13,6 +13,8 @@
         <activity android:name=".activities.PlayQueueActivity" android:label="PlayQueue">
         </activity>
         <activity android:name=".activities.NewTabsActivity" android:label="NewTabsQueue">
+        </activity>
+        <activity android:name=".activities.BothFragmentsActivity" android:label="Music Player">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

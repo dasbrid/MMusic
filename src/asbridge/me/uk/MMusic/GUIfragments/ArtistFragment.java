@@ -183,6 +183,12 @@ public class ArtistFragment extends Fragment implements
         return v;
     }
 
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume "+ artistGroups.size() + " artists");
+        super.onResume();
+    }
+
     public ArrayList<Song> getSelectedSongs() {
         ArrayList<Song> selectedSongs = new ArrayList<>();
         for(int i = 0; i < artistGroups.size(); i++) {

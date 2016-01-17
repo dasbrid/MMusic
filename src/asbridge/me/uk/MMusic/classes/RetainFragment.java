@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import asbridge.me.uk.MMusic.activities.NewTabsActivity;
+import asbridge.me.uk.MMusic.adapters.NewTabsAdapter;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.utils.Content;
 
@@ -24,6 +26,7 @@ public class RetainFragment extends Fragment {
 
     private static final String TAG = "DAVE:RetainFragment";
 
+    public NewTabsAdapter tabsAdapter;
 
     private RetainFragmentListener listener;
     public interface RetainFragmentListener {
