@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.database.PlaylistsTable;
 
@@ -19,6 +20,8 @@ import java.util.HashSet;
  * Created by AsbridgeD on 18/01/2016.
  */
 public class PlaylistsContentProvider  extends ContentProvider {
+
+    private final static String TAG = "ContentProvider";
 
     // database
     private PlaylistsDatabaseHelper database;
@@ -62,14 +65,16 @@ public class PlaylistsContentProvider  extends ContentProvider {
 
         // Set the table
         queryBuilder.setTables(PlaylistsTable.TABLE_NAME);
-
+        Log.d(TAG, "query");
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
             case TODOS:
+                Log.d(TAG, "TODO");
                 break;
             case TODO_ID:
+                Log.d(TAG, "TODO_ID");
                 // adding the ID to the original query
-                queryBuilder.appendWhere(PlaylistsTable.COLUMN_ID + "="
+                queryBuilder.appendWhere(PlaylistsTable.COLUMN_NAME_SONG_ID + "="
                         + uri.getLastPathSegment());
                 break;
             default:
@@ -187,5 +192,4 @@ public class PlaylistsContentProvider  extends ContentProvider {
             }
         }
     }
-
 }

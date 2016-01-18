@@ -75,7 +75,7 @@ public class ArtistFragment extends Fragment implements
         ArrayList<Song> selectedSongs;
         selectedSongs = getSelectedSongs();
         for (Song s : selectedSongs) {
-            MusicContent.addSongToPlaylist(getContext(),1);
+            MusicContent.addSongToPlaylist(getContext(),0,s.getID());
         }
 
         if (listener != null)
@@ -83,16 +83,22 @@ public class ArtistFragment extends Fragment implements
     }
 
     public void setSongList(ArrayList<Song> songs) {
+
+        songs = new ArrayList<>();
+        MusicContent.getAllSongs(getContext(), songs);
         Log.d(TAG, "setSongList "+songs.size());
 
+        ArrayList<Long> selectedSongs= MusicContent.getSongsInPlaylist(getContext(), 0);
         int i=0;
         ArtistGroup newGroup = null;
         for (Song s : songs) {
-            if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
-                newGroup = new ArtistGroup(s.getArtist());
-                artistGroups.append(i++, newGroup);
-            }
-            newGroup.songs.add(new ArtistGroup.SelectedSong(s, true));
+
+                if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
+                    newGroup = new ArtistGroup(s.getArtist());
+                    artistGroups.append(i++, newGroup);
+                }
+                newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
+
         }
         artistGroupAdapter.notifyDataSetChanged();
     }

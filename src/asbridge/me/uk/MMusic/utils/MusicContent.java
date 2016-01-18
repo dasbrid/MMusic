@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.utils;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Address;
@@ -9,6 +10,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider;
+import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.database.PlaylistsTable;
 
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class MusicContent {
         getSongs(context, selection, selectionArgs, sortOrder, songList);
     }
 
-        // generic method called after the selection and order has been setup
+    // generic method called after the selection and order has been setup
     public static void getSongs(Context context, String selection, String[] selectionArgs, String sortOrder, ArrayList<Song> songList) {
         //retrieve song info
         ContentResolver musicResolver = context.getContentResolver();
@@ -122,23 +124,49 @@ public class MusicContent {
         }
     }
 
-    public static ArrayList<Song> getSongsInPlaylist(Context context, int playlistID) {
-        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI + "/" + playlistID);
-        ArrayList<Song> songsInPlaylist = new ArrayList<>();
+    public static void addSongToPlaylist(Context context, int playlistID, long songID) {
+        Log.d(TAG,"addsong "+ songID + " to playlist "+playlistID);
+        // Defines a new Uri object that receives the result of the insertion
+        Uri mNewUri;
+        // Defines an object to contain the new values to insert
+        ContentValues mNewValues = new ContentValues();
+
+        /*
+         * Sets the values of each column and inserts the word. The arguments to the "put"
+         * method are "column name" and "value"
+         */
+        mNewValues.put(PlaylistsTable.COLUMN_NAME_PLAYLIST_ID, playlistID);
+        mNewValues.put(PlaylistsTable.COLUMN_NAME_SONG_ID, songID);
+
+        mNewUri = context.getContentResolver().insert(
+                PlaylistsContentProvider.CONTENT_URI,   // the user dictionary content URI
+                mNewValues                          // the values to insert
+        );
+    }
+
+
+    public static ArrayList<Long> getSongsInPlaylist(Context context, int playlistID) {
+        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI + "/#" + playlistID);
+        ArrayList<Long> songIDs = new ArrayList<>();
         Log.d(TAG, "getting playlist "+playlistID);
-        String[] projection = {PlaylistsTable.COLUMN_NAME_SONG_ID };
+        String[] projection = {PlaylistsTable.COLUMN_NAME_PLAYLIST_ID, PlaylistsTable.COLUMN_NAME_SONG_ID };
+
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null,
                 null);
+
+        int songIDColumn = cursor.getColumnIndex(PlaylistsTable.COLUMN_NAME_SONG_ID);
+
         if (cursor != null  && cursor.moveToFirst()) {
 
-            int songID = cursor.getColumnIndex (PlaylistsTable.COLUMN_NAME_SONG_ID);
             do {
-                Log.d(TAG, "   song "+songID);
+                long songID = cursor.getInt(songIDColumn);
+                Log.d(TAG, "  playlist " + playlistID  + " contains song "+songID);
+                songIDs.add(songID);
             } while (cursor.moveToNext());
 
             // always close the cursor
             cursor.close();
         }
-        return songsInPlaylist;
+        return songIDs;
     }
 }
