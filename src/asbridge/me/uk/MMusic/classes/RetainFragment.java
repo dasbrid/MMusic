@@ -9,11 +9,8 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
-import asbridge.me.uk.MMusic.utils.Content;
+import asbridge.me.uk.MMusic.utils.MusicContent;
 
 import java.util.ArrayList;
 
@@ -114,7 +111,7 @@ public class RetainFragment extends Fragment {
 
             // set the list of songs in the service
             ArrayList<Song> songList = new ArrayList<>();
-            Content.getAllSongs(getActivity().getApplicationContext(), songList);
+            MusicContent.getAllSongs(getActivity().getApplicationContext(), songList);
             serviceReference.setSongList(songList);
             serviceReference.fillPlayQueue();
             isBound = true;

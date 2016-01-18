@@ -76,15 +76,16 @@ public class ArtistFragment extends Fragment implements
 
     public void setSongList(ArrayList<Song> songs) {
         Log.d(TAG, "setSongList "+songs.size());
-            int i=0;
-            ArtistGroup newGroup = null;
-            for (Song s : songs) {
-                if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
-                    newGroup = new ArtistGroup(s.getArtist());
-                    artistGroups.append(i++, newGroup);
-                }
-                newGroup.songs.add(new ArtistGroup.SelectedSong(s, true));
+
+        int i=0;
+        ArtistGroup newGroup = null;
+        for (Song s : songs) {
+            if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
+                newGroup = new ArtistGroup(s.getArtist());
+                artistGroups.append(i++, newGroup);
             }
+            newGroup.songs.add(new ArtistGroup.SelectedSong(s, true));
+        }
         artistGroupAdapter.notifyDataSetChanged();
     }
 

@@ -11,13 +11,22 @@
         </activity>
         <activity android:name=".activities.SelectSongsActivity" android:label="Select songs"/>
         <activity android:name=".activities.PlayQueueActivity" android:label="PlayQueue">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>        </activity>
+        </activity>
         <activity android:name=".activities.MMusicActivity" android:label="MMusic">
 
         </activity>
+        <activity android:name=".activities.TwoFragmentsActivity" android:label="two fragments">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
+
+        <provider
+                android:name=".contentprovider.PlaylistsContentProvider"
+                android:authorities="de.vogella.android.todos.contentprovider" >
+        </provider>
+
     </application>
 </manifest>

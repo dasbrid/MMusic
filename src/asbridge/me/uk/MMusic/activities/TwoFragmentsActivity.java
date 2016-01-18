@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,10 +16,10 @@ import android.widget.TextView;
 import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.adapters.MusicFragmentsAdapter;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.dialogs.SetTimerDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 /**
  * Created by AsbridgeD on 22/12/2015.
  */
-public class MMusicActivity extends FragmentActivity
+public class TwoFragmentsActivity extends FragmentActivity
         implements
         RetainFragment.RetainFragmentListener
         ,PlayQueueFragment.OnPlayQueueListener
@@ -45,7 +44,6 @@ public class MMusicActivity extends FragmentActivity
 
     private boolean shuffleOn = true;
 
-    private MusicFragmentsAdapter tabsAdapter;
     private PlayQueueFragment mMusicPlayerFragment = null;
     private ArtistFragment artistsFragment = null;
 
@@ -53,7 +51,9 @@ public class MMusicActivity extends FragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setContentView(R.layout.activity_mmusic);
+        setContentView(R.layout.activity_twofragments);
+
+        PlaylistsDatabaseHelper db = new PlaylistsDatabaseHelper(this);
 
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
@@ -68,10 +68,12 @@ public class MMusicActivity extends FragmentActivity
 
         tvNowPlaying = (TextView) findViewById(R.id.pqa_tvPlaying);
 
-        mMusicPlayerFragment = new PlayQueueFragment();
+        //mMusicPlayerFragment = new PlayQueueFragment();
+        mMusicPlayerFragment = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayqueue);
         mMusicPlayerFragment.setOnPlayQueueListener(this);
 
-        artistsFragment = new ArtistFragment();
+        //artistsFragment = new ArtistFragment();
+        artistsFragment = (ArtistFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
         artistsFragment.setOnSongsChangedListener(this);
 
 
@@ -82,11 +84,6 @@ public class MMusicActivity extends FragmentActivity
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
-
-        ViewPager viewPager = (ViewPager) findViewById(R.id.mmusic_pagertabs);
-        tabsAdapter = new MusicFragmentsAdapter(getSupportFragmentManager(), mMusicPlayerFragment, artistsFragment);
-        viewPager.setAdapter(tabsAdapter);
-
 
         retainFragment.doBindService();
     }
@@ -174,7 +171,7 @@ public class MMusicActivity extends FragmentActivity
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
         ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-//        artistsFragment.setSongList(songList);
+        artistsFragment.setSongList(songList);
     }
 
     public void btnChooseSongsClicked(View v) {

@@ -3,19 +3,22 @@ package asbridge.me.uk.MMusic.utils;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.location.Address;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider;
+import asbridge.me.uk.MMusic.database.PlaylistsTable;
 
 import java.util.ArrayList;
 
 /**
  * Created by David on 05/12/2015.
  */
-public class Content {
+public class MusicContent {
 
-    private static String TAG = "DAVE:Content";
+    private static String TAG = "DAVE:MusicContent";
 
     public static void getArtists(Context context, ArrayList<String> artistList) {
         //retrieve song info
@@ -113,9 +116,29 @@ public class Content {
                 String thisAlbum = musicCursor.getString(albumColumn);
                 // Log.d(TAG, "adding song, title = " + thisTitle);
                 songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1));
-            }
-            while (musicCursor.moveToNext());
+            } while (musicCursor.moveToNext());
+            // always close the cursor
+            musicCursor.close();
         }
     }
 
+    public static ArrayList<Song> getSongsInPlaylist(Context context, int playlistID) {
+        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI + "/" + playlistID);
+        ArrayList<Song> songsInPlaylist = new ArrayList<>();
+        Log.d(TAG, "getting playlist "+playlistID);
+        String[] projection = {PlaylistsTable.COLUMN_NAME_SONG_ID };
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null,
+                null);
+        if (cursor != null  && cursor.moveToFirst()) {
+
+            int songID = cursor.getColumnIndex (PlaylistsTable.COLUMN_NAME_SONG_ID);
+            do {
+                Log.d(TAG, "   song "+songID);
+            } while (cursor.moveToNext());
+
+            // always close the cursor
+            cursor.close();
+        }
+        return songsInPlaylist;
+    }
 }

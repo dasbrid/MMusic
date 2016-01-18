@@ -31,17 +31,19 @@ public class PlayQueueAdapter extends BaseAdapter {
 
 
     // Constructor
-    public PlayQueueAdapter(Activity activity, ArrayList<Song> theSongs){
+    public PlayQueueAdapter(Context activity, ArrayList<Song> theSongs){
         songs=theSongs;
         songInf=LayoutInflater.from(activity);
         playqueueActionsListener = (PlayQueueActionsListener)activity;
     }
 
-
+    private Context activity;
     // Constructor
-    public PlayQueueAdapter(Activity activity, PlayQueueActionsListener listener, ArrayList<Song> theSongs){
+    public PlayQueueAdapter(Context activity, PlayQueueActionsListener listener, ArrayList<Song> theSongs){
+        Log.d(TAG, "Ctor: context is " + (activity==null?"null":"not null"));
         songs=theSongs;
-        songInf=LayoutInflater.from(activity);
+        this.activity = activity;
+        // moved to createview songInf=LayoutInflater.from(activity);
         playqueueActionsListener = listener;
     }
 
@@ -73,7 +75,7 @@ public class PlayQueueAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi = convertView;
         ViewHolder holder;
-
+        songInf=LayoutInflater.from(activity);
         if(convertView==null) {
             /****** Inflate tabitem.xml file for each row ( Defined below ) *******/
             vi = songInf.inflate(R.layout.playqueuesong, null);
