@@ -9,14 +9,10 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class PlaylistsDatabaseHelper extends SQLiteOpenHelper {
 
-
-
     // Database Version
     private static final int DATABASE_VERSION = 1;
     // Database Name
     private static final String DATABASE_NAME = "MusicDB";
-
-
 
     private static final String SQL_DROP_PLAYLIST_TABLE = "DROP TABLE IF EXISTS " + PlaylistsTable.TABLE_NAME;
 

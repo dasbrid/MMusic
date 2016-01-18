@@ -22,9 +22,9 @@ public final class PlaylistsTable {
 
     private static final String SQL_CREATE_PLAYLIST_TABLE =
             "CREATE TABLE " + PlaylistsTable.TABLE_NAME + " (" +
-                    PlaylistsTable.COLUMN_ID + " INTEGER PRIMARY KEY," +
+                    PlaylistsTable.COLUMN_ID + " INTEGER PRIMARY KEY autoincrement," +
                     PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + INTEGER_TYPE + COMMA_SEP +
-                    PlaylistsTable.COLUMN_NAME_SONG_ID + INTEGER_TYPE + COMMA_SEP +
+                    PlaylistsTable.COLUMN_NAME_SONG_ID + INTEGER_TYPE +
                     " )";
 
     private static final String SQL_DROP_PLAYLIST_TABLE = "DROP TABLE IF EXISTS " + PlaylistsTable.TABLE_NAME;
@@ -33,11 +33,8 @@ public final class PlaylistsTable {
         database.execSQL(SQL_CREATE_PLAYLIST_TABLE);
     }
 
-    public static void onUpgrade(SQLiteDatabase database, int oldVersion,
-                                 int newVersion) {
+    public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         database.execSQL(SQL_DROP_PLAYLIST_TABLE);
-
-        // create fresh playlist table
         onCreate(database);
     }
 }

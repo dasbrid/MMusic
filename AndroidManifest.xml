@@ -24,8 +24,10 @@
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
 
         <provider
-                android:name=".contentprovider.PlaylistsContentProvider"
-                android:authorities="de.vogella.android.todos.contentprovider" >
+                android:name="asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider"
+                android:authorities="asbridge.me.uk.mmusic.playlists.contentprovider"
+                android:exported="false"
+        >
         </provider>
 
     </application>

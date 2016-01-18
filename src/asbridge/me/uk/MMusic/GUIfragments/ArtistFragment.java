@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.support.v4.app.Fragment;
+import asbridge.me.uk.MMusic.utils.MusicContent;
+
 /**
  * Created by AsbridgeD on 08/12/2015.
  */
@@ -70,6 +72,12 @@ public class ArtistFragment extends Fragment implements
     // Update the services list of artists
     public void changeArtist() {
         Log.d(TAG, "changeArtist");
+        ArrayList<Song> selectedSongs;
+        selectedSongs = getSelectedSongs();
+        for (Song s : selectedSongs) {
+            MusicContent.addSongToPlaylist(getContext(),1);
+        }
+
         if (listener != null)
             listener.onSongsChanged();
     }
