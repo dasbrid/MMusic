@@ -92,7 +92,7 @@ public class SelectSongsActivity extends FragmentActivity
     public void playThisSongNow(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
-                retainFragment.serviceReference.playThisSongNow(s);
+                retainFragment.serviceReference.playThisSong(s);
             }
         }
     }

@@ -13,6 +13,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
+import asbridge.me.uk.MMusic.activities.TwoFragmentsActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
@@ -243,7 +244,7 @@ public class SimpleMusicService extends Service
         sendBroadcast(songPlayingIntent);
 
         // we can broadcast song started and set notification
-        Intent notIntent = new Intent(this, PlayQueueActivity.class);
+        Intent notIntent = new Intent(this, TwoFragmentsActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // pending intent to go back to the activity
@@ -430,7 +431,14 @@ public class SimpleMusicService extends Service
         playThisSongNow(nextSong);
     }
 
-    public void playThisSongNow(Song songToPlay) {
+    // call this from outside
+    public void playThisSong(Song songToPlay) {
+        player.reset();
+        playThisSongNow(songToPlay);
+    }
+
+    private void playThisSongNow(Song songToPlay) {
+        Log.v(TAG, "playThisSongNow "+songToPlay.getTitle() + " id=" + songToPlay.getID());
         currentSong = songToPlay;
         long theSongId = songToPlay.getID();
 
