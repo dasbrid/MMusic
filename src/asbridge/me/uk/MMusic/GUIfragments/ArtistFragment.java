@@ -44,6 +44,47 @@ public class ArtistFragment extends Fragment implements
         listener = l;
     }
 
+    private static final String STATE_ALLSONGS = "ALLSONGS";
+    private static final String STATE_SELECTEDSONGS = "SELECTEDSONGS";
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+        // Save our own state now
+        outState.putParcelableArrayList(STATE_ALLSONGS, songs);
+        outState.putParcelableArrayList(STATE_SELECTEDSONGS, getSelectedSongs());
+    }
+
+    private ArrayList<Song> songs = new ArrayList<>() ;
+
+    public void setSongList() {
+        // This displays ALL songs on the device
+        songs = new ArrayList<>();
+        MusicContent.getAllSongs(getContext(), songs);
+        Log.d(TAG, "setSongList " + songs.size());
+
+        // Songs are set selected based on the current playlist
+        ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
+
+        setListViewContents(songs, selectedSongs);
+    }
+
+    private void setListViewContents(ArrayList<Song> songs, ArrayList<Long> selectedSongs) {
+        int i=0;
+        ArtistGroup newGroup = null;
+        for (Song s : songs) {
+
+            if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
+                newGroup = new ArtistGroup(s.getArtist());
+                artistGroups.append(i++, newGroup);
+            }
+            newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
+
+        }
+        artistGroupAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -78,28 +119,6 @@ public class ArtistFragment extends Fragment implements
 
         if (listener != null)
             listener.onSongsChanged();
-    }
-
-    public void setSongList() {
-        // This displays ALL songs on the device
-        ArrayList <Song> songs = new ArrayList<>();
-        MusicContent.getAllSongs(getContext(), songs);
-        Log.d(TAG, "setSongList "+songs.size());
-
-        // Songs are set selected based on the current playlist
-        ArrayList<Long> selectedSongs= MusicContent.getSongsInPlaylist(getContext(), 0);
-        int i=0;
-        ArtistGroup newGroup = null;
-        for (Song s : songs) {
-
-                if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
-                    newGroup = new ArtistGroup(s.getArtist());
-                    artistGroups.append(i++, newGroup);
-                }
-                newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
-
-        }
-        artistGroupAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -178,6 +197,10 @@ public class ArtistFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
+
+
+
+
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
@@ -193,8 +216,38 @@ public class ArtistFragment extends Fragment implements
         artistGroupAdapter = new ArtistGroupAdapter(getActivity(), artistGroups);
         elvArtistGroupList.setAdapter(artistGroupAdapter);
         registerForContextMenu(elvArtistGroupList);
-        setSongList();
+
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            songs = savedInstanceState.getParcelableArrayList(STATE_ALLSONGS);
+            ArrayList<Song> selectedSongs = savedInstanceState.getParcelableArrayList(STATE_SELECTEDSONGS);
+            ArrayList<Long> selectedSongIDs = new ArrayList<>();
+            for (Song s : selectedSongs) {
+                selectedSongIDs.add(s.getID());
+            }
+            setListViewContents(songs, selectedSongIDs);
+        } else {
+            setSongList();
+        }
         return v;
+    }
+
+    public ArrayList<Long> getSelectedSongIDs() {
+        ArrayList<Long> selectedSongIDs = new ArrayList<>();
+        for(int i = 0; i < artistGroups.size(); i++) {
+            int key = artistGroups.keyAt(i);
+            // get the object by the key.
+            ArtistGroup ag = artistGroups.get(key);
+            {
+                List<ArtistGroup.SelectedSong> songs = ag.songs;
+                for (ArtistGroup.SelectedSong ss : songs) {
+                    if (ss.selected) {
+                        selectedSongIDs.add(ss.song.getID());
+                    }
+                }
+            }
+        }
+        return selectedSongIDs;
     }
 
     public ArrayList<Song> getSelectedSongs() {

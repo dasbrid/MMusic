@@ -1,5 +1,8 @@
 package asbridge.me.uk.MMusic.classes;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +10,13 @@ import java.util.List;
  * Created by AsbridgeD on 21/12/2015.
  */
 public class ArtistGroup {
+
+    public String artistName;
+    public final List<SelectedSong> songs = new ArrayList<>();
+
+    public ArtistGroup(String string) {
+        this.artistName = string;
+    }
 
     public static class SelectedSong {
         public Song song;
@@ -55,10 +65,4 @@ public class ArtistGroup {
 
     }
 
-    public String artistName;
-    public final List<SelectedSong> songs = new ArrayList<>();
-
-    public ArtistGroup(String string) {
-        this.artistName = string;
-    }
 }
