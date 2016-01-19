@@ -170,8 +170,8 @@ public class TwoFragmentsActivity extends FragmentActivity
         Log.d(TAG, "onMusicServiceReady");
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
-        ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-        artistsFragment.setSongList(songList);
+        //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
+        artistsFragment.setSongList();
     }
 
     public void btnChooseSongsClicked(View v) {
@@ -368,6 +368,8 @@ public class TwoFragmentsActivity extends FragmentActivity
     @Override
     public void onSongsChanged() {
         Log.d(TAG, "onSongsChanged");
+        /* All this is done directly from the Fragment and stored in the DB
+        Maybe should pass the songs out and store here??????
         Log.d(TAG, "retain fragment is " + (retainFragment==null?"null":"not null"));
         if (retainFragment != null) {
             Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
@@ -378,5 +380,6 @@ public class TwoFragmentsActivity extends FragmentActivity
                 retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }
+        */
     }
 }

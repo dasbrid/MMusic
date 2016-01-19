@@ -28,8 +28,8 @@ public class SelectSongsActivity extends FragmentActivity
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
-        ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-        artistsFragment.setSongList(songList);
+        //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
+        artistsFragment.setSongList();
     }
 
 
@@ -135,7 +135,7 @@ public class SelectSongsActivity extends FragmentActivity
                 ArrayList<Song> selectedSongs;
                 selectedSongs = artistsFragment.getSelectedSongs();
                 Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
-                retainFragment.serviceReference.setSongList(selectedSongs);
+                //retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }
     }

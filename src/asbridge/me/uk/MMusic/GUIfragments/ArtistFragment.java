@@ -82,9 +82,10 @@ public class ArtistFragment extends Fragment implements
             listener.onSongsChanged();
     }
 
-    public void setSongList(ArrayList<Song> songs) {
-
-        songs = new ArrayList<>();
+    public void setSongList() {
+        // This displays ALL songs
+        // Songs are set selected based on the current playlist
+        ArrayList <Song> songs = new ArrayList<>();
         MusicContent.getAllSongs(getContext(), songs);
         Log.d(TAG, "setSongList "+songs.size());
 

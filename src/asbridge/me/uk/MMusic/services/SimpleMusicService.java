@@ -36,7 +36,7 @@ public class SimpleMusicService extends Service
     private static final String ACTION_PLAY = "com.example.action.PLAY";
     private MediaPlayer player = null;
     //song list
-    private ArrayList<Song> songs = null;
+//    private ArrayList<Song> songs = null;
     private Random rand;
 
     private LinkedList<Song> playQueue;
@@ -122,7 +122,7 @@ public class SimpleMusicService extends Service
         Settings.setShuffleState(getApplicationContext(), shuffleOn);
         super.onDestroy();
     }
-
+/*
     // called from activity to set the songs to play
     public void setSongList(ArrayList<Song> songList) {
         Log.d(TAG, "setSongList");
@@ -134,7 +134,7 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "getSongList "+songs.size());
         return songs;
     }
-
+*/
     // returns the current playing song
     public Song getCurrentSong() {
         return currentSong;
@@ -329,7 +329,6 @@ public class SimpleMusicService extends Service
                 Log.d(TAG, "choosing next ordered song");
                 currentPickedSong++;
 
-
                 // get number of songs in the current playlist
                 int numSongsInPlaylist;
                 numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
@@ -337,7 +336,7 @@ public class SimpleMusicService extends Service
 
                 if (currentPickedSong >= numSongsInPlaylist) currentPickedSong = 0;
 
-                if (currentPickedSong >= songs.size()) currentPickedSong = 0;
+                // if (currentPickedSong >= songs.size()) currentPickedSong = 0;
                 nextSongIndex = currentPickedSong;
             }
             Log.v(TAG, "nextSongIndex="+nextSongIndex);
@@ -407,12 +406,14 @@ public class SimpleMusicService extends Service
         }
 
         player.reset();
+
         //get a song
+        /*
         if (this.songs == null || this.songs.size() < 1) {
             Log.d(TAG, "no songs to play");
             return;
         }
-
+        */
         if (playQueue.size() < Settings.getPlayQueueSize(getApplicationContext())) {
             // nothing in the queue, so initialise
             fillPlayQueue();

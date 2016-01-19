@@ -108,11 +108,12 @@ public class RetainFragment extends Fragment {
             SimpleMusicService.SimpleMusicBinder binder = (SimpleMusicService.SimpleMusicBinder)service;
             //get service
             serviceReference = binder.getService();
-
+/*
             // set the list of songs in the service
             ArrayList<Song> songList = new ArrayList<>();
             MusicContent.getAllSongs(getActivity().getApplicationContext(), songList);
             serviceReference.setSongList(songList);
+            */
             serviceReference.fillPlayQueue();
             isBound = true;
             listener.onMusicServiceReady();

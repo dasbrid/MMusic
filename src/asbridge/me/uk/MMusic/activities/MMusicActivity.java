@@ -173,7 +173,7 @@ public class MMusicActivity extends FragmentActivity
         Log.d(TAG, "onMusicServiceReady");
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
-        ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
+        //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
 //        artistsFragment.setSongList(songList);
     }
 
@@ -378,7 +378,7 @@ public class MMusicActivity extends FragmentActivity
                 ArrayList<Song> selectedSongs;
                 selectedSongs = artistsFragment.getSelectedSongs();
                 Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
-                retainFragment.serviceReference.setSongList(selectedSongs);
+                //retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }
     }

@@ -162,7 +162,7 @@ public class PlayQueueActivity extends FragmentActivity
         shuffleOn = retainFragment.serviceReference.getShuffleState();
         //TODO:????
         // music service is bound and ready.
-        ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
+        //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
         //playqueueFragment.setSongList(songList);
     }
 
