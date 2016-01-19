@@ -77,6 +77,22 @@ public class MusicContent {
         getSongs(context, selection, selectionargs, songList);
     }
 
+    public static Song getSongBySongID(Context context, long songID) {
+        String selection = MediaStore.Audio.Media._ID + "=?";
+        String[] selectionargs = new String[1];
+        selectionargs[0] = Long.toString(songID);
+        ArrayList<Song> songList = new ArrayList<>();
+        getSongs(context, selection, selectionargs, songList);
+        if (songList.size() == 0) {
+            return null;
+        } else if (songList.size() > 1) {
+            Log.e(TAG, "More than one song with ID = " + songID);
+            return songList.get(0);
+            //throw new Exception("More than one song with ID = " + songID);
+        }
+        return songList.get(0);
+    }
+
     // generic method called after the selection has been setup, ordered by title
     public static void getSongs(Context context, String selection, String[] selectionArgs, ArrayList<Song> songList) {
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
@@ -139,20 +155,19 @@ public class MusicContent {
         mNewValues.put(PlaylistsTable.COLUMN_NAME_SONG_ID, songID);
 
         mNewUri = context.getContentResolver().insert(
-                PlaylistsContentProvider.CONTENT_URI,   // the user dictionary content URI
+                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,   // the user dictionary content URI
                 mNewValues                          // the values to insert
         );
     }
 
 
     public static ArrayList<Long> getSongsInPlaylist(Context context, int playlistID) {
-        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI + "/#" + playlistID);
+        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_PLAYLISTS + "/" + playlistID);
         ArrayList<Long> songIDs = new ArrayList<>();
-        Log.d(TAG, "getting playlist "+playlistID);
+        Log.d(TAG, "getting playlist "+playlistID+" using uri "+uri.toString());
         String[] projection = {PlaylistsTable.COLUMN_NAME_PLAYLIST_ID, PlaylistsTable.COLUMN_NAME_SONG_ID };
 
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null,
-                null);
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
 
         int songIDColumn = cursor.getColumnIndex(PlaylistsTable.COLUMN_NAME_SONG_ID);
 
@@ -168,5 +183,36 @@ public class MusicContent {
             cursor.close();
         }
         return songIDs;
+    }
+
+    public static int getNumSongsInPlaylist(Context context, int playlistID ) {
+
+        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_PLAYLISTS + "/" + playlistID);
+
+        String[] projection = {"count(*)"};
+
+        Cursor cursor = context.getContentResolver().query(uri,projection, null, null, null);
+
+        if (cursor != null  && cursor.getCount() == 0) {
+            cursor.close();
+            return 0;
+        } else {
+            cursor.moveToFirst();
+            int result = cursor.getInt(0);
+            cursor.close();
+            return result;
+        }
+    }
+
+    /* This would be MUCH better if we didn't return ALL the songs in a playlist get the nth one*/
+    /* Better to have the database / content provider so that we can get the nth song in the playlist with one query */
+    // ... but it works!
+    public static Song getSongInCurrentPlaylist(Context context, int  songINDEX) {
+        ArrayList<Long> songIDs = getSongsInPlaylist(context, 0 /*Current playlist*/);
+        Long songID = songIDs.get(songINDEX);
+        Song song = getSongBySongID(context, songID);
+
+        return song;
+
     }
 }

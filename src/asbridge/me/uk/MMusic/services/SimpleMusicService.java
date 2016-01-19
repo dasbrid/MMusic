@@ -15,6 +15,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
+import asbridge.me.uk.MMusic.utils.MusicContent;
 import asbridge.me.uk.MMusic.utils.Settings;
 
 import java.util.*;
@@ -307,8 +308,11 @@ public class SimpleMusicService extends Service
     // should NOT be the same as currentIndex
     private int getRandomSongIndex(int currentIndex) {
         int songIndex = currentIndex;
+        int numSongsInPlaylist;
+        numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
+        Log.v(TAG, "getRandomSongIndex, numSongsInPlaylist="+numSongsInPlaylist);
         while(songIndex == currentIndex){
-            songIndex=rand.nextInt(songs.size());
+            songIndex=rand.nextInt(numSongsInPlaylist);
         }
         return songIndex;
     }
@@ -324,12 +328,24 @@ public class SimpleMusicService extends Service
             } else {
                 Log.d(TAG, "choosing next ordered song");
                 currentPickedSong++;
+
+
+                // get number of songs in the current playlist
+                int numSongsInPlaylist;
+                numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
+                Log.v(TAG,  "num songs in playlist = "+numSongsInPlaylist);
+
+                if (currentPickedSong >= numSongsInPlaylist) currentPickedSong = 0;
+
                 if (currentPickedSong >= songs.size()) currentPickedSong = 0;
                 nextSongIndex = currentPickedSong;
             }
+            Log.v(TAG, "nextSongIndex="+nextSongIndex);
+            if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
 
-            if (nextSongPID++ > 100) nextSongPID = 0;
-            Song pqSong = new Song(songs.get(nextSongIndex), nextSongPID);
+            Song nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
+            //Song pqSong = new Song(songs.get(nextSongIndex), nextSongPID);
+            Song pqSong = new Song(nextSong,nextSongPID);
             playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
         }
         // broadcast that the play queue has changed
