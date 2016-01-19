@@ -140,6 +140,23 @@ public class MusicContent {
         }
     }
 
+    public static void setCurrentPlaylist(Context context, ArrayList<Song> selectedSongs) {
+
+        final int playlistID = 0; /* current playlist */
+        String[] selectionArgs = {"0"};
+
+        int numDeleted;
+        numDeleted = context.getContentResolver().delete(
+                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,   // the user dictionary content URI
+                PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + " = ?",
+                selectionArgs);
+
+
+        for (Song s : selectedSongs) {
+            addSongToPlaylist(context, 0, s.getID());
+        }
+    }
+
     public static void addSongToPlaylist(Context context, int playlistID, long songID) {
         Log.d(TAG,"addsong "+ songID + " to playlist "+playlistID);
         // Defines a new Uri object that receives the result of the insertion

@@ -318,6 +318,13 @@ public class SimpleMusicService extends Service
     }
 
     public void fillPlayQueue() {
+        // get number of songs in the current playbucket
+        int numSongsInPlaylist;
+        numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
+        if (numSongsInPlaylist == 0) {
+            Log.v(TAG, "No songs in playbucket");
+            return;
+        }
         int i = playQueue.size();
         for (; i< Settings.getPlayQueueSize(getApplicationContext()) ; i++) {
             int nextSongIndex;
@@ -329,9 +336,6 @@ public class SimpleMusicService extends Service
                 Log.d(TAG, "choosing next ordered song");
                 currentPickedSong++;
 
-                // get number of songs in the current playlist
-                int numSongsInPlaylist;
-                numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
                 Log.v(TAG,  "num songs in playlist = "+numSongsInPlaylist);
 
                 if (currentPickedSong >= numSongsInPlaylist) currentPickedSong = 0;

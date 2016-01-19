@@ -171,7 +171,7 @@ public class TwoFragmentsActivity extends FragmentActivity
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
         //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-        artistsFragment.setSongList();
+        //artistsFragment.setSongList();
     }
 
     public void btnChooseSongsClicked(View v) {

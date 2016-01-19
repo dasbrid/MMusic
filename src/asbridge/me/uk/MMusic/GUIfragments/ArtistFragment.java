@@ -74,21 +74,19 @@ public class ArtistFragment extends Fragment implements
         Log.d(TAG, "changeArtist");
         ArrayList<Song> selectedSongs;
         selectedSongs = getSelectedSongs();
-        for (Song s : selectedSongs) {
-            MusicContent.addSongToPlaylist(getContext(),0,s.getID());
-        }
+        MusicContent.setCurrentPlaylist(getContext(), selectedSongs);
 
         if (listener != null)
             listener.onSongsChanged();
     }
 
     public void setSongList() {
-        // This displays ALL songs
-        // Songs are set selected based on the current playlist
+        // This displays ALL songs on the device
         ArrayList <Song> songs = new ArrayList<>();
         MusicContent.getAllSongs(getContext(), songs);
         Log.d(TAG, "setSongList "+songs.size());
 
+        // Songs are set selected based on the current playlist
         ArrayList<Long> selectedSongs= MusicContent.getSongsInPlaylist(getContext(), 0);
         int i=0;
         ArtistGroup newGroup = null;
@@ -195,7 +193,7 @@ public class ArtistFragment extends Fragment implements
         artistGroupAdapter = new ArtistGroupAdapter(getActivity(), artistGroups);
         elvArtistGroupList.setAdapter(artistGroupAdapter);
         registerForContextMenu(elvArtistGroupList);
-
+        setSongList();
         return v;
     }
 
