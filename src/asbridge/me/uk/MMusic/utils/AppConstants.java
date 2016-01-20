@@ -17,5 +17,7 @@ public class AppConstants {
 
     public static final String INTENT_ACTION_PLAY_QUEUE_CHANGED = "asbridge.me.uk.MMusic.ACTION_PLAY_QUEUE_CHANGED";
 
+    public static final int PLAYEDQUEUE_SIZE = 3;
+
 
 }

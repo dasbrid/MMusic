@@ -41,6 +41,7 @@ public class SimpleMusicService extends Service
     private Random rand;
 
     private LinkedList<Song> playQueue;
+    private Queue<Song> playedQueue;
     private Song currentSong;
 
     // current position in playing song
@@ -212,7 +213,8 @@ public class SimpleMusicService extends Service
         registerReceiver(becomingNoisyListener, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
         currentSong = null;
-        playQueue = new LinkedList<>(); //ArrayList<>();
+        playQueue = new LinkedList<>();
+        playedQueue = new LinkedList<>();
     }
 
     private void initialiseMediaPlayer() {
@@ -439,6 +441,12 @@ public class SimpleMusicService extends Service
 
     private void playThisSongNow(Song songToPlay) {
         Log.v(TAG, "playThisSongNow "+songToPlay.getTitle() + " id=" + songToPlay.getID());
+
+        playedQueue.add(currentSong);
+        if (playedQueue.size() > AppConstants.PLAYEDQUEUE_SIZE) {
+            playedQueue.remove();
+        }
+
         currentSong = songToPlay;
         long theSongId = songToPlay.getID();
 
