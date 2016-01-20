@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
 import asbridge.me.uk.MMusic.activities.TwoFragmentsActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -41,7 +40,7 @@ public class SimpleMusicService extends Service
     private Random rand;
 
     private LinkedList<Song> playQueue;
-    private Queue<Song> playedQueue;
+    private Queue<Song> playedList;
     private Song currentSong;
 
     // current position in playing song
@@ -143,8 +142,19 @@ public class SimpleMusicService extends Service
     }
 
     public ArrayList<Song> getPlayQueue() {
-        Log.d(TAG, "getPlayQueue="+playQueue.size());
+        Log.v(TAG, "getPlayQueue="+playQueue.size());
         return new ArrayList<Song> (playQueue);
+    }
+
+    public ArrayList<Song> getPlayedList() {
+
+        if (playedList.size() > 0) {
+            Song currSong = playedList.peek();
+            Log.v(TAG, "getPlayedListQueue=" + playedList.size() + (currSong == null ? " null" : " not null"));
+        }
+
+
+        return new ArrayList<Song> (playedList);
     }
 
     /**
@@ -214,7 +224,7 @@ public class SimpleMusicService extends Service
 
         currentSong = null;
         playQueue = new LinkedList<>();
-        playedQueue = new LinkedList<>();
+        playedList = new LinkedList<>();
     }
 
     private void initialiseMediaPlayer() {
@@ -442,9 +452,10 @@ public class SimpleMusicService extends Service
     private void playThisSongNow(Song songToPlay) {
         Log.v(TAG, "playThisSongNow "+songToPlay.getTitle() + " id=" + songToPlay.getID());
 
-        playedQueue.add(currentSong);
-        if (playedQueue.size() > AppConstants.PLAYEDQUEUE_SIZE) {
-            playedQueue.remove();
+        if (currentSong != null)
+            playedList.add(currentSong);
+        if (playedList.size() > AppConstants.PLAYEDQUEUE_SIZE) {
+            playedList.remove();
         }
 
         currentSong = songToPlay;

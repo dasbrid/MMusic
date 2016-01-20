@@ -1,6 +1,5 @@
 package asbridge.me.uk.MMusic.activities;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,12 +13,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
+import asbridge.me.uk.MMusic.GUIfragments.PlayedListFragment;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.dialogs.SetTimerDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
@@ -31,23 +30,28 @@ import java.util.ArrayList;
  * Created by AsbridgeD on 22/12/2015.
  */
 public class PlayQueueActivity extends FragmentActivity
-    implements
+        implements
         RetainFragment.RetainFragmentListener
         ,PlayQueueFragment.OnPlayQueueListener
 {
 
-    private static final String TAG = "PlayQueueActivity";
+    private static final String TAG = "MMusicActivity";
 
     private RetainFragment retainFragment = null;
-    private PlayQueueFragment playqueueFragment = null;
     private TextView tvNowPlaying;
 
     private boolean shuffleOn = true;
 
+    private PlayQueueFragment mPlayQueueFragment = null;
+    private PlayedListFragment mPlayedListFragment = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_playqueue);
+
+        PlaylistsDatabaseHelper db = new PlaylistsDatabaseHelper(this);
 
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
@@ -62,12 +66,13 @@ public class PlayQueueActivity extends FragmentActivity
 
         tvNowPlaying = (TextView) findViewById(R.id.pqa_tvPlaying);
 
-        playqueueFragment = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayqueue);
-        if (playqueueFragment != null)
-        {
-            // set listenter for callbacks from the fragment
-            playqueueFragment.setOnPlayQueueListener(this);
-        }
+        //mPlayQueueFragment = new PlayQueueFragment();
+        mPlayQueueFragment = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayqueue);
+        mPlayQueueFragment.setOnPlayQueueListener(this);
+
+        //mPlayQueueFragment = new PlayQueueFragment();
+        mPlayedListFragment = (PlayedListFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayedqueue);
+        //mPlayQueueFragment.setOnPlayQueueListener(this);
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -75,6 +80,7 @@ public class PlayQueueActivity extends FragmentActivity
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
+
         retainFragment.doBindService();
     }
 
@@ -104,15 +110,16 @@ public class PlayQueueActivity extends FragmentActivity
         }
     }
 
-    // TODO: Should this be done here, and pass play queue to the fragment, or should
-    // we just tell the fragment to update 'itself'
-    // i've added commented calls to unimplemented fragment methods ...
+
+    // called from fragment
     private void updatePlayQueue() {
         Log.d(TAG, "updatePlayQueue");
         if (retainFragment.serviceReference != null) {
             ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             Log.d(TAG, "new play queue="+newPlayQueue.size());
-            playqueueFragment.updatePlayQueue(newPlayQueue);
+            mPlayQueueFragment.updatePlayQueue(newPlayQueue);
+            ArrayList<Song> newPlayedList = retainFragment.serviceReference.getPlayedList();
+            mPlayedListFragment.updatePlayedList(newPlayedList);
         }
     }
 
@@ -152,18 +159,17 @@ public class PlayQueueActivity extends FragmentActivity
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
             ArrayList <Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
-            playqueueFragment.updatePlayQueue(newPlayQueue);
+            mPlayQueueFragment.updatePlayQueue(newPlayQueue);
         }
     }
 
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
+        // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
-        //TODO:????
-        // music service is bound and ready.
         //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-        //playqueueFragment.setSongList(songList);
+        //artistsFragment.setSongList();
     }
 
     public void btnChooseSongsClicked(View v) {
@@ -186,10 +192,10 @@ public class PlayQueueActivity extends FragmentActivity
 
         MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
         if(shuffleOn){
-            shuffleMenuItem.setIcon(R.drawable.shuffle_on);
+            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_on);
             shuffleMenuItem.setTitle("Turn Shuffle Off");
         }else{
-            shuffleMenuItem.setIcon(R.drawable.shuffle_off);
+            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_off);
             shuffleMenuItem.setTitle("Turn Shuffle On");
         }
 
@@ -204,6 +210,9 @@ public class PlayQueueActivity extends FragmentActivity
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.action_playbuckets:
+                startActivity(new Intent(this, SelectSongsActivity.class));
+                return true;
             case R.id.action_timer:
                 showSetTimerDialog();
                 return true;
@@ -217,12 +226,12 @@ public class PlayQueueActivity extends FragmentActivity
                 if(shuffleOn){
                     shuffleOn = false;
                     //change your view and sort it by Alphabet
-                    item.setIcon(R.drawable.shuffle_off);
+                    item.setIcon(R.drawable.ic_action_shuffle_off);
                     item.setTitle("Turn Shuffle On");
                 }else{
                     shuffleOn = true;
                     //change your view and sort it by Alphabet
-                    item.setIcon(R.drawable.shuffle_on);
+                    item.setIcon(R.drawable.ic_action_shuffle_on);
                     item.setTitle("Turn Shuffle Off");
                 }
                 Log.d(TAG, "shuffle turned "+ (shuffleOn?"on":"off"));

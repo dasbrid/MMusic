@@ -5,6 +5,8 @@
               android:layout_height="match_parent">
     <TextView
             android:text="Play queue:"
+            android:textColor="#FF9999FF"
+            android:textSize="10sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     <asbridge.me.uk.MMusic.controls.RearrangeableListView

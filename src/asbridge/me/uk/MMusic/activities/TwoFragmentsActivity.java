@@ -194,10 +194,10 @@ public class TwoFragmentsActivity extends FragmentActivity
 
         MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
         if(shuffleOn){
-            shuffleMenuItem.setIcon(R.drawable.shuffle_on);
+            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_on);
             shuffleMenuItem.setTitle("Turn Shuffle Off");
         }else{
-            shuffleMenuItem.setIcon(R.drawable.shuffle_off);
+            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_off);
             shuffleMenuItem.setTitle("Turn Shuffle On");
         }
 

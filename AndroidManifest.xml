@@ -10,12 +10,12 @@
         <activity android:name=".settings.SettingsActivity">
         </activity>
         <activity android:name=".activities.SelectSongsActivity" android:label="Select songs"/>
-        <activity android:name=".activities.PlayQueueActivity" android:label="PlayQueue">
-        </activity>
         <activity android:name=".activities.MMusicActivity" android:label="MMusic">
 
         </activity>
         <activity android:name=".activities.TwoFragmentsActivity" android:label="two fragments">
+        </activity>
+        <activity android:name=".activities.PlayQueueActivity" android:label="play queue">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

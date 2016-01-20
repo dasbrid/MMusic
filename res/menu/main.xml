@@ -13,14 +13,21 @@
             android:title="Set timer"/>
     <item
             android:id="@+id/action_end"
-            android:icon="@drawable/end"
+            android:icon="@drawable/ic_action_exit"
             android:orderInCategory="2"
             android:showAsAction="always"
             android:title="End"/>
     <item
             android:id="@+id/action_shuffle"
-            android:icon="@drawable/shuffle_on"
+            android:icon="@drawable/ic_action_shuffle_on"
             android:orderInCategory="1"
             android:showAsAction="always"
             android:title="Shuffle"/>
+    <item
+            android:id="@+id/action_playbuckets"
+            android:icon="@drawable/ic_action_playbuckets"
+            android:orderInCategory="1"
+            android:showAsAction="always"
+            android:title="Playbuckets"/>
+
 </menu>

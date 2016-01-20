@@ -3,64 +3,66 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
     <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-    <ImageButton
-            android:id="@+id/pqa_btnPlayPause"
-            android:src="@drawable/playpause"
-            android:onClick="btnPlayPauseClicked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <ImageButton
-            android:id="@+id/pqa_btnStop"
-            android:src="@drawable/stop"
-            android:onClick="btnStopClicked"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/pqa_btnPlayPause"
-    />
-    <ImageButton
-            android:id="@+id/pqa_btnNext"
-            android:src="@drawable/next"
-            android:onClick="btnNextClicked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/pqa_btnStop"
-    />
-    <Button
-            android:id="@+id/pqa_btnChooseSongs"
-            android:text="library"
-            android:onClick="btnChooseSongsClicked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/pqa_btnNext"
-    />
+            android:gravity="center"
+    >
+        <ImageButton
+                android:id="@+id/pqa_btnPlayPause"
+                android:src="@drawable/playpause"
+                android:onClick="btnPlayPauseClicked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        <ImageButton
+                android:id="@+id/pqa_btnStop"
+                android:src="@drawable/stop"
+                android:onClick="btnStopClicked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/pqa_btnPlayPause"
+        />
+        <ImageButton
+                android:id="@+id/pqa_btnNext"
+                android:src="@drawable/next"
+                android:onClick="btnNextClicked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/pqa_btnStop"
+        />
     </RelativeLayout>
+    <fragment android:name="asbridge.me.uk.MMusic.GUIfragments.PlayedListFragment"
+              android:id="@+id/fragplayedqueue"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+    />
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-    <TextView
-            android:id="@+id/pqa_labelNowPlaying"
-            android:text="Now Playing:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF99"
-            android:textSize="16sp"
-    />
-    <TextView
-            android:id="@+id/pqa_tvPlaying"
-            android:textColor="#FFFFFF99"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/pqa_labelNowPlaying"
-    />
+        <TextView
+                android:id="@+id/pqa_labelNowPlaying"
+                android:text="Now Playing:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF99"
+                android:textSize="16sp"
+        />
+        <TextView
+                android:id="@+id/pqa_tvPlaying"
+                android:textColor="#FFFFFF99"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="Song Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pqa_labelNowPlaying"
+        />
     </RelativeLayout>
     <fragment android:name="asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment"
               android:id="@+id/fragplayqueue"
               android:layout_width="match_parent"
-              android:layout_height="match_parent" />
+              android:layout_height="match_parent"
+/>
 
 </LinearLayout>

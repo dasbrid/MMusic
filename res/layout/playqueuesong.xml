@@ -16,7 +16,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#FFFFFF99"
-                        android:textSize="16sp"
+                        android:textSize="10sp"
                         android:textStyle="bold"
                         android:layout_alignParentLeft="true"
                 />
@@ -27,7 +27,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
                         android:textColor="#FFFFFF99"
-                        android:textSize="16sp"
+                        android:textSize="10sp"
                         android:layout_below="@id/pqsong_title"
 
                 />

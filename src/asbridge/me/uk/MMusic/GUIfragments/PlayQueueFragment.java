@@ -34,7 +34,6 @@ public class PlayQueueFragment extends Fragment
 
     private ArrayList<Song> playQueue;
     private PlayQueueAdapter playQueueAdapter;
-    private int counter;
 
     private OnPlayQueueListener listener = null;
     public interface OnPlayQueueListener {
@@ -55,14 +54,9 @@ public class PlayQueueFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_playqueue, container, false);
 
         lvPlayQueue = (ListView) v.findViewById(R.id.frag_lvrearangablePlayQueue);
-/* move to constr
-        playQueue = new ArrayList<>();
-*/
         playQueueAdapter = new PlayQueueAdapter(getContext(), this, playQueue);
-            counter++;
 
         lvPlayQueue.setAdapter(playQueueAdapter);
-        Log.d(TAG, "size "+ playQueue.size()+", counter="+counter);
         return v;
     }
 
@@ -74,8 +68,6 @@ public class PlayQueueFragment extends Fragment
     }
 
     public void updatePlayQueue(ArrayList<Song> newPlayQueue) {
-        Log.d(TAG, "updatePlazQueue, counter="+ counter + "PlayQueue"+(playQueue==null?"null":"not null")+", npq "+(newPlayQueue==null?"null":"not null")
-                +", paq "+(playQueueAdapter==null?"null":"not null"));
         playQueue.clear();
         playQueue.addAll(newPlayQueue);
         playQueueAdapter.notifyDataSetChanged();// This crashes when rotating screen
