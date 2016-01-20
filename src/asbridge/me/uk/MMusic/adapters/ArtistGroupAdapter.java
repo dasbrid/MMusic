@@ -6,10 +6,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.ImageButton;
+import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 
@@ -45,14 +42,17 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
         final ArtistGroup.SelectedSong checkedSong = (ArtistGroup.SelectedSong) getChild(groupPosition, childPosition);
-        CheckedTextView text = null;
+        TextView text = null;
+        CheckBox checkbox = null;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.artistrow_details, null);
         }
-        text = (CheckedTextView) convertView.findViewById(R.id.textView1);
+        text = (TextView) convertView.findViewById(R.id.textView1);
         text.setText(checkedSong.song.getTitle());
-        text.setChecked(checkedSong.selected);
-        text.setOnClickListener(new OnSongClickListener(groupPosition,childPosition));
+
+        checkbox = (CheckBox) convertView.findViewById(R.id.songcheckbox);
+        checkbox.setChecked(checkedSong.selected);
+        checkbox.setOnClickListener(new OnSongClickListener(groupPosition,childPosition));
 
         return convertView;
     }
@@ -121,9 +121,9 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
 
         int selectedState = group.getSelectedState();
 
-        CheckedTextView ctv = (CheckedTextView) convertView.findViewById(R.id.textView1);
+        TextView ctv = (TextView) convertView.findViewById(R.id.textView1);
         ctv.setText(group.artistName);
-        ctv.setChecked(isExpanded);
+        //ctv.setChecked(isExpanded);
 
         ImageButton btnAgSelectNone = (ImageButton) convertView.findViewById(R.id.btnAgSelectNone);
         btnAgSelectNone.setOnClickListener(new OnArtistClickListener(groupPosition));
