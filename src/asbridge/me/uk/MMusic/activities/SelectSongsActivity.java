@@ -28,7 +28,6 @@ public class SelectSongsActivity extends FragmentActivity
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
-        //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
         artistsFragment.setSongList();
     }
 

@@ -225,12 +225,12 @@ public class TwoFragmentsActivity extends FragmentActivity
                 if(shuffleOn){
                     shuffleOn = false;
                     //change your view and sort it by Alphabet
-                    item.setIcon(R.drawable.shuffle_off);
+                    item.setIcon(R.drawable.ic_action_shuffle_off);
                     item.setTitle("Turn Shuffle On");
                 }else{
                     shuffleOn = true;
                     //change your view and sort it by Alphabet
-                    item.setIcon(R.drawable.shuffle_on);
+                    item.setIcon(R.drawable.ic_action_shuffle_on);
                     item.setTitle("Turn Shuffle Off");
                 }
                 Log.d(TAG, "shuffle turned "+ (shuffleOn?"on":"off"));
