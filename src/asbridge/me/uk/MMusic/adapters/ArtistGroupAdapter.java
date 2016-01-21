@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
+import asbridge.me.uk.MMusic.controls.TriStateButton;
 
 
 /**
@@ -123,45 +124,36 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
 
         TextView ctv = (TextView) convertView.findViewById(R.id.textView1);
         ctv.setText(group.artistName);
-        //ctv.setChecked(isExpanded);
 
-        ImageButton btnAgSelectNone = (ImageButton) convertView.findViewById(R.id.btnAgSelectNone);
-        btnAgSelectNone.setOnClickListener(new OnArtistClickListener(groupPosition));
-        switch (selectedState) {
-            case 0:
-                btnAgSelectNone.setImageResource(R.drawable.ic_selectionbox_none);
-                break;
-            case 1:
-                btnAgSelectNone.setImageResource(R.drawable.ic_selectionbox_some);
-                break;
-            case 2:
-                btnAgSelectNone.setImageResource(R.drawable.ic_selectionbox_all);
-                break;
-        }
+        TriStateButton btnAgSelect = (TriStateButton) convertView.findViewById(R.id.btnAgSelect);
+        btnAgSelect.setState(selectedState);
+        btnAgSelect.setOnClickListener(new OnAgSelectClickListener(groupPosition) );
         return convertView;
     }
 
-    class OnArtistClickListener implements View.OnClickListener {
+    class OnAgSelectClickListener implements View.OnClickListener {
+
         int groupPosition;
         // constructor
-        public OnArtistClickListener(int groupPosition) {
+        public OnAgSelectClickListener(int groupPosition) {
             this.groupPosition = groupPosition;
         }
+
         @Override
-        public void onClick(View v) {
-            Log.d(TAG,"artistremoveclicked");
-            // checkbox clicked
+        public void onClick(View v)
+        {
+            // Same as TriToggleButton's _state
+            // Will be 0, 1, or 2
+            int btnState = ((TriStateButton)v).getState();
             final ArtistGroup artistGroup = (ArtistGroup) getGroup(groupPosition);
-            int selectedState = artistGroup.getSelectedState();
-            if (selectedState == 2)
+            int groupState = artistGroup.getSelectedState();
+            if (groupState == 2)
                 artistGroup.doSelectNone();
             else
                 artistGroup.doSelectAll();
-
             notifyDataSetChanged();
         }
     }
-
 
     @Override
     public boolean hasStableIds() {

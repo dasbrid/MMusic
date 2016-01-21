@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="tristateBbuttonState">
+        <!-- Use one for every state you want to have  -->
+        <attr name="none" format="boolean" />
+        <attr name="all" format="boolean" />
+        <attr name="some" format="boolean" />
+    </declare-styleable>
+</resources>

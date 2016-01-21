@@ -11,7 +11,7 @@
                  xmlns:tools="http://schemas.android.com/tools"
                  android:id="@+id/textView1"
                  android:layout_width="wrap_content"
-                 android:layout_height="?android:attr/listPreferredItemHeight"
+                 android:layout_height="wrap_content"
                  android:layout_marginStart="8dp"
                  android:gravity="start|center_vertical"
                  android:paddingLeft="32dp"
@@ -21,15 +21,13 @@
           android:layout_alignParentLeft="true"
 
 />
-    <ImageButton
-            android:id="@+id/btnAgSelectNone"
-            android:layout_width="24dp"
-            android:layout_height="?android:attr/listPreferredItemHeight"
-            android:src="@drawable/ic_selectionbox_some"
-            android:layout_alignParentRight="true"
-            android:paddingRight="16dp"
-            android:gravity="center_vertical"
-
+    <asbridge.me.uk.MMusic.controls.TriStateButton
+        android:id="@+id/btnAgSelect"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentRight="true"
     >
-    </ImageButton>
+</asbridge.me.uk.MMusic.controls.TriStateButton>
+
 </RelativeLayout>
