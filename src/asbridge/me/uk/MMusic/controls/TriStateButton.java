@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.controls;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Button;
@@ -12,7 +13,7 @@ import asbridge.me.uk.MMusic.R;
  */
 public class TriStateButton extends Button
 {
-    private String DEBUGTAG = "CustonButtonExample";
+    private String DEBUGTAG = "TriStateButton";
 
     // Keeps track of the current state, 0, 1, or 2
     private int _state;
@@ -40,7 +41,7 @@ public class TriStateButton extends Button
 
         // Set the default state and text
         _state = 0;
-        this.setText("1");
+        setButtonText();
     }
 
     public TriStateButton(Context context, AttributeSet attrs)
@@ -49,7 +50,7 @@ public class TriStateButton extends Button
 
         // Set the default state and text
         _state = 0;
-        this.setText("1");
+        setButtonText();
     }
 
     public TriStateButton(Context context, AttributeSet attrs, int defStyle)
@@ -58,7 +59,7 @@ public class TriStateButton extends Button
 
         // Set the default state and text
         _state = 0;
-        this.setText("1");
+        setButtonText();
     }
 
     @Override
@@ -98,7 +99,6 @@ public class TriStateButton extends Button
     {
         if((state > -1) && (state < 3))
         {
-//			Log.d(DEBUGTAG, "   Setting Toggle state to " + state);
             _state = state;
             setButtonText();
         }
@@ -122,8 +122,6 @@ public class TriStateButton extends Button
         }
 
         setButtonText();
-//		Log.d(DEBUGTAG, "   Setting Toggle state to " + _state);
-
     }
 
     // Decreases state, or loops to 2
@@ -138,8 +136,6 @@ public class TriStateButton extends Button
         }
 
         setButtonText();
-        Log.d(DEBUGTAG, "   Setting Toggle state to " + _state);
-
     }
 
     // Set the text displayed on the button
@@ -147,20 +143,17 @@ public class TriStateButton extends Button
     {
         switch(_state)
         {
-            case 0: this.setText("1");
+            case 0:
+                this.setBackgroundResource(R.drawable.selected_none);
                 break;
-            case 1: this.setText("2");
+            case 1:
+                this.setBackgroundResource(R.drawable.selected_some);
                 break;
-            case 2: this.setText("3");
+            case 2:
+                this.setBackgroundResource(R.drawable.selected_all);
                 break;
             default: this.setText("N/A"); // Should never happen, but just in case
                 break;
         }
-    }
-
-    // A method just to make using Toasts easier
-    private void showShortToast(String s)
-    {
-        Toast.makeText(this.getContext(), s, Toast.LENGTH_SHORT).show();
     }
 }
