@@ -21,7 +21,8 @@ import asbridge.me.uk.MMusic.utils.MusicContent;
  * Created by AsbridgeD on 08/12/2015.
  */
 public class ArtistFragment extends Fragment implements
-        View.OnClickListener
+        View.OnClickListener,
+        ArtistGroupAdapter.OnSelectionStateChangedListener
 {
 
     private String TAG = "DAVE: ArtistFragment";
@@ -94,12 +95,6 @@ public class ArtistFragment extends Fragment implements
             case R.id.btnArtist:
                 changeArtist();
                 break;
-            case R.id.btnSongsSelectAll:
-                selectAllorNone(true);
-                break;
-            case R.id.btnSongsSelectNone:
-                selectAllorNone(false);
-                break;
             case R.id.btnSongsSelect:
                 selectSongs(((TriStateButton)v).getState());
                 break;
@@ -107,19 +102,15 @@ public class ArtistFragment extends Fragment implements
     }
 
     private void selectSongs(int buttonState) {
-/*
-        int currentState = artistGroupAdapter.getSelectedState();
+
+        int currentState = artistGroupAdapter.getSelectionState();
         if (currentState == 2) {
             btnSongsSelect.setState(0);
             selectAllorNone(false);
-
-            artistGroupAdapter.notifyDataSetChanged();
         } else {
             btnSongsSelect.setState(2);
-            selectAllorNone(false);
-            artistGroupAdapter.notifyDataSetChanged();
+            selectAllorNone(true);
         }
-*/
     }
 
     private void selectAllorNone(boolean newState) {
@@ -129,8 +120,10 @@ public class ArtistFragment extends Fragment implements
             ArtistGroup ag = artistGroups.get(key);
             ag.changeStateofAllSongs(newState);
         }
+        Log.v(TAG, "selectAllorNone "+(newState?"true":"false"));
         artistGroupAdapter.notifyDataSetChanged();
     }
+
     // the changeartist button is clicked
     // Update the services list of artists
     public void changeArtist() {
@@ -217,23 +210,20 @@ public class ArtistFragment extends Fragment implements
     }
 
     @Override
+    public void onSelectionStateChanged(int state) {
+        btnSongsSelect.setState(state);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-
-
-
 
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
-        ImageButton btnSongsSelectAll = (ImageButton) v.findViewById(R.id.btnSongsSelectAll);
-        btnSongsSelectAll.setOnClickListener(this);
-        Button btnSongsSelectNone = (Button) v.findViewById(R.id.btnSongsSelectNone);
-        btnSongsSelectNone.setOnClickListener(this);
 
         btnSongsSelect = (TriStateButton) v.findViewById(R.id.btnSongsSelect);
         btnSongsSelect.setOnClickListener(this);
-
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 
@@ -242,6 +232,7 @@ public class ArtistFragment extends Fragment implements
         artistGroupAdapter = new ArtistGroupAdapter(getActivity(), artistGroups);
         elvArtistGroupList.setAdapter(artistGroupAdapter);
         registerForContextMenu(elvArtistGroupList);
+        artistGroupAdapter.setOnSelectionStateChangedListener(this);
 
         // if we have a saved instance then we are returning (e.g. rotate)
         // get the list of songs and the list of selected songs from the saved instance
@@ -294,7 +285,6 @@ public class ArtistFragment extends Fragment implements
                 }
             }
         }
-
         return selectedSongs;
     }
 }

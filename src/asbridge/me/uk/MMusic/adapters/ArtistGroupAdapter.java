@@ -20,13 +20,56 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     private final static String TAG = "ArtistGroupAdapter";
 
     private final SparseArray<ArtistGroup> groups;
+    private int selectionState;
     public LayoutInflater inflater;
     public Activity activity;
+
+    public interface OnSelectionStateChangedListener {
+        void onSelectionStateChanged (int selectionState);
+    }
+
+    private OnSelectionStateChangedListener listener = null;
+
+    public void setOnSelectionStateChangedListener(OnSelectionStateChangedListener l) {
+        listener = l;
+    }
 
     public ArtistGroupAdapter(Activity act, SparseArray<ArtistGroup> groups) {
         activity = act;
         this.groups = groups;
         inflater = act.getLayoutInflater();
+    }
+
+    // override notifyDatasetchanged to recalculate the selection state
+    // and fire event if listener is set and the state has changed
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        int oldState = selectionState;
+        int numSongs = 0;
+        int numSelected = 0;
+        for(int i = 0; i < groups.size(); i++) {
+            int key = groups.keyAt(i);
+            // get the object by the key.
+            ArtistGroup ag = groups.get(key);
+            numSongs += ag.getNumSongs();
+            numSelected += ag.getNumSelected();
+        }
+
+        if (numSelected == 0)
+            selectionState = 0;
+        else if (numSelected == numSongs)
+            selectionState = 2;
+        else
+            selectionState = 1;
+
+        if (listener != null && selectionState != oldState) {
+            listener.onSelectionStateChanged(selectionState);
+        }
+    }
+
+    public int getSelectionState() {
+        return selectionState;
     }
 
     @Override
@@ -59,10 +102,8 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     }
 
     class OnSongClickListener implements View.OnClickListener {
-
         int groupPosition;
         int childPosition;
-
         // constructor
         public OnSongClickListener(int groupPosition, int childPosition) {
             this.groupPosition = groupPosition;
@@ -80,7 +121,6 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
             notifyDataSetChanged();
         }
     }
-
 
     @Override
     public int getChildrenCount(int groupPosition) {
@@ -131,8 +171,9 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
+    // when group checkbox is clicked.
+    // select or unselct all the child songs
     class OnAgSelectClickListener implements View.OnClickListener {
-
         int groupPosition;
         // constructor
         public OnAgSelectClickListener(int groupPosition) {
@@ -142,15 +183,13 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         @Override
         public void onClick(View v)
         {
-            // Same as TriToggleButton's _state
-            // Will be 0, 1, or 2
-            int btnState = ((TriStateButton)v).getState();
             final ArtistGroup artistGroup = (ArtistGroup) getGroup(groupPosition);
             int groupState = artistGroup.getSelectedState();
-            if (groupState == 2)
+            if (groupState == 2) { /* all currently selected */
                 artistGroup.doSelectNone();
-            else
+            } else {
                 artistGroup.doSelectAll();
+            }
             notifyDataSetChanged();
         }
     }

@@ -17,29 +17,12 @@
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
     >
-    <ImageButton
-            android:text="all"
-            android:id="@+id/btnSongsSelectAll"
-            android:drawable="@drawable/selected_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-    >
-    </ImageButton>
-    <Button
-            android:text="clear"
-            android:textSize="12sp"
-            android:id="@+id/btnSongsSelectNone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/btnSongsSelectAll"
-    >
-    </Button>
-        <asbridge.me.uk.MMusic.controls.TriStateButton
-                android:id="@+id/btnSongsSelect"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_alignParentRight="true"
-        />
+    <asbridge.me.uk.MMusic.controls.TriStateButton
+            android:id="@+id/btnSongsSelect"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+    />
     </RelativeLayout>
     <ExpandableListView
             android:id="@+id/lvSongsByArtist"

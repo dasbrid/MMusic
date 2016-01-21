@@ -40,6 +40,19 @@ public class ArtistGroup {
         }
     }
 
+    public int getNumSelected() {
+        int n = 0;
+        for (SelectedSong ss : songs) {
+            if (ss.selected)
+                n += 1;
+        }
+        return n;
+    }
+
+    public int getNumSongs() {
+        return songs.size();
+    }
+
     public void changeStateofAllSongs(boolean newState) {
         for (SelectedSong ss : songs) {
             ss.selected = newState;
