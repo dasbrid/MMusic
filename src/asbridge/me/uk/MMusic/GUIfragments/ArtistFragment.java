@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.support.v4.app.Fragment;
+import asbridge.me.uk.MMusic.controls.TriStateButton;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 
 /**
@@ -26,9 +27,13 @@ public class ArtistFragment extends Fragment implements
     private String TAG = "DAVE: ArtistFragment";
 
     private CheckBox cbCheckAll;
+
     private SparseArray<ArtistGroup> artistGroups;
-    ExpandableListView elvArtistGroupList;
-    ArtistGroupAdapter artistGroupAdapter;
+    private ArrayList<Song> songs = new ArrayList<>() ;
+
+    private ExpandableListView elvArtistGroupList;
+    private ArtistGroupAdapter artistGroupAdapter;
+    private TriStateButton btnSongsSelect;
 
     private OnSongsChangedListener listener = null;
     public interface OnSongsChangedListener {
@@ -55,8 +60,6 @@ public class ArtistFragment extends Fragment implements
         outState.putParcelableArrayList(STATE_ALLSONGS, songs);
         outState.putParcelableArrayList(STATE_SELECTEDSONGS, getSelectedSongs());
     }
-
-    private ArrayList<Song> songs = new ArrayList<>() ;
 
     public void setSongList() {
         // This displays ALL songs on the device
@@ -97,7 +100,26 @@ public class ArtistFragment extends Fragment implements
             case R.id.btnSongsSelectNone:
                 selectAllorNone(false);
                 break;
+            case R.id.btnSongsSelect:
+                selectSongs(((TriStateButton)v).getState());
+                break;
         }
+    }
+
+    private void selectSongs(int buttonState) {
+/*
+        int currentState = artistGroupAdapter.getSelectedState();
+        if (currentState == 2) {
+            btnSongsSelect.setState(0);
+            selectAllorNone(false);
+
+            artistGroupAdapter.notifyDataSetChanged();
+        } else {
+            btnSongsSelect.setState(2);
+            selectAllorNone(false);
+            artistGroupAdapter.notifyDataSetChanged();
+        }
+*/
     }
 
     private void selectAllorNone(boolean newState) {
@@ -204,10 +226,14 @@ public class ArtistFragment extends Fragment implements
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
         btnArtist.setOnClickListener(this);
-        Button btnSongsSelectAll = (Button) v.findViewById(R.id.btnSongsSelectAll);
+        ImageButton btnSongsSelectAll = (ImageButton) v.findViewById(R.id.btnSongsSelectAll);
         btnSongsSelectAll.setOnClickListener(this);
         Button btnSongsSelectNone = (Button) v.findViewById(R.id.btnSongsSelectNone);
         btnSongsSelectNone.setOnClickListener(this);
+
+        btnSongsSelect = (TriStateButton) v.findViewById(R.id.btnSongsSelect);
+        btnSongsSelect.setOnClickListener(this);
+
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 
@@ -217,6 +243,8 @@ public class ArtistFragment extends Fragment implements
         elvArtistGroupList.setAdapter(artistGroupAdapter);
         registerForContextMenu(elvArtistGroupList);
 
+        // if we have a saved instance then we are returning (e.g. rotate)
+        // get the list of songs and the list of selected songs from the saved instance
         if (savedInstanceState != null) {
             // Restore last state for checked position.
             songs = savedInstanceState.getParcelableArrayList(STATE_ALLSONGS);
@@ -227,6 +255,7 @@ public class ArtistFragment extends Fragment implements
             }
             setListViewContents(songs, selectedSongIDs);
         } else {
+            // if there is no saved instance then we will get songs from the device content provider
             setSongList();
         }
         return v;
