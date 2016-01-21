@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:descendantFocusability="blocksDescendants"
-                android:paddingTop="8dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:descendantFocusability="blocksDescendants"
 >
->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                 xmlns:tools="http://schemas.android.com/tools"
-                 android:id="@+id/textView1"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_marginStart="8dp"
-                 android:gravity="start|center_vertical"
-                 android:paddingLeft="32dp"
-                 android:text="Test"
-                 android:textSize="14sp"
-                 android:textStyle="bold"
-          android:layout_alignParentLeft="true"
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="32dp"
+        android:textSize="14sp"
+        android:textStyle="bold"
 
-/>
+    />
     <asbridge.me.uk.MMusic.controls.TriStateButton
         android:id="@+id/btnAgSelect"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_gravity="center_horizontal"
         android:layout_alignParentRight="true"
-    >
-</asbridge.me.uk.MMusic.controls.TriStateButton>
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+    />
 
 </RelativeLayout>
