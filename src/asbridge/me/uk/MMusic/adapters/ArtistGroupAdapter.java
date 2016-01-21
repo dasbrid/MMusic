@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.adapters;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -97,7 +98,11 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         checkbox = (CheckBox) convertView.findViewById(R.id.songcheckbox);
         checkbox.setChecked(checkedSong.selected);
         checkbox.setOnClickListener(new OnSongClickListener(groupPosition,childPosition));
-
+        if (childPosition % 2 == 1) {
+            convertView.setBackgroundColor(Color.rgb(0x22,0x22,0x22));
+        } else {
+            convertView.setBackgroundColor(Color.rgb(0x44,0x44,0x44));
+        }
         return convertView;
     }
 

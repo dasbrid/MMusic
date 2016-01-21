@@ -2,6 +2,7 @@ package asbridge.me.uk.MMusic.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,12 +64,12 @@ public class PlayQueueAdapter extends BaseAdapter {
         return 0;
     }
 
-    /********* Create a holder Class to contain inflated xml file elements *********/
     public static class ViewHolder{
         public TextView songTitle;
         public TextView songArtist;
         public ImageButton btnRemoveSong;
         public ImageButton btnMoveToTop;
+        public View view;
     }
 
     @Override
@@ -77,11 +78,11 @@ public class PlayQueueAdapter extends BaseAdapter {
         ViewHolder holder;
         songInf=LayoutInflater.from(activity);
         if(convertView==null) {
-            /****** Inflate tabitem.xml file for each row ( Defined below ) *******/
             vi = songInf.inflate(R.layout.playqueuesong, null);
 
-            /****** View Holder Object to contain xml file elements ******/
+
             holder = new ViewHolder();
+            holder.view = vi;
             holder.songTitle = (TextView) vi.findViewById(R.id.pqsong_title);
             holder.songArtist =(TextView)vi.findViewById(R.id.pqsong_artist);
             holder.btnRemoveSong =(ImageButton)vi.findViewById(R.id.pqbtnRemoveSong);
@@ -92,8 +93,13 @@ public class PlayQueueAdapter extends BaseAdapter {
             holder=(ViewHolder)vi.getTag();
         }
 
-        //get song using position
         Song currSong = songs.get(position);
+        if (position % 2 == 1) {
+            holder.view.setBackgroundColor(Color.rgb(0x22,0x22,0x22));
+        } else {
+            holder.view.setBackgroundColor(Color.rgb(0x44,0x44,0x44));
+        }
+
         holder.songTitle.setText(currSong.getTitle());
         holder.songArtist.setText(currSong.getArtist());
         holder.btnRemoveSong.setOnClickListener(new OnRemoveButtonClickListener(position));

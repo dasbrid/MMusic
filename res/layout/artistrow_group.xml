@@ -2,17 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:background="#313131"
                 android:descendantFocusability="blocksDescendants"
 >
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginLeft="32dp"
+        android:text="Artist"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:paddingLeft="32dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
 
     />
@@ -22,6 +23,8 @@
         android:layout_height="32dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
         android:layout_marginRight="16dp"
     />
 
