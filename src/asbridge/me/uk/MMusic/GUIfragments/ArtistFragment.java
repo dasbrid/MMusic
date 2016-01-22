@@ -27,8 +27,6 @@ public class ArtistFragment extends Fragment implements
 
     private String TAG = "DAVE: ArtistFragment";
 
-    private CheckBox cbCheckAll;
-
     private SparseArray<ArtistGroup> artistGroups;
     private ArrayList<Song> songs = new ArrayList<>() ;
 
@@ -66,11 +64,8 @@ public class ArtistFragment extends Fragment implements
         // This displays ALL songs on the device
         songs = new ArrayList<>();
         MusicContent.getAllSongs(getContext(), songs);
-        Log.d(TAG, "setSongList " + songs.size());
-
-        // Songs are set selected based on the current playlist
+        // Songs are set selected (ticked) based on the current playlist
         ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
-
         setListViewContents(songs, selectedSongs);
     }
 
@@ -101,8 +96,8 @@ public class ArtistFragment extends Fragment implements
         }
     }
 
+    // The select (all/none) button has been pressed
     private void selectSongs(int buttonState) {
-
         int currentState = artistGroupAdapter.getSelectionState();
         if (currentState == 2) {
             btnSongsSelect.setState(0);
@@ -120,14 +115,12 @@ public class ArtistFragment extends Fragment implements
             ArtistGroup ag = artistGroups.get(key);
             ag.changeStateofAllSongs(newState);
         }
-        Log.v(TAG, "selectAllorNone "+(newState?"true":"false"));
         artistGroupAdapter.notifyDataSetChanged();
     }
 
     // the changeartist button is clicked
     // Update the services list of artists
     public void changeArtist() {
-        Log.d(TAG, "changeArtist");
         ArrayList<Song> selectedSongs;
         selectedSongs = getSelectedSongs();
         MusicContent.setCurrentPlaylist(getContext(), selectedSongs);
@@ -139,7 +132,6 @@ public class ArtistFragment extends Fragment implements
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        Log.d(TAG, "onCreateContextMenu v="+v.toString()+","+v.getId());
         ExpandableListView.ExpandableListContextMenuInfo elvcmi = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
         int type = ExpandableListView.getPackedPositionType(elvcmi.packedPosition);
         MenuInflater menuInflater = getActivity().getMenuInflater();
@@ -160,7 +152,6 @@ public class ArtistFragment extends Fragment implements
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
             groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
             childPos = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
-            Log.d(TAG, ": Child " + childPos + " clicked in group " + groupPos);
 
             int key = artistGroups.keyAt(groupPos);
             // get the object by the key.
@@ -169,22 +160,18 @@ public class ArtistFragment extends Fragment implements
 
             switch (item.getItemId()) {
                 case R.id.menu_song_long_click_playnext:
-                    Log.d(TAG, "menu_song_long_click_playnext");
                     listener.playThisSongNext(s);
                     return true;
                 case R.id.menu_song_long_click_addtoqueue:
-                    Log.d(TAG, "menu_song_long_click_addtoqueue");
                     listener.addThisSongToPlayQueue(s);
                     return true;
                 case R.id.menu_song_long_click_playnow:
-                    Log.d(TAG, "menu_song_long_click_playnow");
                     listener.playThisSongNow(s);
                     return true;
             }
 
         } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
-            Log.d(TAG, ": Group " + groupPos + " clicked");
 
             int key = artistGroups.keyAt(groupPos);
             // get the object by the key.
@@ -192,23 +179,21 @@ public class ArtistFragment extends Fragment implements
 
             switch (item.getItemId()) {
                 case R.id.menu_artist_long_click_addsongstoqueue:
-                    Log.d(TAG, "menu_song_long_click_addtoqueue");
                     listener.addArtistsSongsToPlayQueue(ag);
                     return true;
             }
 
             switch (item.getItemId()) {
                 case R.id.menu_artist_long_click_clearandaddsongstoqueue:
-                    Log.d(TAG, "menu_song_long_click_addtoqueue");
                     listener.clearPlayQueueAndaddArtistsSongsToPlayQueue(ag);
                     return true;
             }
         }
-
-
         return super.onContextItemSelected(item);
     }
 
+    // an Event from the List Adapter
+    // A song has been selected or deselcted and as a result the selected state has changed
     @Override
     public void onSelectionStateChanged(int state) {
         btnSongsSelect.setState(state);
@@ -216,7 +201,6 @@ public class ArtistFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
 
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
         Button btnArtist = (Button) v.findViewById(R.id.btnArtist);

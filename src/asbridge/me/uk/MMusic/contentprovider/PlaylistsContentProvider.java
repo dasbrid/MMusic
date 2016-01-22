@@ -28,6 +28,7 @@ public class PlaylistsContentProvider  extends ContentProvider {
 
     // used for the UriMacher
     private static final int PLAYLISTS = 10;
+    private static final int PLAYLIST_SONGS = 15;
     private static final int TODO_ID = 20;
     private static final int SONGS = 30;
     private static final int SONG_BY_ID = 40;
@@ -35,10 +36,13 @@ public class PlaylistsContentProvider  extends ContentProvider {
     private static final String AUTHORITY = "asbridge.me.uk.mmusic.playlists.contentprovider";
 
     private static final String BASE_PATH_PLAYLISTS = "playlists";
+    private static final String BASE_PATH_PLAYLIST_SONGS = "playlistsongs";
     private static final String BASE_PATH_SONG = "song";
 
     public static final Uri CONTENT_URI_PLAYLISTS = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH_PLAYLISTS);
+    public static final Uri CONTENT_URI_PLAYLIST_SONGS = Uri.parse("content://" + AUTHORITY
+            + "/" + BASE_PATH_PLAYLIST_SONGS);
     public static final Uri CONTENT_URI_SONGS = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH_SONG);
 
@@ -51,6 +55,7 @@ public class PlaylistsContentProvider  extends ContentProvider {
     static {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS, PLAYLISTS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS + "/#", TODO_ID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLIST_SONGS, PLAYLIST_SONGS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONG, SONGS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONG + "/#", SONG_BY_ID);
     }
@@ -135,6 +140,11 @@ public class PlaylistsContentProvider  extends ContentProvider {
         int rowsDeleted = 0;
         switch (uriType) {
             case PLAYLISTS:
+                rowsDeleted = sqlDB.delete(PlaylistsTable.TABLE_NAME, selection,
+                        selectionArgs);
+                break;
+            case PLAYLIST_SONGS:
+                Log.v(TAG, "PLAYLIST_SONGS");
                 rowsDeleted = sqlDB.delete(PlaylistsTable.TABLE_NAME, selection,
                         selectionArgs);
                 break;

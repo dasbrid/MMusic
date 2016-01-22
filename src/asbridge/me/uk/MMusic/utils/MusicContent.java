@@ -140,6 +140,21 @@ public class MusicContent {
         }
     }
 
+    public static void removeSongFromCurrentPlaylist(Context context, Song song) {
+        String[] selectionArgs = {"0", Long.toString(song.getID())};
+
+        int numDeleted;
+        numDeleted = context.getContentResolver().delete(
+                PlaylistsContentProvider.CONTENT_URI_PLAYLIST_SONGS,   // the user dictionary content URI
+                PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + " = ? AND " + PlaylistsTable.COLUMN_NAME_SONG_ID + " = ?",
+                selectionArgs);
+
+    }
+
+    public static void addSongToCurrentPlaylist(Context context, Song song) {
+        addSongToPlaylist(context, 0 /*current playlist*/, song.getID());
+    }
+
     public static void setCurrentPlaylist(Context context, ArrayList<Song> selectedSongs) {
 
         final int playlistID = 0; /* current playlist */
@@ -164,10 +179,6 @@ public class MusicContent {
         // Defines an object to contain the new values to insert
         ContentValues mNewValues = new ContentValues();
 
-        /*
-         * Sets the values of each column and inserts the word. The arguments to the "put"
-         * method are "column name" and "value"
-         */
         mNewValues.put(PlaylistsTable.COLUMN_NAME_PLAYLIST_ID, playlistID);
         mNewValues.put(PlaylistsTable.COLUMN_NAME_SONG_ID, songID);
 

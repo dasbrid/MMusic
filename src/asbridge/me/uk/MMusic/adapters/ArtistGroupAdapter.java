@@ -11,6 +11,7 @@ import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
+import asbridge.me.uk.MMusic.utils.MusicContent;
 
 
 /**
@@ -120,9 +121,12 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
             final ArtistGroup.SelectedSong checkedSong = (ArtistGroup.SelectedSong) getChild(groupPosition, childPosition);
             if (checkedSong.selected) {
                 checkedSong.selected = false;
+                MusicContent.removeSongFromCurrentPlaylist(activity, checkedSong.song);
             } else {
                 checkedSong.selected = true;
+                MusicContent.addSongToCurrentPlaylist(activity, checkedSong.song);
             }
+
             notifyDataSetChanged();
         }
     }
@@ -191,11 +195,31 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
             final ArtistGroup artistGroup = (ArtistGroup) getGroup(groupPosition);
             int groupState = artistGroup.getSelectedState();
             if (groupState == 2) { /* all currently selected */
-                artistGroup.doSelectNone();
+                // artistGroup.doSelectNone();
+                clearAllSongsInGroup(artistGroup);
             } else {
-                artistGroup.doSelectAll();
+                //artistGroup.doSelectAll();
+                selectAllSongsInGroup(artistGroup);
             }
             notifyDataSetChanged();
+        }
+    }
+
+    private void clearAllSongsInGroup(ArtistGroup ag) {
+        for (ArtistGroup.SelectedSong ss : ag.songs) {
+            if (ss.selected) {
+                ss.selected = false;
+                MusicContent.removeSongFromCurrentPlaylist(activity, ss.song);
+            }
+        }
+    }
+
+    private void selectAllSongsInGroup(ArtistGroup ag) {
+        for (ArtistGroup.SelectedSong ss : ag.songs) {
+            if (!ss.selected) {
+                ss.selected = true;
+                MusicContent.addSongToCurrentPlaylist(activity, ss.song);
+            }
         }
     }
 
