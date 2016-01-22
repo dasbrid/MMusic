@@ -63,14 +63,13 @@ public class PlayQueueFragment extends Fragment
     @Override
     public void onResume() {
         Log.d(TAG, "onResume size "+ playQueue.size());
-        //playQueue = new ArrayList<>();
         super.onResume();
     }
 
     public void updatePlayQueue(ArrayList<Song> newPlayQueue) {
         playQueue.clear();
         playQueue.addAll(newPlayQueue);
-        playQueueAdapter.notifyDataSetChanged();// This crashes when rotating screen
+        playQueueAdapter.notifyDataSetChanged();
     }
 
     // callback from the playqueue adapter

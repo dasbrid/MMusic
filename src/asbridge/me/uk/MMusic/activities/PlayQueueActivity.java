@@ -110,7 +110,6 @@ public class PlayQueueActivity extends FragmentActivity
         }
     }
 
-
     // called from fragment
     private void updatePlayQueue() {
         Log.d(TAG, "updatePlayQueue");
@@ -160,6 +159,9 @@ public class PlayQueueActivity extends FragmentActivity
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
             ArrayList <Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             mPlayQueueFragment.updatePlayQueue(newPlayQueue);
+            ArrayList <Song> newPlayedList = retainFragment.serviceReference.getPlayedList();
+            mPlayedListFragment.updatePlayedList(newPlayedList);
+
         }
     }
 
@@ -168,14 +170,6 @@ public class PlayQueueActivity extends FragmentActivity
         Log.d(TAG, "onMusicServiceReady");
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
-        //ArrayList<Song> songList = retainFragment.serviceReference.getSongList();
-        //artistsFragment.setSongList();
-    }
-
-    public void btnChooseSongsClicked(View v) {
-        Log.d(TAG, "btnChooseSongs");
-        Intent intent = new Intent(this, SelectSongsActivity.class);
-        startActivity(intent);
     }
 
     // Don't stop the playback when the backbutton is pressed
