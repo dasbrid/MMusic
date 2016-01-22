@@ -33,6 +33,7 @@ public class PlayQueueActivity extends FragmentActivity
         implements
         RetainFragment.RetainFragmentListener
         ,PlayQueueFragment.OnPlayQueueListener
+        ,SetTimerDialog.OnSleepTimerChangedListener
 {
 
     private static final String TAG = "PlayQueueActivity";
@@ -48,7 +49,6 @@ public class PlayQueueActivity extends FragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_playqueue);
 
         PlaylistsDatabaseHelper db = new PlaylistsDatabaseHelper(this);
@@ -59,7 +59,6 @@ public class PlayQueueActivity extends FragmentActivity
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (retainFragment == null) {
-            Log.d(TAG, "creating and adding retain Fragment");
             retainFragment = new RetainFragment();
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
@@ -79,8 +78,6 @@ public class PlayQueueActivity extends FragmentActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart");
-
         retainFragment.doBindService();
     }
 
@@ -104,7 +101,6 @@ public class PlayQueueActivity extends FragmentActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED)) {
-                Log.d(TAG, "NextSongChangedReceiver");
                 updatePlayQueue();
             }
         }
@@ -113,10 +109,8 @@ public class PlayQueueActivity extends FragmentActivity
     // called from fragment
     // pass the change onto the service
     private void updatePlayQueue() {
-        Log.d(TAG, "updatePlayQueue");
         if (retainFragment.serviceReference != null) {
             ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
-            Log.d(TAG, "new play queue="+newPlayQueue.size());
             mPlayQueueFragment.updatePlayQueue(newPlayQueue);
             // TODO: why also update played list?
             ArrayList<Song> newPlayedList = retainFragment.serviceReference.getPlayedList();
@@ -125,7 +119,6 @@ public class PlayQueueActivity extends FragmentActivity
     }
 
     private void updateNowPlaying(String songArtist, String songTitle) {
-        Log.d(TAG, "updateNowPlaying " + songTitle);
         tvNowPlaying.setText(songArtist + " - " + songTitle);
     }
 
@@ -133,7 +126,6 @@ public class PlayQueueActivity extends FragmentActivity
     @Override
     protected void onPause(){
         super.onPause();
-        Log.d(TAG, "onPause");
         if (songPlayingReceiver != null) unregisterReceiver(songPlayingReceiver);
         if (nextSongChangedReceiver != null) unregisterReceiver(nextSongChangedReceiver);
 
@@ -144,7 +136,6 @@ public class PlayQueueActivity extends FragmentActivity
     @Override
     protected void onResume(){
         super.onResume();
-        Log.d(TAG, "onResume");
         // set up the listener for broadcast from the service for new song playing
         if (songPlayingReceiver == null) songPlayingReceiver = new SongPlayingReceiver();
         IntentFilter intentFilter = new IntentFilter(AppConstants.INTENT_ACTION_SONG_PLAYING);
@@ -155,7 +146,6 @@ public class PlayQueueActivity extends FragmentActivity
         registerReceiver(nextSongChangedReceiver, new IntentFilter(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED));
 
         if (retainFragment.serviceReference != null) {
-            Log.d(TAG, "servicereference is not null");
             Song currentSong = retainFragment.serviceReference.getCurrentSong();
             if (currentSong != null)
                 updateNowPlaying(currentSong.getArtist(), currentSong.getTitle());
@@ -169,7 +159,6 @@ public class PlayQueueActivity extends FragmentActivity
 
     @Override
     public void onMusicServiceReady() {
-        Log.d(TAG, "onMusicServiceReady");
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
     }
@@ -177,12 +166,10 @@ public class PlayQueueActivity extends FragmentActivity
     // Don't stop the playback when the backbutton is pressed
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onbackpressed");
         moveTaskToBack(true);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
@@ -230,7 +217,6 @@ public class PlayQueueActivity extends FragmentActivity
                     item.setIcon(R.drawable.ic_action_shuffle_on);
                     item.setTitle("Turn Shuffle Off");
                 }
-                Log.d(TAG, "shuffle turned "+ (shuffleOn?"on":"off"));
                 retainFragment.serviceReference.setShuffleState(shuffleOn);
 
         }
@@ -245,16 +231,23 @@ public class PlayQueueActivity extends FragmentActivity
         if (timeTillSleep < 0) {
             FragmentManager fm = getFragmentManager();
             SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
+            setSleepTimerDialog.setOnSetSleepTimerListener(this);
             setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
         } else {
             retainFragment.serviceReference.cancelSleepTimer();
         }
     }
 
+    @Override
+    public void onSleepTimerChanged(int minsTillSleep) {
+        if (retainFragment != null && retainFragment.serviceReference != null) {
+            retainFragment.serviceReference.setSleepTimer(minsTillSleep);
+        }
+    }
+
     ///////////////////////////
     // These methods deal with music control button clicks
     public void btnNextClicked(View v) {
-        Log.d(TAG, "btnNextClicked");
         playNextSong();
     }
 
@@ -264,7 +257,6 @@ public class PlayQueueActivity extends FragmentActivity
     }
 
     public void btnStopClicked(View v) {
-        Log.d(TAG, "btnStopClicked");
         stopPlayback();
     }
 
@@ -274,7 +266,6 @@ public class PlayQueueActivity extends FragmentActivity
     }
 
     public void btnPlayPauseClicked(View v) {
-        Log.d(TAG, "btnPauseClicked");
         pauseOrResumePlayack();
     }
 
@@ -288,7 +279,6 @@ public class PlayQueueActivity extends FragmentActivity
     // callback from the playqueue fragment
     @Override
     public void onRemoveSongClicked(Song song) {
-        Log.d(TAG, "onRemoveSong "+song.getTitle());
         if (retainFragment.isBound) {
             retainFragment.serviceReference.removeSongFromPlayQueue(song.getPID());
         }
@@ -297,7 +287,6 @@ public class PlayQueueActivity extends FragmentActivity
     // callback from the playqueue fragment
     @Override
     public void onMoveSongToTopClicked(Song song) {
-        Log.d(TAG, "onMoveSongToTopClicked "+song.getTitle());
         if (retainFragment.isBound) {
             retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(song.getPID());
         }

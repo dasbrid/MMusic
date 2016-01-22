@@ -25,7 +25,7 @@
                 android:id="@+id/btnSetTimerDialogCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Close" />
+                android:text="Cancel" />
 
     <Button
             android:id="@+id/btnSetTimerDialogOK"

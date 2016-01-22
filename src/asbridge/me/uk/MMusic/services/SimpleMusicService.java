@@ -13,7 +13,6 @@ import android.os.PowerManager;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
-import asbridge.me.uk.MMusic.activities.TwoFragmentsActivity;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
@@ -65,7 +64,7 @@ public class SimpleMusicService extends Service
         @Override
         public void onReceive(Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                Log.d(TAG, "NoisyAudioStreamReceiver:OnReceive"+intent.getAction());
+                Log.v(TAG, "NoisyAudioStreamReceiver:OnReceive"+intent.getAction());
                 pausePlayback();
             }
         }
@@ -76,7 +75,6 @@ public class SimpleMusicService extends Service
     public class MusicControlListener extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "SwitchButtonListener:OnReceive"+intent.getAction());
             if (intent.getAction().equals(AppConstants.INTENT_ACTION_STOP_PLAYBACK)) {
                 stopPlayback();
             } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_PLAY_NEXT_SONG)) {
@@ -93,7 +91,6 @@ public class SimpleMusicService extends Service
 
     public void setShuffleState(boolean newState) {
         shuffleOn = newState;
-        Log.d(TAG, "shuffle set "+ (shuffleOn?"on":"off"));
     }
 
     private Calendar sleepTime = null;
@@ -124,26 +121,13 @@ public class SimpleMusicService extends Service
         Settings.setShuffleState(getApplicationContext(), shuffleOn);
         super.onDestroy();
     }
-/*
-    // called from activity to set the songs to play
-    public void setSongList(ArrayList<Song> songList) {
-        Log.d(TAG, "setSongList");
-        this.songs = songList;
-    }
 
-    // called from activity to set the songs to play
-    public ArrayList<Song> getSongList() {
-        Log.d(TAG, "getSongList "+songs.size());
-        return songs;
-    }
-*/
     // returns the current playing song
     public Song getCurrentSong() {
         return currentSong;
     }
 
     public ArrayList<Song> getPlayQueue() {
-        Log.v(TAG, "getPlayQueue="+playQueue.size());
         return new ArrayList<Song> (playQueue);
     }
 
@@ -151,9 +135,7 @@ public class SimpleMusicService extends Service
 
         if (playedList.size() > 0) {
             Song currSong = playedList.peek();
-            Log.v(TAG, "getPlayedListQueue=" + playedList.size() + (currSong == null ? " null" : " not null"));
         }
-
 
         return new ArrayList<Song> (playedList);
     }
@@ -204,12 +186,10 @@ public class SimpleMusicService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SimpleMusicService onStartCommand");
         shuffleOn = Settings.getShuffleState(getApplicationContext());
-        Log.d(TAG, "shuffle is " + (shuffleOn?"on":"off"));
         return START_STICKY; // Ensures that onStartCommand is called if the Service needs to restart after being killed by the system
     }
 
     public void onCreate(){
-        Log.d(TAG, "SimpleMusicService onCreate");
         //create the service
         super.onCreate();
         rand=new Random();
@@ -244,7 +224,6 @@ public class SimpleMusicService extends Service
     // callback when ready to play a song, after calling prepareAsync
     @Override
     public void onPrepared(MediaPlayer mp) {
-        Log.d(TAG, "SimpleMusicService onPrepared");
         // start playback
         mp.start();
         currentState = PLAYING;
@@ -293,7 +272,6 @@ public class SimpleMusicService extends Service
     // callback from media player when song finishes
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d(TAG, "SimpleMusicService onCompletion");
         if(player.getCurrentPosition() > 0){
             mp.reset();
             playNextSongInPlayQueue();
@@ -308,9 +286,9 @@ public class SimpleMusicService extends Service
             return true;
         return false;
     }
+
     // can be called from outside the service (e.g. from next button in the activity)
     public void playSong() {
-        Log.d(TAG, "SimpleMusicService playNextSong");
         if (currentState == STOPPED) { // if we are not playing anything, then play a random song
             playNextSongInPlayQueue();
         } else {
@@ -324,7 +302,6 @@ public class SimpleMusicService extends Service
         int songIndex = currentIndex;
         int numSongsInPlaylist;
         numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
-        Log.v(TAG, "getRandomSongIndex, numSongsInPlaylist="+numSongsInPlaylist);
         while(songIndex == currentIndex){
             songIndex=rand.nextInt(numSongsInPlaylist);
         }
@@ -419,19 +396,14 @@ public class SimpleMusicService extends Service
         if (timeToGoToSleep()) {
             // if we have reached (passed) the sleep timer.
             // turn the sleep timer off and don't play any more songs
+            Log.v(TAG, "time to sleep");
+            stopPlayback();
             sleepTime = null;
             return;
         }
 
         player.reset();
 
-        //get a song
-        /*
-        if (this.songs == null || this.songs.size() < 1) {
-            Log.d(TAG, "no songs to play");
-            return;
-        }
-        */
         if (playQueue.size() < Settings.getPlayQueueSize(getApplicationContext())) {
             // nothing in the queue, so initialise
             fillPlayQueue();

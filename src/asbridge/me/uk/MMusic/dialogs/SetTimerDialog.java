@@ -16,12 +16,12 @@ public class SetTimerDialog extends DialogFragment {
 
     private NumberPicker numberPicker;
 
-    public interface OnSetSleepTimerListener {
+    public interface OnSleepTimerChangedListener {
         void onSleepTimerChanged(int x);
     }
 
-    private OnSetSleepTimerListener listener = null;
-    public void setOnSetSleepTimerListener(OnSetSleepTimerListener l) {
+    private OnSleepTimerChangedListener listener = null;
+    public void setOnSetSleepTimerListener(OnSleepTimerChangedListener l) {
         listener = l;
     }
 
