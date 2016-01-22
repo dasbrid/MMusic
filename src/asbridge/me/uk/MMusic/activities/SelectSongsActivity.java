@@ -4,7 +4,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
+import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
@@ -17,13 +17,13 @@ import java.util.ArrayList;
  * Created by David on 20/12/2015.
  */
 public class SelectSongsActivity extends FragmentActivity
-        implements ArtistFragment.OnSongsChangedListener
+        implements SelectSongsFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
 {
     private static final String TAG = "SelectSongsActivity";
 
     private RetainFragment retainFragment = null;
-    private ArtistFragment artistsFragment = null;
+    private SelectSongsFragment artistsFragment = null;
 
     @Override
     public void onMusicServiceReady() {
@@ -49,7 +49,7 @@ public class SelectSongsActivity extends FragmentActivity
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
 
-        artistsFragment = (ArtistFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
+        artistsFragment = (SelectSongsFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
         if (artistsFragment != null)
         {
             artistsFragment.setOnSongsChangedListener(this);

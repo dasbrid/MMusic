@@ -35,7 +35,7 @@ public class PlayQueueActivity extends FragmentActivity
         ,PlayQueueFragment.OnPlayQueueListener
 {
 
-    private static final String TAG = "MMusicActivity";
+    private static final String TAG = "PlayQueueActivity";
 
     private RetainFragment retainFragment = null;
     private TextView tvNowPlaying;
@@ -111,12 +111,14 @@ public class PlayQueueActivity extends FragmentActivity
     }
 
     // called from fragment
+    // pass the change onto the service
     private void updatePlayQueue() {
         Log.d(TAG, "updatePlayQueue");
         if (retainFragment.serviceReference != null) {
             ArrayList<Song> newPlayQueue = retainFragment.serviceReference.getPlayQueue();
             Log.d(TAG, "new play queue="+newPlayQueue.size());
             mPlayQueueFragment.updatePlayQueue(newPlayQueue);
+            // TODO: why also update played list?
             ArrayList<Song> newPlayedList = retainFragment.serviceReference.getPlayedList();
             mPlayedListFragment.updatePlayedList(newPlayedList);
         }
@@ -124,7 +126,7 @@ public class PlayQueueActivity extends FragmentActivity
 
     private void updateNowPlaying(String songArtist, String songTitle) {
         Log.d(TAG, "updateNowPlaying " + songTitle);
-        tvNowPlaying.setText(songArtist + "-" + songTitle);
+        tvNowPlaying.setText(songArtist + " - " + songTitle);
     }
 
     // used to save paused state so it can be resumed

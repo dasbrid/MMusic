@@ -41,7 +41,10 @@
     />
     <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+    >
         <TextView
                 android:id="@+id/pqa_labelNowPlaying"
                 android:text="Now Playing:"
@@ -49,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF99"
                 android:textSize="16sp"
+                android:layout_marginRight="5dp"
         />
         <TextView
                 android:id="@+id/pqa_tvPlaying"

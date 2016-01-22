@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
-import asbridge.me.uk.MMusic.GUIfragments.ArtistFragment;
+import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
 
 /**
@@ -18,13 +18,13 @@ public class MusicFragmentsAdapter extends FragmentPagerAdapter {
     int mNumOfTabs;
 
     private PlayQueueFragment musicPlayerFragment;
-    private ArtistFragment artistFragment;
+    private SelectSongsFragment selectSongsFragment;
 
     Fragment currentFragment;
-    public MusicFragmentsAdapter(FragmentManager fm, PlayQueueFragment theMusicPlayerFragment, ArtistFragment theArtistFragment ) {
+    public MusicFragmentsAdapter(FragmentManager fm, PlayQueueFragment theMusicPlayerFragment, SelectSongsFragment theSelectSongsFragment) {
         super(fm);
         musicPlayerFragment=theMusicPlayerFragment;
-        artistFragment=theArtistFragment;
+        selectSongsFragment = theSelectSongsFragment;
         this.mNumOfTabs = 2;
     }
 
@@ -49,7 +49,7 @@ public class MusicFragmentsAdapter extends FragmentPagerAdapter {
                 Fragment tab0 = musicPlayerFragment;
                 return tab0;
             case 1:
-                Fragment tab1 = artistFragment;
+                Fragment tab1 = selectSongsFragment;
                 return tab1;
 
             default:

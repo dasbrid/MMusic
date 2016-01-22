@@ -20,12 +20,12 @@ import asbridge.me.uk.MMusic.utils.MusicContent;
 /**
  * Created by AsbridgeD on 08/12/2015.
  */
-public class ArtistFragment extends Fragment implements
+public class SelectSongsFragment extends Fragment implements
         View.OnClickListener,
         ArtistGroupAdapter.OnSelectionStateChangedListener
 {
 
-    private String TAG = "DAVE: ArtistFragment";
+    private String TAG = "SelectSongsFragment";
 
     private SparseArray<ArtistGroup> artistGroups;
     private ArrayList<Song> songs = new ArrayList<>() ;
@@ -87,9 +87,6 @@ public class ArtistFragment extends Fragment implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnArtist:
-                changeArtist();
-                break;
             case R.id.btnSongsSelect:
                 selectSongs(((TriStateButton)v).getState());
                 break;
@@ -116,17 +113,6 @@ public class ArtistFragment extends Fragment implements
             ag.changeStateofAllSongs(newState);
         }
         artistGroupAdapter.notifyDataSetChanged();
-    }
-
-    // the changeartist button is clicked
-    // Update the services list of artists
-    public void changeArtist() {
-        ArrayList<Song> selectedSongs;
-        selectedSongs = getSelectedSongs();
-        MusicContent.setCurrentPlaylist(getContext(), selectedSongs);
-
-        if (listener != null)
-            listener.onSongsChanged();
     }
 
     @Override
@@ -203,8 +189,6 @@ public class ArtistFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
-        Button btnArtist = (Button) v.findViewById(R.id.btnArtist);
-        btnArtist.setOnClickListener(this);
 
         btnSongsSelect = (TriStateButton) v.findViewById(R.id.btnSongsSelect);
         btnSongsSelect.setOnClickListener(this);
