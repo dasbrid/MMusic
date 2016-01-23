@@ -142,7 +142,6 @@ public class SelectSongsActivity extends FragmentActivity
                 ArrayList<Song> selectedSongs;
                 selectedSongs = artistsFragment.getSelectedSongs();
                 Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
-                //retainFragment.serviceReference.setSongList(selectedSongs);
             }
         }
     }
@@ -164,6 +163,9 @@ public class SelectSongsActivity extends FragmentActivity
             case R.id.action_save_playlist:
                 saveCurrentAsNewPlaylist();
                 return true;
+            case R.id.action_load_playlist:
+                loadPlaylist();
+                return true;
             case R.id.action_timer:
                 //showSetTimerDialog();
                 Toast.makeText(this, "Timer dialog not implemented here", Toast.LENGTH_LONG).show();
@@ -181,5 +183,12 @@ public class SelectSongsActivity extends FragmentActivity
     private void saveCurrentAsNewPlaylist() {
         ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
         MusicContent.createNewPlaylist(this, 10 /*this MUST be calculated automatically */, selectedSongs);
+    }
+
+    private void loadPlaylist() {
+        Log.d(TAG, "loadPlaylist");
+        MusicContent.setCurrentBucketFromSavedBucket(this, 10 /* should be entered by user */);
+        //TODO: update the current playlist
+        artistsFragment.setSongList();
     }
 }

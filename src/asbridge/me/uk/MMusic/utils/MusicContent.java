@@ -4,12 +4,15 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider;
 import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
+import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 
 import java.util.ArrayList;
 
@@ -229,6 +232,45 @@ public class MusicContent {
         for (Long songID : selectedSongIDs) {
             addSongToPlaylist(context, playlistID, songID);
         }
+    }
+
+    public static ArrayList<Integer> getPlaylists(Context context) {
+        Uri uri = PlaylistsContentProvider.CONTENT_URI_SONGS;
+        ArrayList<Integer> playlistIDs = new ArrayList<>();
+        Log.d(TAG, "getting playlists using uri "+uri.toString());
+        String[] projection = {"Distinct " + PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID};
+        String selection = PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " <> ?";
+        String[] selectionArgs = new String[] {"0"};
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+
+        int playlistIDColumn = cursor.getColumnIndex(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID);
+
+        if (cursor != null  && cursor.moveToFirst()) {
+
+            do {
+                int playlistID = cursor.getInt(playlistIDColumn);
+                playlistIDs.add(playlistID);
+            } while (cursor.moveToNext());
+
+            // always close the cursor
+            cursor.close();
+        }
+        return playlistIDs;
+    }
+
+    public static void setCurrentBucketFromSavedBucket(Context context, int playBucketID) {
+        PlaylistsDatabaseHelper database;
+        database = new PlaylistsDatabaseHelper(context);
+        SQLiteDatabase db = database.getWritableDatabase();
+        String[] args={ Integer.toString(playBucketID)};
+        String selectQuery = "insert into playlistsongs select NULL, 0, songid from playlistsongs pids where playlistid = " + playBucketID + " and not exists (select 1 from playlistsongs where playlistid = 0 AND songid = pids.songid);";
+//        String selectQuery = "insert into playlistsongs values (NULL, 0, 61);";
+        Log.d(TAG, selectQuery);
+        db.execSQL(selectQuery);
+
+        selectQuery = "delete from playlistsongs where playlistsongs.playlistid = 0 and not exists (select 1 from playlistsongs AS pids where pids.playlistid = " + playBucketID + " and playlistsongs.songid = pids.songid);";
+        db.execSQL(selectQuery);
+
     }
 
     /*

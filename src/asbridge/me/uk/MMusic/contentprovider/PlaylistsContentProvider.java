@@ -33,7 +33,6 @@ public class PlaylistsContentProvider  extends ContentProvider {
     private static final String AUTHORITY = "asbridge.me.uk.mmusic";
 
     private static final String BASE_PATH_SONGS = "songs";
-    private static final String BASE_PATH_PLAYLIST_SONGS = "playlistsongs";
 
     public static final Uri CONTENT_URI_SONGS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_SONGS);
 
@@ -71,6 +70,10 @@ public class PlaylistsContentProvider  extends ContentProvider {
                 // adding the ID to the original query
                 queryBuilder.appendWhere(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "="
                         + uri.getLastPathSegment());
+                break;
+            case SONGS:
+                Log.d(TAG, "query SONGS");
+                queryBuilder.setTables(PlaylistSongsTable.TABLE_NAME); // Set the table
                 break;
             default:
                 throw new IllegalArgumentException("query unknown URI: " + uri);
