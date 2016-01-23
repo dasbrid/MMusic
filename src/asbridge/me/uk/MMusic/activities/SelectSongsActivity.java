@@ -17,6 +17,7 @@ import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
+import asbridge.me.uk.MMusic.utils.MusicContent;
 
 import java.util.ArrayList;
 
@@ -178,6 +179,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     private void saveCurrentAsNewPlaylist() {
-
+        ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
+        MusicContent.createNewPlaylist(this, 10 /*this MUST be calculated automatically */, selectedSongs);
     }
 }

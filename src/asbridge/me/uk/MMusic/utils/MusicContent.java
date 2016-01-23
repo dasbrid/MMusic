@@ -221,6 +221,16 @@ public class MusicContent {
 
     }
 
+    // add these songs to the playlist
+    // we pass ID
+    // TODO: pass name of new playlist and calculate playlist ID automatically
+    public static void createNewPlaylist(Context context, int playlistID, ArrayList<Long> selectedSongIDs) {
+        // TODO: implement bulkinsert in content provider to avoid looping here
+        for (Long songID : selectedSongIDs) {
+            addSongToPlaylist(context, playlistID, songID);
+        }
+    }
+
     /*
     public static void setCurrentPlaylist(Context context, ArrayList<Song> selectedSongs) {
 
