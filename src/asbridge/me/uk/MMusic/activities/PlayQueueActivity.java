@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,7 +49,11 @@ public class PlayQueueActivity extends FragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playqueue);
-
+        // Create or Upgrade the database as necessary
+        // TODO: problem???? where the DB is only created when this activity starts ???
+        // only a problem when activity is first installed and DB does not already exist
+        // probably OK if this is the first activity started
+        // actually the same call is made from the content resolver onCreate
         PlaylistsDatabaseHelper db = new PlaylistsDatabaseHelper(this);
 
         FragmentManager fm = getFragmentManager();
@@ -171,7 +174,7 @@ public class PlayQueueActivity extends FragmentActivity
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
+        inflater.inflate(R.menu.menu_options_player, menu);
 
         MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
         if(shuffleOn){

@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
-import asbridge.me.uk.MMusic.database.PlaylistsTable;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,24 +27,15 @@ public class PlaylistsContentProvider  extends ContentProvider {
     private PlaylistsDatabaseHelper database;
 
     // used for the UriMacher
-    private static final int PLAYLISTS = 10;
-    private static final int PLAYLIST_SONGS = 15;
-    private static final int TODO_ID = 20;
-    private static final int SONGS = 30;
-    private static final int SONG_BY_ID = 40;
+    private static final int SONGS_IN_PLAYLIST = 10;
+    private static final int SONGS = 20;
 
-    private static final String AUTHORITY = "asbridge.me.uk.mmusic.playlists.contentprovider";
+    private static final String AUTHORITY = "asbridge.me.uk.mmusic";
 
-    private static final String BASE_PATH_PLAYLISTS = "playlists";
+    private static final String BASE_PATH_SONGS = "songs";
     private static final String BASE_PATH_PLAYLIST_SONGS = "playlistsongs";
-    private static final String BASE_PATH_SONG = "song";
 
-    public static final Uri CONTENT_URI_PLAYLISTS = Uri.parse("content://" + AUTHORITY
-            + "/" + BASE_PATH_PLAYLISTS);
-    public static final Uri CONTENT_URI_PLAYLIST_SONGS = Uri.parse("content://" + AUTHORITY
-            + "/" + BASE_PATH_PLAYLIST_SONGS);
-    public static final Uri CONTENT_URI_SONGS = Uri.parse("content://" + AUTHORITY
-            + "/" + BASE_PATH_SONG);
+    public static final Uri CONTENT_URI_SONGS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_SONGS);
 
     public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
             + "/playlists";
@@ -53,11 +44,8 @@ public class PlaylistsContentProvider  extends ContentProvider {
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS, PLAYLISTS);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS + "/#", TODO_ID);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLIST_SONGS, PLAYLIST_SONGS);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONG, SONGS);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONG + "/#", SONG_BY_ID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS, SONGS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS + "/#", SONGS_IN_PLAYLIST);
     }
 
     @Override
@@ -70,37 +58,22 @@ public class PlaylistsContentProvider  extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        // Uisng SQLiteQueryBuilder instead of query() method
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        checkColumns(projection); // check if the caller has requested a column which does not exists
 
-        // check if the caller has requested a column which does not exists
-        checkColumns(projection);
 
-        // Set the table
-        queryBuilder.setTables(PlaylistsTable.TABLE_NAME);
         Log.d(TAG, "query:"+uri.toString());
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
-            case SONG_BY_ID:
-                Log.d(TAG, "SONG_BY_ID");
-                queryBuilder.appendWhere(/*PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + "=0 AND " + */PlaylistsTable.COLUMN_NAME_SONG_ID + "="
-                        + uri.getLastPathSegment());
-                break;
-            case TODO_ID:
-                Log.d(TAG, "TODO_ID");
+            case SONGS_IN_PLAYLIST:
+                Log.d(TAG, "query SONGS_IN_PLAYLIST");
+                queryBuilder.setTables(PlaylistSongsTable.TABLE_NAME); // Set the table
                 // adding the ID to the original query
-                queryBuilder.appendWhere(PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + "="
+                queryBuilder.appendWhere(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "="
                         + uri.getLastPathSegment());
                 break;
-            case PLAYLISTS:
-                Log.d(TAG, "TODO");
-                break;
-            case SONGS:
-                Log.d(TAG, "SONGS");
-                break;
-
             default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
+                throw new IllegalArgumentException("query unknown URI: " + uri);
         }
 
         SQLiteDatabase db = database.getWritableDatabase();
@@ -123,14 +96,15 @@ public class PlaylistsContentProvider  extends ContentProvider {
         SQLiteDatabase sqlDB = database.getWritableDatabase();
         long id = 0;
         switch (uriType) {
-            case PLAYLISTS:
-                id = sqlDB.insert(PlaylistsTable.TABLE_NAME, null, values);
+            case SONGS:
+                Log.d(TAG, "insert SONGS");
+                id = sqlDB.insert(PlaylistSongsTable.TABLE_NAME, null, values);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
+                throw new IllegalArgumentException("insert unknown URI: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
-        return Uri.parse(BASE_PATH_PLAYLISTS + "/" + id);
+        return Uri.parse(BASE_PATH_SONGS + "/" + id);
     }
 
     @Override
@@ -139,30 +113,13 @@ public class PlaylistsContentProvider  extends ContentProvider {
         SQLiteDatabase sqlDB = database.getWritableDatabase();
         int rowsDeleted = 0;
         switch (uriType) {
-            case PLAYLISTS:
-                rowsDeleted = sqlDB.delete(PlaylistsTable.TABLE_NAME, selection,
+            case SONGS:
+                Log.v(TAG, "delete SONGS");
+                rowsDeleted = sqlDB.delete(PlaylistSongsTable.TABLE_NAME, selection,
                         selectionArgs);
-                break;
-            case PLAYLIST_SONGS:
-                Log.v(TAG, "PLAYLIST_SONGS");
-                rowsDeleted = sqlDB.delete(PlaylistsTable.TABLE_NAME, selection,
-                        selectionArgs);
-                break;
-            case TODO_ID:
-                String id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    rowsDeleted = sqlDB.delete(PlaylistsTable.TABLE_NAME,
-                            PlaylistsTable.COLUMN_ID + "=" + id,
-                            null);
-                } else {
-                    rowsDeleted = sqlDB.delete(PlaylistsTable.TABLE_NAME,
-                            PlaylistsTable.COLUMN_ID + "=" + id
-                                    + " and " + selection,
-                            selectionArgs);
-                }
                 break;
             default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
+                throw new IllegalArgumentException("delete unknown URI: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
@@ -175,42 +132,15 @@ public class PlaylistsContentProvider  extends ContentProvider {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
         int rowsUpdated = 0;
-        switch (uriType) {
-            case PLAYLISTS:
-                rowsUpdated = sqlDB.update(PlaylistsTable.TABLE_NAME,
-                        values,
-                        selection,
-                        selectionArgs);
-                break;
-            case TODO_ID:
-                String id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    rowsUpdated = sqlDB.update(PlaylistsTable.TABLE_NAME,
-                            values,
-                            PlaylistsTable.COLUMN_ID + "=" + id,
-                            null);
-                } else {
-                    rowsUpdated = sqlDB.update(PlaylistsTable.TABLE_NAME,
-                            values,
-                            PlaylistsTable.COLUMN_ID + "=" + id
-                                    + " and "
-                                    + selection,
-                            selectionArgs);
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
-        }
-        getContext().getContentResolver().notifyChange(uri, null);
-        return rowsUpdated;
+        throw new IllegalArgumentException("update unknown URI: " + uri);
     }
 
     private void checkColumns(String[] projection) {
         String[] available = {
                 "count(*)",
-                PlaylistsTable.COLUMN_NAME_PLAYLIST_ID,
-                PlaylistsTable.COLUMN_NAME_SONG_ID,
-                PlaylistsTable.COLUMN_ID };
+                PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID,
+                PlaylistSongsTable.COLUMN_NAME_SONG_ID,
+                PlaylistSongsTable.COLUMN_ID };
         if (projection != null) {
             HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
             HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));

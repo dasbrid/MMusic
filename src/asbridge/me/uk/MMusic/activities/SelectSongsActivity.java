@@ -1,14 +1,21 @@
 package asbridge.me.uk.MMusic.activities;
 
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.services.SimpleMusicService;
+import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -139,4 +146,38 @@ public class SelectSongsActivity extends FragmentActivity
         }
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_options_selectsongs, menu);
+        return true;
+    }
+
+    // handle user interaction with the menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_save_playlist:
+                saveCurrentAsNewPlaylist();
+                return true;
+            case R.id.action_timer:
+                //showSetTimerDialog();
+                Toast.makeText(this, "Timer dialog not implemented here", Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_end:
+                Intent playIntent = new Intent(this, SimpleMusicService.class);
+                stopService(playIntent);
+                retainFragment.serviceReference=null;
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void saveCurrentAsNewPlaylist() {
+
+    }
 }

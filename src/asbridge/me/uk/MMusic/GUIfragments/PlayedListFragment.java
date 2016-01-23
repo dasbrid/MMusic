@@ -32,7 +32,6 @@ public class PlayedListFragment extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_playedlist, container, false);
 
         lvPlayedList = (ListView) v.findViewById(R.id.frag_lvPlayedQueue);
@@ -44,7 +43,6 @@ public class PlayedListFragment extends Fragment
 
     @Override
     public void onResume() {
-        Log.v(TAG, "onResume size "+ playedList.size());
         super.onResume();
     }
 
@@ -53,7 +51,6 @@ public class PlayedListFragment extends Fragment
         playedList.addAll(newPlayedQueue);
         if (newPlayedQueue.size() > 0) {
             Song currSong = newPlayedQueue.get(0);
-            Log.v(TAG, "updatePlayedList npq size = " + newPlayedQueue.size() + (currSong == null ? " null" : " not null"));
         }
         playedListAdapter.notifyDataSetChanged();
     }

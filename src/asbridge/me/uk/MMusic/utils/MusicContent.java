@@ -4,14 +4,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.location.Address;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider;
-import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
-import asbridge.me.uk.MMusic.database.PlaylistsTable;
+import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 
 import java.util.ArrayList;
 
@@ -115,7 +113,6 @@ public class MusicContent {
         };
 
         Cursor musicCursor = musicResolver.query(musicUri, projection, selection, selectionArgs, sortOrder);
-        Log.d(TAG, "got songs from ContentResolver, count = " + (musicCursor == null ? null : musicCursor.getCount()));
         if(musicCursor!=null && musicCursor.moveToFirst()){
             //get columns
             int titleColumn = musicCursor.getColumnIndex
@@ -145,8 +142,8 @@ public class MusicContent {
 
         int numDeleted;
         numDeleted = context.getContentResolver().delete(
-                PlaylistsContentProvider.CONTENT_URI_PLAYLIST_SONGS,   // the user dictionary content URI
-                PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + " = ? AND " + PlaylistsTable.COLUMN_NAME_SONG_ID + " = ?",
+                PlaylistsContentProvider.CONTENT_URI_SONGS,
+                PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ? AND " + PlaylistSongsTable.COLUMN_NAME_SONG_ID + " = ?",
                 selectionArgs);
 
     }
@@ -155,55 +152,35 @@ public class MusicContent {
         addSongToPlaylist(context, 0 /*current playlist*/, song.getID());
     }
 
-    public static void setCurrentPlaylist(Context context, ArrayList<Song> selectedSongs) {
-
-        final int playlistID = 0; /* current playlist */
-        String[] selectionArgs = {"0"};
-
-        int numDeleted;
-        numDeleted = context.getContentResolver().delete(
-                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,   // the user dictionary content URI
-                PlaylistsTable.COLUMN_NAME_PLAYLIST_ID + " = ?",
-                selectionArgs);
-
-
-        for (Song s : selectedSongs) {
-            addSongToPlaylist(context, 0, s.getID());
-        }
-    }
-
     public static void addSongToPlaylist(Context context, int playlistID, long songID) {
-        Log.d(TAG,"addsong "+ songID + " to playlist "+playlistID);
-        // Defines a new Uri object that receives the result of the insertion
-        Uri mNewUri;
+        Uri mNewUri; // result of the insertion, not used here
+
         // Defines an object to contain the new values to insert
         ContentValues mNewValues = new ContentValues();
 
-        mNewValues.put(PlaylistsTable.COLUMN_NAME_PLAYLIST_ID, playlistID);
-        mNewValues.put(PlaylistsTable.COLUMN_NAME_SONG_ID, songID);
+        mNewValues.put(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID, playlistID);
+        mNewValues.put(PlaylistSongsTable.COLUMN_NAME_SONG_ID, songID);
 
         mNewUri = context.getContentResolver().insert(
-                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,   // the user dictionary content URI
+                PlaylistsContentProvider.CONTENT_URI_SONGS,
                 mNewValues                          // the values to insert
         );
     }
 
-
     public static ArrayList<Long> getSongsInPlaylist(Context context, int playlistID) {
-        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_PLAYLISTS + "/" + playlistID);
+        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
         ArrayList<Long> songIDs = new ArrayList<>();
         Log.d(TAG, "getting playlist "+playlistID+" using uri "+uri.toString());
-        String[] projection = {PlaylistsTable.COLUMN_NAME_PLAYLIST_ID, PlaylistsTable.COLUMN_NAME_SONG_ID };
+        String[] projection = {PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID, PlaylistSongsTable.COLUMN_NAME_SONG_ID };
 
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
 
-        int songIDColumn = cursor.getColumnIndex(PlaylistsTable.COLUMN_NAME_SONG_ID);
+        int songIDColumn = cursor.getColumnIndex(PlaylistSongsTable.COLUMN_NAME_SONG_ID);
 
         if (cursor != null  && cursor.moveToFirst()) {
 
             do {
                 long songID = cursor.getInt(songIDColumn);
-                Log.d(TAG, "  playlist " + playlistID  + " contains song "+songID);
                 songIDs.add(songID);
             } while (cursor.moveToNext());
 
@@ -215,8 +192,8 @@ public class MusicContent {
 
     public static int getNumSongsInPlaylist(Context context, int playlistID ) {
 
-        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_PLAYLISTS + "/" + playlistID);
-
+        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
+        Log.d(TAG, uri.toString());
         String[] projection = {"count(*)"};
 
         Cursor cursor = context.getContentResolver().query(uri,projection, null, null, null);
@@ -243,4 +220,23 @@ public class MusicContent {
         return song;
 
     }
+
+    /*
+    public static void setCurrentPlaylist(Context context, ArrayList<Song> selectedSongs) {
+
+        final int playlistID = 0; // current playlist
+        String[] selectionArgs = {"0"};
+
+        int numDeleted;
+        numDeleted = context.getContentResolver().delete(
+                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,   // the user dictionary content URI
+                PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ?",
+                selectionArgs);
+
+
+        for (Song s : selectedSongs) {
+            addSongToPlaylist(context, 0, s.getID());
+        }
+    }
+*/
 }

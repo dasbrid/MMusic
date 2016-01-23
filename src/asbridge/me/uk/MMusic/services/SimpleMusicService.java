@@ -320,21 +320,15 @@ public class SimpleMusicService extends Service
         for (; i< Settings.getPlayQueueSize(getApplicationContext()) ; i++) {
             int nextSongIndex;
             if (shuffleOn) {
-                Log.d(TAG, "choosing random song");
                 nextSongIndex = getRandomSongIndex(-1);
 
             } else {
-                Log.d(TAG, "choosing next ordered song");
                 currentPickedSong++;
-
-                Log.v(TAG,  "num songs in playlist = "+numSongsInPlaylist);
-
                 if (currentPickedSong >= numSongsInPlaylist) currentPickedSong = 0;
 
                 // if (currentPickedSong >= songs.size()) currentPickedSong = 0;
                 nextSongIndex = currentPickedSong;
             }
-            Log.v(TAG, "nextSongIndex="+nextSongIndex);
             if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
 
             Song nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
@@ -351,9 +345,7 @@ public class SimpleMusicService extends Service
     public void removeSongFromPlayQueue(int songPID) {
         Log.d(TAG, "SimpleMusicService removeSongFromPlayQueue:id="+songPID+" size="+playQueue.size());
         for (Song s : playQueue) {
-            Log.d(TAG, "s, id="+s.getID()+",PID="+s.getPID());
             if (s.getPID() == songPID) {
-                Log.d(TAG, "found");
                 playQueue.remove(s);
                 fillPlayQueue();
                 break;
@@ -364,9 +356,7 @@ public class SimpleMusicService extends Service
     public void moveThisSongToTopOfPlayQueue(int songPID) {
         Log.d(TAG, "SimpleMusicService moveThisSongToTopOfPlayQueue:id="+songPID);
         for (Song s : playQueue) {
-            Log.d(TAG, "s, id="+s.getID()+",PID="+s.getPID());
             if (s.getPID() == songPID) {
-                Log.d(TAG, "found");
                 playQueue.remove(s);
                 playQueue.add(0,s); // Add at the BEGINNING of the list
                 fillPlayQueue();
@@ -434,12 +424,10 @@ public class SimpleMusicService extends Service
         currentSong = songToPlay;
         long theSongId = songToPlay.getID();
 
-        Log.d(TAG, "song="+songToPlay.getTitle()+" id="+ theSongId);
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, theSongId);
         try{
             player.setDataSource(getApplicationContext(), trackUri);
-            Log.d(TAG, "song="+songToPlay.getTitle()+" id="+ trackUri);
 
         }
         catch(Exception e){
