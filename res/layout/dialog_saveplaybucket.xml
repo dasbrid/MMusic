@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView
+            android:id="@+id/dlgSlideshowSpeedMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Choose a playbucket"
+            android:textSize="16sp" />
+
+    <EditText
+            android:id="@+id/frag_etBucketname"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FF999999"
+            android:textSize="16sp">
+    </EditText>
+    <RelativeLayout android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+
+    >
+        <Button
+                android:id="@+id/btnSavePlaybucketDialogCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel" />
+        <Button
+                android:id="@+id/btnSavePlaybucketDialogOK"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/btnSavePlaybucketDialogCancel"
+                android:text="OK" />
+    </RelativeLayout>
+</LinearLayout>

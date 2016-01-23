@@ -15,6 +15,7 @@ import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.dialogs.LoadPlaybucketDialog;
+import asbridge.me.uk.MMusic.dialogs.SavePlaybucketDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -29,6 +30,7 @@ public class SelectSongsActivity extends FragmentActivity
         implements SelectSongsFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
         , LoadPlaybucketDialog.OnPlaybucketSelectedListener
+        ,SavePlaybucketDialog.OnPlaybucketNameEnteredListener
 {
     private static final String TAG = "SelectSongsActivity";
 
@@ -183,8 +185,20 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     private void saveCurrentAsNewPlaylist() {
+        FragmentManager fm = getFragmentManager();
+        SavePlaybucketDialog savePlaybucketDialog = new SavePlaybucketDialog();
+        //loadPlaybucketDialog.setOnSetSleepTimerListener(this);
+        savePlaybucketDialog.setOnPlaybucketNameEnteredListener(this);
+        savePlaybucketDialog.show(fm, "fragment_saveplaylist_dialog");
+
         ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
         MusicContent.createNewPlaylist(this, "new playlist", selectedSongs);
+    }
+
+    @Override
+    public void onPlaybucketNameEntered(String playBucketName) {
+        ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
+        MusicContent.createNewPlaylist(this, playBucketName, selectedSongs);
     }
 
     private void loadPlaylist() {
@@ -192,7 +206,7 @@ public class SelectSongsActivity extends FragmentActivity
         LoadPlaybucketDialog loadPlaybucketDialog = new LoadPlaybucketDialog();
         //loadPlaybucketDialog.setOnSetSleepTimerListener(this);
         loadPlaybucketDialog.setOnPlaybucketSelectedListener(this);
-        loadPlaybucketDialog.show(fm, "fragment_settimer_dialog");
+        loadPlaybucketDialog.show(fm, "fragment_loadplaylist_dialog");
     }
 
     @Override
