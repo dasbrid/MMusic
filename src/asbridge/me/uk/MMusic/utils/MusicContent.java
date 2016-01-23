@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -13,6 +12,7 @@ import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider;
 import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
+import asbridge.me.uk.MMusic.database.PlaybucketsTable;
 
 import java.util.ArrayList;
 
@@ -227,21 +227,44 @@ public class MusicContent {
     // add these songs to the playlist
     // we pass ID
     // TODO: pass name of new playlist and calculate playlist ID automatically
-    public static void createNewPlaylist(Context context, int playlistID, ArrayList<Long> selectedSongIDs) {
+    public static void createNewPlaylist(Context context, String playlistName, ArrayList<Long> selectedSongIDs) {
+        // First insert the playlist
+        Uri mNewUri; // result of the insertion, not used here
+
+        // Defines an object to contain the new values to insert
+        ContentValues mNewValues = new ContentValues();
+
+        mNewValues.put(PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME, playlistName);
+
+        mNewUri = context.getContentResolver().insert(
+                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,
+                mNewValues                          // the values to insert
+        );
+        String newPlayBucketidString = mNewUri.getLastPathSegment();
+        Log.d(TAG, "NEW PLAYLIST HAS ID:"+newPlayBucketidString);
+        // use mNewUri to get the recently inserted playlist exist
+
+        int newPlayBucketID = Integer.parseInt(newPlayBucketidString);
         // TODO: implement bulkinsert in content provider to avoid looping here
         for (Long songID : selectedSongIDs) {
-            addSongToPlaylist(context, playlistID, songID);
+            addSongToPlaylist(context, newPlayBucketID, songID);
         }
+
     }
 
-    public static ArrayList<Integer> getPlaylists(Context context) {
-        Uri uri = PlaylistsContentProvider.CONTENT_URI_SONGS;
-        ArrayList<Integer> playlistIDs = new ArrayList<>();
-        Log.d(TAG, "getting playlists using uri "+uri.toString());
-        String[] projection = {"Distinct " + PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID};
-        String selection = PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " <> ?";
-        String[] selectionArgs = new String[] {"0"};
+    public static Cursor getPlaylistsCursor(Context context) {
+        Uri uri = PlaylistsContentProvider.CONTENT_URI_PLAYLISTS;
+
+        Log.d(TAG, "getting playlists using uri " + uri.toString());
+        String[] projection = {PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME };
+        String selection = null;
+        String[] selectionArgs = null;
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        return cursor;
+    }
+    public static ArrayList<Integer> getPlaylists(Context context) {
+        ArrayList<Integer> playlistIDs = new ArrayList<>();
+        Cursor cursor = getPlaylistsCursor(context);
 
         int playlistIDColumn = cursor.getColumnIndex(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID);
 

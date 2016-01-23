@@ -8,10 +8,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
+import asbridge.me.uk.MMusic.database.PlaybucketsTable;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,12 +29,15 @@ public class PlaylistsContentProvider  extends ContentProvider {
     // used for the UriMacher
     private static final int SONGS_IN_PLAYLIST = 10;
     private static final int SONGS = 20;
+    private static final int PLAYLISTS = 30;
 
     private static final String AUTHORITY = "asbridge.me.uk.mmusic";
 
     private static final String BASE_PATH_SONGS = "songs";
+    private static final String BASE_PATH_PLAYLISTS = "playlists";
 
     public static final Uri CONTENT_URI_SONGS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_SONGS);
+    public static final Uri CONTENT_URI_PLAYLISTS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_PLAYLISTS);
 
     public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
             + "/playlists";
@@ -45,6 +48,7 @@ public class PlaylistsContentProvider  extends ContentProvider {
     static {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS, SONGS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS + "/#", SONGS_IN_PLAYLIST);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS, PLAYLISTS);
     }
 
     @Override
@@ -58,7 +62,7 @@ public class PlaylistsContentProvider  extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        checkColumns(projection); // check if the caller has requested a column which does not exists
+//        checkColumns(projection); // check if the caller has requested a column which does not exists
 
 
         Log.d(TAG, "query:"+uri.toString());
@@ -74,6 +78,10 @@ public class PlaylistsContentProvider  extends ContentProvider {
             case SONGS:
                 Log.d(TAG, "query SONGS");
                 queryBuilder.setTables(PlaylistSongsTable.TABLE_NAME); // Set the table
+                break;
+            case PLAYLISTS:
+                Log.d(TAG, "query PLAYLISTS");
+                queryBuilder.setTables(PlaybucketsTable.TABLE_NAME); // Set the table
                 break;
             default:
                 throw new IllegalArgumentException("query unknown URI: " + uri);
@@ -102,6 +110,10 @@ public class PlaylistsContentProvider  extends ContentProvider {
             case SONGS:
                 Log.d(TAG, "insert SONGS");
                 id = sqlDB.insert(PlaylistSongsTable.TABLE_NAME, null, values);
+                break;
+            case PLAYLISTS:
+                Log.d(TAG, "insert PLAYLISTS");
+                id = sqlDB.insert(PlaybucketsTable.TABLE_NAME, null, values);
                 break;
             default:
                 throw new IllegalArgumentException("insert unknown URI: " + uri);

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#313131"
+                android:descendantFocusability="blocksDescendants"
+>
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/playbucketID"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="32dp"
+              android:text="id"
+              android:layout_centerVertical="true"
+              android:layout_alignParentLeft="true"
+              android:textSize="16sp"
+              android:textStyle="bold"
+
+    />
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/playbucketName"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="32dp"
+              android:text="name"
+              android:layout_centerVertical="true"
+              android:textSize="16sp"
+              android:textStyle="bold"
+              android:layout_toRightOf="@id/playbucketID"
+    />
+</RelativeLayout>

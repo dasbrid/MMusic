@@ -14,6 +14,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.dialogs.LoadPlaybucketDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 public class SelectSongsActivity extends FragmentActivity
         implements SelectSongsFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
+        , LoadPlaybucketDialog.OnPlaybucketSelectedListener
 {
     private static final String TAG = "SelectSongsActivity";
 
@@ -182,13 +184,20 @@ public class SelectSongsActivity extends FragmentActivity
 
     private void saveCurrentAsNewPlaylist() {
         ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
-        MusicContent.createNewPlaylist(this, 10 /*this MUST be calculated automatically */, selectedSongs);
+        MusicContent.createNewPlaylist(this, "new playlist", selectedSongs);
     }
 
     private void loadPlaylist() {
-        Log.d(TAG, "loadPlaylist");
-        MusicContent.setCurrentBucketFromSavedBucket(this, 10 /* should be entered by user */);
-        //TODO: update the current playlist
+        FragmentManager fm = getFragmentManager();
+        LoadPlaybucketDialog loadPlaybucketDialog = new LoadPlaybucketDialog();
+        //loadPlaybucketDialog.setOnSetSleepTimerListener(this);
+        loadPlaybucketDialog.setOnPlaybucketSelectedListener(this);
+        loadPlaybucketDialog.show(fm, "fragment_settimer_dialog");
+    }
+
+    @Override
+    public void onPlayBucketSelected(int playbucketID) {
+        MusicContent.setCurrentBucketFromSavedBucket(this, playbucketID);
         artistsFragment.setSongList();
     }
 }
