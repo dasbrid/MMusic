@@ -163,7 +163,8 @@ public class PlayQueueActivity extends FragmentActivity
         // music service is bound and ready
         shuffleOn = retainFragment.serviceReference.getShuffleState();
     }
-    MenuItem shuffleMenuItem;
+
+    MenuItem sleepIcon;
     // Don't stop the playback when the backbutton is pressed
     @Override
     public void onBackPressed() {
@@ -174,7 +175,14 @@ public class PlayQueueActivity extends FragmentActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_options_player, menu);
 
-        shuffleMenuItem = menu.findItem(R.id.action_shuffle);
+        sleepIcon = menu.findItem(R.id.action_zzz);
+        if (retainFragment != null && retainFragment.serviceReference != null) {
+            long secsTillSleep = retainFragment.serviceReference.getSecsTillSleep();
+            sleepIcon.setVisible(secsTillSleep > 0);
+        }
+
+
+        MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
         if(shuffleOn){
             shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_on);
             shuffleMenuItem.setTitle("Turn Shuffle Off");
@@ -258,11 +266,8 @@ public class PlayQueueActivity extends FragmentActivity
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_off);
+                            sleepIcon.setVisible(false);
                             retainFragment.serviceReference.cancelSleepTimer();
-
-
-
                             dialog.dismiss();
                         }
                     });
@@ -276,8 +281,7 @@ public class PlayQueueActivity extends FragmentActivity
     public void onSleepTimerChanged(int minsTillSleep) {
         if (retainFragment != null && retainFragment.serviceReference != null) {
             retainFragment.serviceReference.setSleepTimer(minsTillSleep);
-            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_on);
-
+            sleepIcon.setVisible(true);
         }
     }
 

@@ -18,6 +18,13 @@
             android:showAsAction="always"
             android:title="End"/>
     <item
+            android:id="@+id/action_zzz"
+            android:icon="@drawable/ic_action_zzz"
+            android:orderInCategory="2"
+            android:showAsAction="always"
+            android:title="Sleep on"
+            android:visible="false"/>
+    <item
             android:id="@+id/action_shuffle"
             android:icon="@drawable/ic_action_shuffle_on"
             android:orderInCategory="1"
