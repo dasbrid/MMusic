@@ -171,7 +171,7 @@ public class SelectSongsActivity extends FragmentActivity
                 loadPlaylist();
                 return true;
             case R.id.action_timer:
-                //showSetTimerDialog();
+                //showTimerDialog();
                 Toast.makeText(this, "Timer dialog not implemented here", Toast.LENGTH_LONG).show();
                 return true;
             case R.id.action_end:

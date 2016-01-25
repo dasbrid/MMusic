@@ -101,11 +101,11 @@ public class SimpleMusicService extends Service
         sleepTime = c;
     }
 
-    public long getTimeTillSleep() {
+    public long getSecsTillSleep() {
         if (sleepTime == null) return -1;
         Calendar currentTime = Calendar.getInstance();
         long diff = sleepTime.getTimeInMillis() - currentTime.getTimeInMillis();
-        long mins = diff / 1000 / 60;
+        long mins = diff / 1000;
         return mins;
     }
 

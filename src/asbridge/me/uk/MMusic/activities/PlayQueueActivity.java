@@ -1,10 +1,8 @@
 package asbridge.me.uk.MMusic.activities;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -200,7 +198,7 @@ public class PlayQueueActivity extends FragmentActivity
                 startActivity(new Intent(this, SelectSongsActivity.class));
                 return true;
             case R.id.action_timer:
-                showSetTimerDialog();
+                showTimerDialog();
                 return true;
             case R.id.action_end:
                 Intent playIntent = new Intent(this, SimpleMusicService.class);
@@ -226,18 +224,47 @@ public class PlayQueueActivity extends FragmentActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void showSetTimerDialog() {
-        long timeTillSleep = -1;
+    public void showTimerDialog() {
+        long secsTillSleep = -1;
         if (retainFragment != null && retainFragment.serviceReference != null) {
-            timeTillSleep = retainFragment.serviceReference.getTimeTillSleep();
+            secsTillSleep = retainFragment.serviceReference.getSecsTillSleep();
         }
-        if (timeTillSleep < 0) {
+        if (secsTillSleep < 0) {
             FragmentManager fm = getFragmentManager();
             SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
             setSleepTimerDialog.setOnSetSleepTimerListener(this);
             setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
         } else {
-            retainFragment.serviceReference.cancelSleepTimer();
+            // sleep timer is active ... allow user to cancel
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            String msg;
+            if (secsTillSleep < 60) {
+                msg = "less than one minute";
+            } else {
+                long minsTillSleep = secsTillSleep / 60;
+                msg = Long.toString(minsTillSleep) + " minutes";
+            }
+
+            builder.setTitle("Cancel sleep timer")
+                    .setMessage("Sleep in "+msg+"\nCancel?")
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Do nothing
+                            dialog.dismiss();
+                        }
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            retainFragment.serviceReference.cancelSleepTimer();
+                            dialog.dismiss();
+                        }
+                    });
+
+            AlertDialog alert = builder.create();
+            alert.show();
         }
     }
 
