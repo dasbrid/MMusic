@@ -110,6 +110,7 @@ public class SimpleMusicService extends Service
     }
 
     public void cancelSleepTimer() {
+        Log.v(TAG, "cancel sleep timer");
         sleepTime = null;
     }
 
@@ -274,65 +275,68 @@ public class SimpleMusicService extends Service
     public void onCompletion(MediaPlayer mp) {
         if(player.getCurrentPosition() > 0){
             mp.reset();
-            playNextSongInPlayQueue();
+            playNextSongInPlayQueue(true); // true means check sleep timer
         }
     }
 
     private boolean timeToGoToSleep() {
+        Log.v(TAG, "timeToGoToSleep (test) "+((sleepTime==null)?" null":sleepTime.getTimeInMillis()));
         if (sleepTime == null)
             return false; // no sleep timer set
         Calendar currentTime = Calendar.getInstance();
         if (currentTime.after(sleepTime))
             return true;
+        Log.v(TAG, "timeToGoToSleep (test) - not time yet");
         return false;
-    }
-
-    // can be called from outside the service (e.g. from next button in the activity)
-    public void playSong() {
-        if (currentState == STOPPED) { // if we are not playing anything, then play a random song
-            playNextSongInPlayQueue();
-        } else {
-            resumePlaying(); // otherwise resume playing the current song
-        }
     }
 
     // choose a random song (index) from the list
     // should NOT be the same as currentIndex
-    private int getRandomSongIndex(int currentIndex) {
-        int songIndex = currentIndex;
+    private int getRandomSongIndex() {
         int numSongsInPlaylist;
         numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
-        while(songIndex == currentIndex){
-            songIndex=rand.nextInt(numSongsInPlaylist);
-        }
+        int songIndex=rand.nextInt(numSongsInPlaylist);
         return songIndex;
+    }
+
+    private boolean playqueueContainsSong(long songID) {
+        for (Song s : playQueue)
+        {
+            if (s.getID() == songID)
+                return true;
+        }
+        return false;
     }
 
     public void fillPlayQueue() {
         // get number of songs in the current playbucket
-        int numSongsInPlaylist;
-        numSongsInPlaylist = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
-        if (numSongsInPlaylist == 0) {
+        int numSongsInBucket;
+        numSongsInBucket = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
+        if (numSongsInBucket == 0) {
             Log.v(TAG, "No songs in playbucket");
             return;
         }
-        int i = playQueue.size();
-        for (; i< Settings.getPlayQueueSize(getApplicationContext()) ; i++) {
+        int numItemsInQueue = playQueue.size();
+        int queueSize = Settings.getPlayQueueSize(getApplicationContext());
+        Song nextSong;
+        // repeat while ...
+        // the playqueue is not full && there are still some songs left for us to choose
+
+        while ( playQueue.size() < queueSize && (numSongsInBucket > playQueue.size() )) {
             int nextSongIndex;
             if (shuffleOn) {
-                nextSongIndex = getRandomSongIndex(-1);
-
+                do {
+                    nextSongIndex = getRandomSongIndex();
+                    nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
+                } while (playqueueContainsSong(nextSong.getID()));
             } else {
                 currentPickedSong++;
-                if (currentPickedSong >= numSongsInPlaylist) currentPickedSong = 0;
-
-                // if (currentPickedSong >= songs.size()) currentPickedSong = 0;
+                if (currentPickedSong >= numSongsInBucket) currentPickedSong = 0;
                 nextSongIndex = currentPickedSong;
+                nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
             }
             if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
 
-            Song nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
-            //Song pqSong = new Song(songs.get(nextSongIndex), nextSongPID);
             Song pqSong = new Song(nextSong,nextSongPID);
             playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
         }
@@ -380,17 +384,17 @@ public class SimpleMusicService extends Service
         playQueue.clear();
     }
 
-    // play button pressed in the activity start playing the song
+    // overload of PNSIPQ which DOESN'T check the sleep timer
     public void playNextSongInPlayQueue() {
+        playNextSongInPlayQueue(false);
+    }
+
+    // play button pressed in the activity or current song finished
+    // get and play the next song
+    // if check4sleep is true then check if the sleep timer is passed.
+    // otherwise don't check (if called from play button fro example)
+    public void playNextSongInPlayQueue(boolean check4sleep) {
         Log.d(TAG, "SimpleMusicService playNext");
-        if (timeToGoToSleep()) {
-            // if we have reached (passed) the sleep timer.
-            // turn the sleep timer off and don't play any more songs
-            Log.v(TAG, "time to sleep");
-            stopPlayback();
-            sleepTime = null;
-            return;
-        }
 
         player.reset();
 
@@ -403,6 +407,15 @@ public class SimpleMusicService extends Service
 
         // add a song into the queue
         fillPlayQueue();
+
+        if (check4sleep && timeToGoToSleep()) {
+            // if we have reached (passed) the sleep timer.
+            // turn the sleep timer off and don't play any more songs
+            Log.v(TAG, "time to sleep");
+            stopPlayback();
+            sleepTime = null;
+            return;
+        }
         playThisSongNow(nextSong);
     }
 
