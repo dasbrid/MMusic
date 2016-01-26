@@ -170,10 +170,6 @@ public class SelectSongsActivity extends FragmentActivity
             case R.id.action_load_playlist:
                 loadPlaylist();
                 return true;
-            case R.id.action_timer:
-                //showTimerDialog();
-                Toast.makeText(this, "Timer dialog not implemented here", Toast.LENGTH_LONG).show();
-                return true;
             case R.id.action_end:
                 Intent playIntent = new Intent(this, SimpleMusicService.class);
                 stopService(playIntent);
@@ -204,7 +200,6 @@ public class SelectSongsActivity extends FragmentActivity
     private void loadPlaylist() {
         FragmentManager fm = getFragmentManager();
         LoadPlaybucketDialog loadPlaybucketDialog = new LoadPlaybucketDialog();
-        //loadPlaybucketDialog.setOnSetSleepTimerListener(this);
         loadPlaybucketDialog.setOnPlaybucketSelectedListener(this);
         loadPlaybucketDialog.show(fm, "fragment_loadplaylist_dialog");
     }

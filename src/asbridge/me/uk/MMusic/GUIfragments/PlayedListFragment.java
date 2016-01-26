@@ -17,14 +17,23 @@ import java.util.ArrayList;
  * Created by AsbridgeD on 22/12/2015.
  */
 public class PlayedListFragment extends Fragment
+    implements PlayedListAdapter.OnPlayedListClickedListener
 {
 
     private String TAG = "DAVE: PlayedListFragment";
 
     private ListView lvPlayedList;
-
     private ArrayList<Song> playedList;
     private PlayedListAdapter playedListAdapter;
+
+    // for call back to the activity
+    private OnPlayedListClickedListener onPlayedListSongClickedListener;
+    public interface OnPlayedListClickedListener {
+        public void onPlayedListClicked(Song playedListSong);
+    }
+    public void setOnPlayedListClickedListener(OnPlayedListClickedListener l) {
+        onPlayedListSongClickedListener = l;
+    }
 
     public PlayedListFragment() {
         playedList = new ArrayList<>();
@@ -35,10 +44,17 @@ public class PlayedListFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_playedlist, container, false);
 
         lvPlayedList = (ListView) v.findViewById(R.id.frag_lvPlayedQueue);
-        playedListAdapter = new PlayedListAdapter(getContext(), playedList);
+        playedListAdapter = new PlayedListAdapter(getContext(), this, playedList);
 
         lvPlayedList.setAdapter(playedListAdapter);
         return v;
+    }
+
+    @Override
+    public void onPlayedListSongClicked(Song playedListSong) {
+        if (onPlayedListSongClickedListener != null) {
+            onPlayedListSongClickedListener.onPlayedListClicked(playedListSong);
+        }
     }
 
     @Override

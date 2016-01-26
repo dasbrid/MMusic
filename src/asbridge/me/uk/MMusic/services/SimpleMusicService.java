@@ -35,8 +35,6 @@ public class SimpleMusicService extends Service
     private static final int NOTIFY_ID=1;
     private static final String ACTION_PLAY = "com.example.action.PLAY";
     private MediaPlayer player = null;
-    //song list
-//    private ArrayList<Song> songs = null;
     private Random rand;
 
     private LinkedList<Song> playQueue;
@@ -56,6 +54,14 @@ public class SimpleMusicService extends Service
     private static final int PLAYING = 2;
     private int currentState = STOPPED;
 
+    // music sleeplistener fires when sleep timer is reached
+    public interface OnMusicSleepListener {
+        public void onMusicSleep();
+    }
+    private OnMusicSleepListener onMusicSleepListener = null;
+    public void setOnMusicSleepListener (OnMusicSleepListener l) {
+        onMusicSleepListener = l;
+    }
 
     private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     // broadcast receiver to kill audio when headphones unplugged
@@ -70,7 +76,7 @@ public class SimpleMusicService extends Service
         }
     }
 
-    // broadcast receeiver receives actions from notification
+    // broadcast receiver receives actions from notification
     private MusicControlListener musicControlListener;
     public class MusicControlListener extends BroadcastReceiver {
         @Override
@@ -418,6 +424,10 @@ public class SimpleMusicService extends Service
             Log.v(TAG, "time to sleep");
             stopPlayback();
             sleepTime = null;
+            // call back to the activity to hide the sleep timer
+            if (onMusicSleepListener != null) {
+                onMusicSleepListener.onMusicSleep();
+            }
             return;
         }
         playThisSongNow(nextSong);

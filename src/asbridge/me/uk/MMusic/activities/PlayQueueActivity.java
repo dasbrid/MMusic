@@ -32,6 +32,8 @@ public class PlayQueueActivity extends FragmentActivity
         RetainFragment.RetainFragmentListener
         ,PlayQueueFragment.OnPlayQueueListener
         ,SetTimerDialog.OnSleepTimerChangedListener
+        ,SimpleMusicService.OnMusicSleepListener
+        ,PlayedListFragment.OnPlayedListClickedListener
 {
 
     private static final String TAG = "PlayQueueActivity";
@@ -71,7 +73,7 @@ public class PlayQueueActivity extends FragmentActivity
         mPlayQueueFragment.setOnPlayQueueListener(this);
 
         mPlayedListFragment = (PlayedListFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayedqueue);
-        //mPlayQueueFragment.setOnPlayQueueListener(this);
+        mPlayedListFragment.setOnPlayedListClickedListener(this);
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -153,7 +155,7 @@ public class PlayQueueActivity extends FragmentActivity
             mPlayQueueFragment.updatePlayQueue(newPlayQueue);
             ArrayList <Song> newPlayedList = retainFragment.serviceReference.getPlayedList();
             mPlayedListFragment.updatePlayedList(newPlayedList);
-
+            retainFragment.serviceReference.setOnMusicSleepListener(this);
         }
     }
 
@@ -283,6 +285,13 @@ public class PlayQueueActivity extends FragmentActivity
         }
     }
 
+    // callback from music service if the sleep timer has been reached
+    @Override
+    public void onMusicSleep() {
+        sleepIcon.setVisible(false);
+    }
+
+
     @Override
     public void onSleepTimerChanged(int minsTillSleep) {
         if (retainFragment != null && retainFragment.serviceReference != null) {
@@ -335,6 +344,13 @@ public class PlayQueueActivity extends FragmentActivity
     public void onMoveSongToTopClicked(Song song) {
         if (retainFragment.isBound) {
             retainFragment.serviceReference.moveThisSongToTopOfPlayQueue(song.getPID());
+        }
+    }
+
+    @Override
+    public void onPlayedListClicked(Song playedListSong) {
+        if (retainFragment != null && retainFragment.serviceReference != null) {
+            retainFragment.serviceReference.playThisSong(playedListSong);
         }
     }
 }

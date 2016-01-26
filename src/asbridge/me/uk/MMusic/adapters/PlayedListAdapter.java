@@ -20,12 +20,18 @@ public class PlayedListAdapter extends BaseAdapter {
     private final String TAG = "PlayedListAdapter";
     private ArrayList<Song> songs;
     private LayoutInflater songInf;
-
     private Context activity;
+
+    private OnPlayedListClickedListener onPlayedListClickedListener = null;
+    public interface OnPlayedListClickedListener  {
+        void onPlayedListSongClicked(Song song);
+    }
+
     // Constructor
-    public PlayedListAdapter(Context activity, ArrayList<Song> theSongs){
+    public PlayedListAdapter(Context activity, OnPlayedListClickedListener listener, ArrayList<Song> theSongs){
         songs=theSongs;
         this.activity = activity;
+        this.onPlayedListClickedListener = listener;
     }
 
     @Override
@@ -67,7 +73,25 @@ public class PlayedListAdapter extends BaseAdapter {
         //get song using position
         Song currSong = songs.get(position);
         holder.songTitle.setText(currSong.getArtist() + " - " + currSong.getTitle());
+        vi.setOnClickListener(new OnSongClickListener(position));
         return vi;
     }
 
+    class OnSongClickListener implements View.OnClickListener {
+        int position;
+        public OnSongClickListener(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            final Song s = songs.get(position);
+            if (onPlayedListClickedListener != null) {
+                onPlayedListClickedListener.onPlayedListSongClicked(s);
+            }
+        }
+
+    }
+
 }
+

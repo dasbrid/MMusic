@@ -17,11 +17,6 @@
             android:showAsAction="never"
             android:title="Load playlist"/>
     <item
-            android:id="@+id/action_timer"
-            android:orderInCategory="200"
-            android:showAsAction="never"
-            android:title="Set timer"/>
-    <item
             android:id="@+id/action_end"
             android:icon="@drawable/ic_action_exit"
             android:orderInCategory="2"
