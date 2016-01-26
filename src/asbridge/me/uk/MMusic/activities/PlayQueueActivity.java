@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
 import asbridge.me.uk.MMusic.GUIfragments.PlayedListFragment;
 import asbridge.me.uk.MMusic.R;
@@ -65,12 +66,10 @@ public class PlayQueueActivity extends FragmentActivity
         }
 
         tvNowPlaying = (TextView) findViewById(R.id.pqa_tvPlaying);
-
-        //mPlayQueueFragment = new PlayQueueFragment();
+        
         mPlayQueueFragment = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayqueue);
         mPlayQueueFragment.setOnPlayQueueListener(this);
 
-        //mPlayQueueFragment = new PlayQueueFragment();
         mPlayedListFragment = (PlayedListFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayedqueue);
         //mPlayQueueFragment.setOnPlayQueueListener(this);
     }
@@ -233,47 +232,54 @@ public class PlayQueueActivity extends FragmentActivity
     }
 
     public void showTimerDialog() {
-        long secsTillSleep = -1;
-        if (retainFragment != null && retainFragment.serviceReference != null) {
-            secsTillSleep = retainFragment.serviceReference.getSecsTillSleep();
-        }
-        if (secsTillSleep < 0) {
-            FragmentManager fm = getFragmentManager();
-            SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
-            setSleepTimerDialog.setOnSetSleepTimerListener(this);
-            setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
+        long secsTillSleep;
+        boolean isSleepTimerActive;
+        if (retainFragment == null || retainFragment.serviceReference == null) {
+            Toast.makeText(this, "Cannot set sleep timer", Toast.LENGTH_SHORT).show();
         } else {
-            // sleep timer is active ... allow user to cancel
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            isSleepTimerActive = retainFragment.serviceReference.isSleepTimerActive();
+            secsTillSleep = retainFragment.serviceReference.getSecsTillSleep();
 
-            String msg;
-            if (secsTillSleep < 60) {
-                msg = "less than one minute";
+            if (!isSleepTimerActive) {
+                FragmentManager fm = getFragmentManager();
+                SetTimerDialog setSleepTimerDialog = new SetTimerDialog();
+                setSleepTimerDialog.setOnSetSleepTimerListener(this);
+                setSleepTimerDialog.show(fm, "fragment_settimer_dialog");
             } else {
-                long minsTillSleep = secsTillSleep / 60;
-                msg = Long.toString(minsTillSleep) + " minutes";
+                // sleep timer is active ... allow user to cancel
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                String msg;
+                if (secsTillSleep < 0) {
+                    msg = "Sleep at end of playing song";
+                } else if (secsTillSleep < 60) {
+                    msg = "Sleep in less than one minute";
+                } else {
+                    long minsTillSleep = secsTillSleep / 60;
+                    msg = "Sleep in " + Long.toString(minsTillSleep) + " minutes";
+                }
+
+                builder.setTitle("Cancel sleep timer")
+                        .setMessage(msg + "\nCancel?")
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                                dialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                sleepIcon.setVisible(false);
+                                retainFragment.serviceReference.cancelSleepTimer();
+                                dialog.dismiss();
+                            }
+                        });
+
+                AlertDialog alert = builder.create();
+                alert.show();
             }
-
-            builder.setTitle("Cancel sleep timer")
-                    .setMessage("Sleep in "+msg+"\nCancel?")
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Do nothing
-                            dialog.dismiss();
-                        }
-                    })
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            sleepIcon.setVisible(false);
-                            retainFragment.serviceReference.cancelSleepTimer();
-                            dialog.dismiss();
-                        }
-                    });
-
-            AlertDialog alert = builder.create();
-            alert.show();
         }
     }
 

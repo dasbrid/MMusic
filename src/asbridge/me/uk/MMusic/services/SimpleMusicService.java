@@ -109,6 +109,10 @@ public class SimpleMusicService extends Service
         return mins;
     }
 
+    public boolean isSleepTimerActive() {
+        return (sleepTime != null);
+    }
+
     public void cancelSleepTimer() {
         Log.v(TAG, "cancel sleep timer");
         sleepTime = null;
