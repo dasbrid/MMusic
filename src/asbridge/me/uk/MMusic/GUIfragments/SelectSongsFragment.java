@@ -88,31 +88,21 @@ public class SelectSongsFragment extends Fragment implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnSongsSelect:
-                selectSongs(((TriStateButton)v).getState());
+                selectSongs();
                 break;
         }
     }
 
     // The select (all/none) button has been pressed
-    private void selectSongs(int buttonState) {
+    private void selectSongs() {
         int currentState = artistGroupAdapter.getSelectionState();
         if (currentState == 2) {
             btnSongsSelect.setState(0);
-            selectAllorNone(false);
+            artistGroupAdapter.selectAllorNone(false);
         } else {
             btnSongsSelect.setState(2);
-            selectAllorNone(true);
+            artistGroupAdapter.selectAllorNone(true);
         }
-    }
-
-    private void selectAllorNone(boolean newState) {
-        for(int i = 0; i < artistGroups.size(); i++) {
-            int key = artistGroups.keyAt(i);
-            // get the object by the key.
-            ArtistGroup ag = artistGroups.get(key);
-            ag.changeStateofAllSongs(newState);
-        }
-        artistGroupAdapter.notifyDataSetChanged();
     }
 
     @Override

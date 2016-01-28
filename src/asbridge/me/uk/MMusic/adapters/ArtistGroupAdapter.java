@@ -180,6 +180,18 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
+    public void selectAllorNone(boolean newState) {
+        for(int i = 0; i < groups.size(); i++) {
+            ArtistGroup ag = (ArtistGroup) getGroup(i);
+            if (newState) {
+                selectAllSongsInGroup(ag);
+            } else {
+                clearAllSongsInGroup(ag);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
     // when group checkbox is clicked.
     // select or unselct all the child songs
     class OnAgSelectClickListener implements View.OnClickListener {
