@@ -10,7 +10,14 @@
             android:layout_gravity="center_horizontal"
             android:text="Choose a playbucket"
             android:textSize="16sp" />
-
+    <ListView
+            android:id="@+id/frag_lvSavePlaybuckets"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#FF999999"
+            android:textSize="16sp">
+    </ListView>
     <EditText
             android:id="@+id/frag_etBucketname"
             android:layout_width="fill_parent"
@@ -24,6 +31,7 @@
                     android:layout_marginTop="10dp"
 
     >
+
         <Button
                 android:id="@+id/btnSavePlaybucketDialogCancel"
                 android:layout_width="wrap_content"

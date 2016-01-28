@@ -20,6 +20,7 @@ import asbridge.me.uk.MMusic.utils.MusicContent;
  */
 public class SavePlaybucketDialog extends DialogFragment {
 
+    private ListView lvPlaybuckets;
     private EditText etBucketname;
 
     public interface OnPlaybucketNameEnteredListener {
@@ -54,6 +55,32 @@ public class SavePlaybucketDialog extends DialogFragment {
                 btnOKClicked();
             }
         });
+
+        String[] columns = new String[] {
+                PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID,
+                PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME,
+        };
+
+        // the XML defined views which the data will be bound to
+        int[] to = new int[] {
+                R.id.playbucketID,
+                R.id.playbucketName
+        };
+
+        Cursor playBucketsCursor = MusicContent.getPlaylistsCursor(getActivity());
+
+        lvPlaybuckets = (ListView) rootView.findViewById(R.id.frag_lvSavePlaybuckets);
+        SimpleCursorAdapter dataAdapter;
+        // create the adapter using the cursor pointing to the desired data
+        //as well as the layout information
+        dataAdapter = new SimpleCursorAdapter(
+                getActivity(),
+                R.layout.row_playbucket,
+                playBucketsCursor,
+                columns,
+                to,
+                0);
+        lvPlaybuckets.setAdapter(dataAdapter);
 
         etBucketname = (EditText) rootView.findViewById(R.id.frag_etBucketname);
 
