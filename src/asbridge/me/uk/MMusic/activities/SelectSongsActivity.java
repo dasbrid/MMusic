@@ -188,10 +188,7 @@ public class SelectSongsActivity extends FragmentActivity
 
     @Override
     public void onNewPlaybucketNameEntered(String playBucketName) {
-        // TODO: Do we really need to get the selected songs here.
-        // Why not just take them from current
-        ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
-        MusicContent.createNewBucket(this, playBucketName, selectedSongs);
+        MusicContent.createNewBucket(this, playBucketName);
     }
 
     @Override

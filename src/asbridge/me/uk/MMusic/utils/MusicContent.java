@@ -240,7 +240,7 @@ public class MusicContent {
     }
 
     // Create a new playbucket with the given name and the list of songs to it
-    public static void createNewBucket(Context context, String playlistName, ArrayList<Long> selectedSongIDs) {
+    public static void createNewBucket(Context context, String playlistName) {
         // First insert the playlist
         Uri mNewUri; // result of insertion, returns the id of the created playbucket
 
@@ -259,14 +259,8 @@ public class MusicContent {
 
         int newPlayBucketID = Integer.parseInt(newPlayBucketidString);
 
-        // Don't use songs passed in, just update to the current.
+        // just update to the current
         updateSavedPlaybucket(context, newPlayBucketID);
-        /*
-        // TODO: implement bulkinsert in content provider to avoid looping here
-        for (Long songID : selectedSongIDs) {
-            addSongToPlaylist(context, newPlayBucketID, songID);
-        }
-        */
     }
 
     // Return a cursor of playlists, used to display a list of all the plazbuckets
