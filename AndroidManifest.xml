@@ -19,7 +19,7 @@
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
 
         <provider
-                android:name="asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider"
+                android:name=".contentprovider.PlaybucketsContentProvider"
                 android:authorities="asbridge.me.uk.mmusic"
                 android:exported="false"
         >

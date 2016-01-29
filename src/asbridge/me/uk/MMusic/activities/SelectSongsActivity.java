@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
@@ -29,8 +28,8 @@ import java.util.ArrayList;
 public class SelectSongsActivity extends FragmentActivity
         implements SelectSongsFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
-        , LoadPlaybucketDialog.OnPlaybucketSelectedListener
-        ,SavePlaybucketDialog.OnPlaybucketNameEnteredListener
+        , LoadPlaybucketDialog.OnLoadPlaybucketSelectedListener
+        ,SavePlaybucketDialog.OnSavePlaybucketActionListener
 {
     private static final String TAG = "SelectSongsActivity";
 
@@ -188,13 +187,19 @@ public class SelectSongsActivity extends FragmentActivity
         savePlaybucketDialog.show(fm, "fragment_saveplaylist_dialog");
 
         ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
-        MusicContent.createNewPlaylist(this, "new playlist", selectedSongs);
+        MusicContent.createNewBucket(this, "new playlist", selectedSongs);
     }
 
     @Override
-    public void onPlaybucketNameEntered(String playBucketName) {
+    public void onNewPlaybucketNameEntered(String playBucketName) {
         ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
-        MusicContent.createNewPlaylist(this, playBucketName, selectedSongs);
+        MusicContent.createNewBucket(this, playBucketName, selectedSongs);
+    }
+
+    @Override
+    public void onSavePlayBucketSelected(int savePlaybucketID) {
+        MusicContent.updateSavedPlaybucket(this, savePlaybucketID);
+        artistsFragment.setSongList();
     }
 
     private void loadPlaylist() {
@@ -205,7 +210,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     @Override
-    public void onPlayBucketSelected(int playbucketID) {
+    public void onLoadPlayBucketSelected(int playbucketID) {
         MusicContent.setCurrentBucketFromSavedBucket(this, playbucketID);
         artistsFragment.setSongList();
     }

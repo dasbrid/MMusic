@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.contentprovider.PlaylistsContentProvider;
+import asbridge.me.uk.MMusic.contentprovider.PlaybucketsContentProvider;
 import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.database.PlaybucketsTable;
@@ -145,7 +145,7 @@ public class MusicContent {
 
         int numDeleted;
         numDeleted = context.getContentResolver().delete(
-                PlaylistsContentProvider.CONTENT_URI_SONGS,
+                PlaybucketsContentProvider.CONTENT_URI_SONGS,
                 PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ? AND " + PlaylistSongsTable.COLUMN_NAME_SONG_ID + " = ?",
                 selectionArgs);
 
@@ -165,13 +165,13 @@ public class MusicContent {
         mNewValues.put(PlaylistSongsTable.COLUMN_NAME_SONG_ID, songID);
 
         mNewUri = context.getContentResolver().insert(
-                PlaylistsContentProvider.CONTENT_URI_SONGS,
+                PlaybucketsContentProvider.CONTENT_URI_SONGS,
                 mNewValues                          // the values to insert
         );
     }
 
     public static ArrayList<Long> getSongsInPlaylist(Context context, int playlistID) {
-        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
+        Uri uri = Uri.parse(PlaybucketsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
         ArrayList<Long> songIDs = new ArrayList<>();
         Log.d(TAG, "getting playlist "+playlistID+" using uri "+uri.toString());
         String[] projection = {PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID, PlaylistSongsTable.COLUMN_NAME_SONG_ID };
@@ -195,7 +195,7 @@ public class MusicContent {
 
     public static int getNumSongsInPlaylist(Context context, int playlistID ) {
 
-        Uri uri = Uri.parse(PlaylistsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
+        Uri uri = Uri.parse(PlaybucketsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
         Log.d(TAG, uri.toString());
         String[] projection = {"count(*)"};
 
@@ -224,12 +224,25 @@ public class MusicContent {
 
     }
 
-    // add these songs to the playlist
-    // we pass ID
-    // TODO: pass name of new playlist and calculate playlist ID automatically
-    public static void createNewPlaylist(Context context, String playlistName, ArrayList<Long> selectedSongIDs) {
+
+    // Update an existing playbucket to be the same as the current playbucket (save the current playbucket)
+    // Do the insert new then delete old trick (could just clear the savedPlaybucket and copy everything from current
+    // Note: Playbucket 0 is the current playbucket
+    public static void updateSavedPlaybucket(Context context, int savePlaybucketID) {
+        PlaylistsDatabaseHelper database;
+        database = new PlaylistsDatabaseHelper(context);
+        SQLiteDatabase db = database.getWritableDatabase();
+        String selectQuery = "insert into playlistsongs select NULL, "+ savePlaybucketID + ", songid from playlistsongs pids where playlistid = 0 and not exists (select 1 from playlistsongs where playlistid = " + savePlaybucketID + " AND songid = pids.songid);";
+        db.execSQL(selectQuery);
+
+        selectQuery = "delete from playlistsongs where playlistsongs.playlistid = "+ savePlaybucketID + " and not exists (select 1 from playlistsongs AS pids where pids.playlistid = 0 and playlistsongs.songid = pids.songid);";
+        db.execSQL(selectQuery);
+    }
+
+    // Create a new playbucket with the given name and the list of songs to it
+    public static void createNewBucket(Context context, String playlistName, ArrayList<Long> selectedSongIDs) {
         // First insert the playlist
-        Uri mNewUri; // result of the insertion, not used here
+        Uri mNewUri; // result of insertion, returns the id of the created playbucket
 
         // Defines an object to contain the new values to insert
         ContentValues mNewValues = new ContentValues();
@@ -237,7 +250,7 @@ public class MusicContent {
         mNewValues.put(PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME, playlistName);
 
         mNewUri = context.getContentResolver().insert(
-                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,
+                PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS,
                 mNewValues                          // the values to insert
         );
         String newPlayBucketidString = mNewUri.getLastPathSegment();
@@ -249,11 +262,11 @@ public class MusicContent {
         for (Long songID : selectedSongIDs) {
             addSongToPlaylist(context, newPlayBucketID, songID);
         }
-
     }
 
-    public static Cursor getPlaylistsCursor(Context context) {
-        Uri uri = PlaylistsContentProvider.CONTENT_URI_PLAYLISTS;
+    // Return a cursor of playlists, used to display a list of all the plazbuckets
+    public static Cursor getPlaybucketsCursor(Context context) {
+        Uri uri = PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS;
 
         Log.d(TAG, "getting playlists using uri " + uri.toString());
         String[] projection = {PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME };
@@ -262,9 +275,10 @@ public class MusicContent {
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         return cursor;
     }
+
     public static ArrayList<Integer> getPlaylists(Context context) {
         ArrayList<Integer> playlistIDs = new ArrayList<>();
-        Cursor cursor = getPlaylistsCursor(context);
+        Cursor cursor = getPlaybucketsCursor(context);
 
         int playlistIDColumn = cursor.getColumnIndex(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID);
 
@@ -281,37 +295,18 @@ public class MusicContent {
         return playlistIDs;
     }
 
+    // used when we load a saved bucket and want to update the current playbucket
+    // First inserts all songs in the saved bucket NOT in the current bucket.
+    // Then deletes all songs in current bucket but NOT in saved bucket.
+    // Would be possible just to clear the current bucket then insert everything in from the saved bucket.
     public static void setCurrentBucketFromSavedBucket(Context context, int playBucketID) {
         PlaylistsDatabaseHelper database;
         database = new PlaylistsDatabaseHelper(context);
         SQLiteDatabase db = database.getWritableDatabase();
-        String[] args={ Integer.toString(playBucketID)};
         String selectQuery = "insert into playlistsongs select NULL, 0, songid from playlistsongs pids where playlistid = " + playBucketID + " and not exists (select 1 from playlistsongs where playlistid = 0 AND songid = pids.songid);";
-//        String selectQuery = "insert into playlistsongs values (NULL, 0, 61);";
-        Log.d(TAG, selectQuery);
         db.execSQL(selectQuery);
 
         selectQuery = "delete from playlistsongs where playlistsongs.playlistid = 0 and not exists (select 1 from playlistsongs AS pids where pids.playlistid = " + playBucketID + " and playlistsongs.songid = pids.songid);";
         db.execSQL(selectQuery);
-
     }
-
-    /*
-    public static void setCurrentPlaylist(Context context, ArrayList<Song> selectedSongs) {
-
-        final int playlistID = 0; // current playlist
-        String[] selectionArgs = {"0"};
-
-        int numDeleted;
-        numDeleted = context.getContentResolver().delete(
-                PlaylistsContentProvider.CONTENT_URI_PLAYLISTS,   // the user dictionary content URI
-                PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ?",
-                selectionArgs);
-
-
-        for (Song s : selectedSongs) {
-            addSongToPlaylist(context, 0, s.getID());
-        }
-    }
-*/
 }

@@ -23,12 +23,13 @@ public class SavePlaybucketDialog extends DialogFragment {
     private ListView lvPlaybuckets;
     private EditText etBucketname;
 
-    public interface OnPlaybucketNameEnteredListener {
-        void onPlaybucketNameEntered(String playBucketName);
+    public interface OnSavePlaybucketActionListener {
+        void onNewPlaybucketNameEntered(String playBucketName);
+        void onSavePlayBucketSelected(int playbucketID);
     }
 
-    private OnPlaybucketNameEnteredListener listener = null;
-    public void setOnPlaybucketNameEnteredListener(OnPlaybucketNameEnteredListener l) {
+    private OnSavePlaybucketActionListener listener = null;
+    public void setOnPlaybucketNameEnteredListener(OnSavePlaybucketActionListener l) {
         listener = l;
     }
 
@@ -67,7 +68,7 @@ public class SavePlaybucketDialog extends DialogFragment {
                 R.id.playbucketName
         };
 
-        Cursor playBucketsCursor = MusicContent.getPlaylistsCursor(getActivity());
+        Cursor playBucketsCursor = MusicContent.getPlaybucketsCursor(getActivity());
 
         lvPlaybuckets = (ListView) rootView.findViewById(R.id.frag_lvSavePlaybuckets);
         SimpleCursorAdapter dataAdapter;
@@ -84,14 +85,32 @@ public class SavePlaybucketDialog extends DialogFragment {
 
         etBucketname = (EditText) rootView.findViewById(R.id.frag_etBucketname);
 
+        lvPlaybuckets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> listView, View view,
+                                    int position, long id) {
+                // Get the cursor, positioned to the corresponding row in the result set
+                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+                // Get the playbucket from this row in the database.
+                String playbucketIDString =
+                        cursor.getString(cursor.getColumnIndexOrThrow(PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID));
+                int playbucketID = Integer.parseInt(playbucketIDString);
+                if (listener != null)
+                    listener.onSavePlayBucketSelected(playbucketID);
+
+                dismiss();
+            }
+        });
+
+
+
         return rootView;
     }
 
     private void btnOKClicked() {
         String playbucketName = etBucketname.getText().toString();
         if (listener != null)
-            listener.onPlaybucketNameEntered(playbucketName);
-
+            listener.onNewPlaybucketNameEntered(playbucketName);
         dismiss();
     }
 }

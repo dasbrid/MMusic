@@ -21,12 +21,12 @@ public class LoadPlaybucketDialog extends DialogFragment {
 
     private ListView lvPlaybuckets;
 
-    public interface OnPlaybucketSelectedListener {
-        void onPlayBucketSelected(int playlistID);
+    public interface OnLoadPlaybucketSelectedListener {
+        void onLoadPlayBucketSelected(int playbucketID);
     }
 
-    private OnPlaybucketSelectedListener listener = null;
-    public void setOnPlaybucketSelectedListener(OnPlaybucketSelectedListener l) {
+    private OnLoadPlaybucketSelectedListener listener = null;
+    public void setOnPlaybucketSelectedListener(OnLoadPlaybucketSelectedListener l) {
         listener = l;
     }
 
@@ -56,7 +56,7 @@ public class LoadPlaybucketDialog extends DialogFragment {
                 R.id.playbucketName
         };
 
-        Cursor playBucketsCursor = MusicContent.getPlaylistsCursor(getActivity());
+        Cursor playBucketsCursor = MusicContent.getPlaybucketsCursor(getActivity());
 
         lvPlaybuckets = (ListView) rootView.findViewById(R.id.frag_lvPlaybuckets);
         SimpleCursorAdapter dataAdapter;
@@ -82,7 +82,7 @@ public class LoadPlaybucketDialog extends DialogFragment {
                         cursor.getString(cursor.getColumnIndexOrThrow(PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID));
                 int playbucketID = Integer.parseInt(playbucketIDString);
                 if (listener != null)
-                    listener.onPlayBucketSelected(playbucketID);
+                    listener.onLoadPlayBucketSelected(playbucketID);
 
                 dismiss();
             }

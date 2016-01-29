@@ -19,7 +19,7 @@ import java.util.HashSet;
 /**
  * Created by AsbridgeD on 18/01/2016.
  */
-public class PlaylistsContentProvider  extends ContentProvider {
+public class PlaybucketsContentProvider extends ContentProvider {
 
     private final static String TAG = "ContentProvider";
 
