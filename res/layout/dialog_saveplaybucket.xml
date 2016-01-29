@@ -8,7 +8,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Choose a playbucket"
+            android:text="Choose a playbucket or enter the name of a new bucket"
+            android:layout_marginBottom="10dp"
             android:textSize="16sp" />
     <ListView
             android:id="@+id/frag_lvSavePlaybuckets"
@@ -18,30 +19,32 @@
             android:textColor="#FF999999"
             android:textSize="16sp">
     </ListView>
-    <EditText
-            android:id="@+id/frag_etBucketname"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#FF999999"
-            android:textSize="16sp">
-    </EditText>
-    <RelativeLayout android:layout_width="wrap_content"
+    <LinearLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                  android:orientation="horizontal"
                     android:layout_marginTop="10dp"
-
+                android:layout_marginBottom="10dp"
     >
-
-        <Button
-                android:id="@+id/btnSavePlaybucketDialogCancel"
-                android:layout_width="wrap_content"
+        <EditText
+                android:id="@+id/frag_etBucketname"
                 android:layout_height="wrap_content"
-                android:text="Cancel" />
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textColor="#FF999999"
+                android:hint="New Blaybucket"
+                android:textSize="16sp">
+        </EditText>
         <Button
                 android:id="@+id/btnSavePlaybucketDialogOK"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/btnSavePlaybucketDialogCancel"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="30dp"
                 android:text="OK" />
-    </RelativeLayout>
+    </LinearLayout>
+    <Button
+            android:id="@+id/btnSavePlaybucketDialogCancel"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
 </LinearLayout>
