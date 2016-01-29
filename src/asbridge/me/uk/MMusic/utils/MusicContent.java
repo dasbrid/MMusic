@@ -258,10 +258,15 @@ public class MusicContent {
         // use mNewUri to get the recently inserted playlist exist
 
         int newPlayBucketID = Integer.parseInt(newPlayBucketidString);
+
+        // Don't use songs passed in, just update to the current.
+        updateSavedPlaybucket(context, newPlayBucketID);
+        /*
         // TODO: implement bulkinsert in content provider to avoid looping here
         for (Long songID : selectedSongIDs) {
             addSongToPlaylist(context, newPlayBucketID, songID);
         }
+        */
     }
 
     // Return a cursor of playlists, used to display a list of all the plazbuckets

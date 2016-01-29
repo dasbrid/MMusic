@@ -164,7 +164,7 @@ public class SelectSongsActivity extends FragmentActivity
                 startActivity(intent);
                 return true;
             case R.id.action_save_playlist:
-                saveCurrentAsNewPlaylist();
+                saveCurrentAsPlaybucket();
                 return true;
             case R.id.action_load_playlist:
                 loadPlaylist();
@@ -179,19 +179,17 @@ public class SelectSongsActivity extends FragmentActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveCurrentAsNewPlaylist() {
+    private void saveCurrentAsPlaybucket() {
         FragmentManager fm = getFragmentManager();
         SavePlaybucketDialog savePlaybucketDialog = new SavePlaybucketDialog();
-        //loadPlaybucketDialog.setOnSetSleepTimerListener(this);
         savePlaybucketDialog.setOnPlaybucketNameEnteredListener(this);
         savePlaybucketDialog.show(fm, "fragment_saveplaylist_dialog");
-
-        ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
-        MusicContent.createNewBucket(this, "new playlist", selectedSongs);
     }
 
     @Override
     public void onNewPlaybucketNameEntered(String playBucketName) {
+        // TODO: Do we really need to get the selected songs here.
+        // Why not just take them from current
         ArrayList<Long> selectedSongs = artistsFragment.getSelectedSongIDs();
         MusicContent.createNewBucket(this, playBucketName, selectedSongs);
     }
