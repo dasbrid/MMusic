@@ -30,6 +30,7 @@ public class PlaybucketsContentProvider extends ContentProvider {
     private static final int SONGS_IN_PLAYLIST = 10;
     private static final int SONGS = 20;
     private static final int PLAYLISTS = 30;
+    private static final int PLAYLISTID = 40;
 
     private static final String AUTHORITY = "asbridge.me.uk.mmusic";
 
@@ -49,6 +50,7 @@ public class PlaybucketsContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS, SONGS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS + "/#", SONGS_IN_PLAYLIST);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS, PLAYLISTS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS + "/#", PLAYLISTID);
     }
 
     @Override
@@ -132,6 +134,17 @@ public class PlaybucketsContentProvider extends ContentProvider {
                 Log.v(TAG, "delete SONGS");
                 rowsDeleted = sqlDB.delete(PlaylistSongsTable.TABLE_NAME, selection,
                         selectionArgs);
+                break;
+            case PLAYLISTID:
+                String playlistIDString = uri.getLastPathSegment();
+                Log.d(TAG, "delete PLAYLIST " + playlistIDString);
+                String deleteSongsSelection = PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "=?";
+                String deletePlaybucketSelection = PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID + "=?";
+                String[] deleteSelectionArgs = {playlistIDString};
+                rowsDeleted = sqlDB.delete(PlaylistSongsTable.TABLE_NAME, deleteSongsSelection,
+                        deleteSelectionArgs);
+                rowsDeleted = sqlDB.delete(PlaybucketsTable.TABLE_NAME, deletePlaybucketSelection,
+                        deleteSelectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("delete unknown URI: " + uri);

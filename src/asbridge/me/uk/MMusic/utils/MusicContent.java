@@ -239,6 +239,12 @@ public class MusicContent {
         db.execSQL(selectQuery);
     }
 
+    // delete a given playbucket from the database
+    public static void deletePlaybucket(Context context, int deletePlaybucketID) {
+        Uri uri = Uri.parse(PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS + "/" + deletePlaybucketID);
+        context.getContentResolver().delete(uri, null, null);
+    }
+
     // Create a new playbucket with the given name and the list of songs to it
     public static void createNewBucket(Context context, String playlistName) {
         // First insert the playlist
@@ -266,8 +272,6 @@ public class MusicContent {
     // Return a cursor of playlists, used to display a list of all the plazbuckets
     public static Cursor getPlaybucketsCursor(Context context) {
         Uri uri = PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS;
-
-        Log.d(TAG, "getting playlists using uri " + uri.toString());
         String[] projection = {PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME };
         String selection = null;
         String[] selectionArgs = null;

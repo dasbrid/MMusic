@@ -1,6 +1,8 @@
 package asbridge.me.uk.MMusic.activities;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -13,6 +15,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.dialogs.DeletePlaybucketDialog;
 import asbridge.me.uk.MMusic.dialogs.LoadPlaybucketDialog;
 import asbridge.me.uk.MMusic.dialogs.SavePlaybucketDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
@@ -29,7 +32,8 @@ public class SelectSongsActivity extends FragmentActivity
         implements SelectSongsFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
         , LoadPlaybucketDialog.OnLoadPlaybucketSelectedListener
-        ,SavePlaybucketDialog.OnSavePlaybucketActionListener
+        , SavePlaybucketDialog.OnSavePlaybucketActionListener
+        , DeletePlaybucketDialog.OnDeletePlaybucketClickedListener
 {
     private static final String TAG = "SelectSongsActivity";
 
@@ -163,11 +167,14 @@ public class SelectSongsActivity extends FragmentActivity
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_save_playlist:
+            case R.id.action_save_playbucket:
                 saveCurrentAsPlaybucket();
                 return true;
-            case R.id.action_load_playlist:
-                loadPlaylist();
+            case R.id.action_load_playbucket:
+                loadPlaybucket();
+                return true;
+            case R.id.action_delete_playbucket:
+                deletePlayBucket();
                 return true;
             case R.id.action_end:
                 Intent playIntent = new Intent(this, SimpleMusicService.class);
@@ -179,6 +186,38 @@ public class SelectSongsActivity extends FragmentActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void deletePlayBucket() {
+        FragmentManager fm = getFragmentManager();
+        DeletePlaybucketDialog deletePlaybucketDialog = new DeletePlaybucketDialog();
+        deletePlaybucketDialog.setOnDeletePlaybucketClickedListener(this);
+        deletePlaybucketDialog.show(fm, "fragment_deleteplaylist_dialog");
+    }
+
+    // Callback when playbucket is clicked in the delete dialog
+    @Override
+    public void onDeletePlaybucketClicked(int playbucketID, String playbucketName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm playbucket delete")
+                .setMessage("Are you sure you want to delete playbucket " + playbucketName)
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MusicContent.deletePlaybucket(getApplicationContext(), playbucketID);
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void saveCurrentAsPlaybucket() {
         FragmentManager fm = getFragmentManager();
         SavePlaybucketDialog savePlaybucketDialog = new SavePlaybucketDialog();
@@ -186,24 +225,27 @@ public class SelectSongsActivity extends FragmentActivity
         savePlaybucketDialog.show(fm, "fragment_saveplaylist_dialog");
     }
 
+    // Callback from SavePlaybucketDialog when a new playbucket name has been entered
     @Override
     public void onNewPlaybucketNameEntered(String playBucketName) {
         MusicContent.createNewBucket(this, playBucketName);
     }
 
+    // Callback from SavePlaybucketDialog when an existing playbucket is clicked
     @Override
     public void onSavePlayBucketSelected(int savePlaybucketID) {
         MusicContent.updateSavedPlaybucket(this, savePlaybucketID);
         artistsFragment.setSongList();
     }
 
-    private void loadPlaylist() {
+    private void loadPlaybucket() {
         FragmentManager fm = getFragmentManager();
         LoadPlaybucketDialog loadPlaybucketDialog = new LoadPlaybucketDialog();
         loadPlaybucketDialog.setOnPlaybucketSelectedListener(this);
         loadPlaybucketDialog.show(fm, "fragment_loadplaylist_dialog");
     }
 
+    // Callback from LoadPlaybucketDialog when playbucket is ticked
     @Override
     public void onLoadPlayBucketSelected(int playbucketID) {
         MusicContent.setCurrentBucketFromSavedBucket(this, playbucketID);
