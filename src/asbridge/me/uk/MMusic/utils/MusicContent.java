@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.contentprovider.PlaybucketsContentProvider;
+import asbridge.me.uk.MMusic.database.PlaybucketsView;
 import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.database.PlaybucketsTable;
@@ -221,9 +222,7 @@ public class MusicContent {
         Song song = getSongBySongID(context, songID);
 
         return song;
-
     }
-
 
     // Update an existing playbucket to be the same as the current playbucket (save the current playbucket)
     // Do the insert new then delete old trick (could just clear the savedPlaybucket and copy everything from current
@@ -271,12 +270,20 @@ public class MusicContent {
 
     // Return a cursor of playlists, used to display a list of all the plazbuckets
     public static Cursor getPlaybucketsCursor(Context context) {
+        Uri uri = PlaybucketsContentProvider.CONTENT_URI_PLAYBUCKETSVIEW;
+        String[] projection = {PlaybucketsView.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsView.COLUMN_NAME_PLAYBUCKET_NAME, PlaybucketsView.COLUMN_NAME_NUMSONGS };
+        String selection = null;
+        String[] selectionArgs = null;
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        return cursor;
+        /*
         Uri uri = PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS;
         String[] projection = {PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME };
         String selection = null;
         String[] selectionArgs = null;
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         return cursor;
+        */
     }
 
     public static ArrayList<Integer> getPlaylists(Context context) {

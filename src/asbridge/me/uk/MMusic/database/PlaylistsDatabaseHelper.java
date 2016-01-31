@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class PlaylistsDatabaseHelper extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
     // Database Name
     private static final String DATABASE_NAME = "MusicDB";
 
@@ -24,6 +24,7 @@ public class PlaylistsDatabaseHelper extends SQLiteOpenHelper {
         // create playlists table
         PlaylistSongsTable.onCreate(db);
         PlaybucketsTable.onCreate(db);
+        PlaybucketsView.onCreate(db);
     }
 
     // Overriden from base class. Will be called if the DB has a new version
@@ -31,6 +32,7 @@ public class PlaylistsDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         PlaylistSongsTable.onUpgrade(db, oldVersion, newVersion);
         PlaybucketsTable.onUpgrade(db, oldVersion, newVersion);
+        PlaybucketsView.onUpgrade(db, oldVersion, newVersion);
     }
 
 }

@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
+import asbridge.me.uk.MMusic.database.PlaybucketsView;
 import asbridge.me.uk.MMusic.database.PlaylistSongsTable;
 import asbridge.me.uk.MMusic.database.PlaylistsDatabaseHelper;
 import asbridge.me.uk.MMusic.database.PlaybucketsTable;
@@ -31,14 +32,17 @@ public class PlaybucketsContentProvider extends ContentProvider {
     private static final int SONGS = 20;
     private static final int PLAYLISTS = 30;
     private static final int PLAYLISTID = 40;
+    private static final int PLAYBUCKETSVIEW = 40;
 
     private static final String AUTHORITY = "asbridge.me.uk.mmusic";
 
     private static final String BASE_PATH_SONGS = "songs";
     private static final String BASE_PATH_PLAYLISTS = "playlists";
+    private static final String BASE_PATH_PLAYLBUCKETSVIEW = "playbucketsview";
 
     public static final Uri CONTENT_URI_SONGS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_SONGS);
     public static final Uri CONTENT_URI_PLAYLISTS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_PLAYLISTS);
+    public static final Uri CONTENT_URI_PLAYBUCKETSVIEW = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_PLAYLBUCKETSVIEW);
 
     public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
             + "/playlists";
@@ -51,6 +55,7 @@ public class PlaybucketsContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_SONGS + "/#", SONGS_IN_PLAYLIST);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS, PLAYLISTS);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLISTS + "/#", PLAYLISTID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PLAYLBUCKETSVIEW, PLAYBUCKETSVIEW);
     }
 
     @Override
@@ -64,9 +69,6 @@ public class PlaybucketsContentProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-//        checkColumns(projection); // check if the caller has requested a column which does not exists
-
-
         Log.d(TAG, "query:"+uri.toString());
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
@@ -84,6 +86,10 @@ public class PlaybucketsContentProvider extends ContentProvider {
             case PLAYLISTS:
                 Log.d(TAG, "query PLAYLISTS");
                 queryBuilder.setTables(PlaybucketsTable.TABLE_NAME); // Set the table
+                break;
+            case PLAYBUCKETSVIEW:
+                Log.d(TAG, "query PLAYBUCKETSVIEW");
+                queryBuilder.setTables(PlaybucketsView.VIEW_NAME); // Set the table
                 break;
             default:
                 throw new IllegalArgumentException("query unknown URI: " + uri);

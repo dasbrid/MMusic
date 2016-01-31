@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.database.PlaybucketsTable;
+import asbridge.me.uk.MMusic.database.PlaybucketsView;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 
 /**
@@ -58,14 +59,16 @@ public class SavePlaybucketDialog extends DialogFragment {
         });
 
         String[] columns = new String[] {
-                PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID,
-                PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME,
+                PlaybucketsView.COLUMN_NAME_PLAYBUCKET_ID,
+                PlaybucketsView.COLUMN_NAME_PLAYBUCKET_NAME,
+                PlaybucketsView.COLUMN_NAME_NUMSONGS
         };
 
         // the XML defined views which the data will be bound to
         int[] to = new int[] {
                 R.id.playbucketID,
-                R.id.playbucketName
+                R.id.playbucketName,
+                R.id.playbucketnumsongs
         };
 
         Cursor playBucketsCursor = MusicContent.getPlaybucketsCursor(getActivity());
