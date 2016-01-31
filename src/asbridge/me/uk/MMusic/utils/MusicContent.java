@@ -141,6 +141,32 @@ public class MusicContent {
         }
     }
 
+    public static void removeSongsFromCurrentPlaylist(Context context, ArrayList<Song> songs) {
+        Log.d(TAG, "Remove "+ songs.size()+ " songs from group");
+        if (songs.size()==0) { return; }
+        int i = 0;
+        String inClause = "";
+        for (; i < (songs.size() -1) ; i++) {
+            inClause += songs.get(i).getID();
+            //inClause += "'";
+            inClause += ",";
+            //inClause += "'";
+        }
+        inClause += songs.get(i).getID();
+
+        String selection = PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ? AND " + PlaylistSongsTable.COLUMN_NAME_SONG_ID + " in (" + inClause + ")";
+
+        String[] selectionArgs = {"0"};
+        Log.d(TAG, "Inclause = "+ inClause + "... selection"+ selection);
+        int numDeleted;
+        numDeleted = context.getContentResolver().delete(
+                PlaybucketsContentProvider.CONTENT_URI_SONGS,
+                selection,
+                selectionArgs);
+
+    }
+
+
     public static void removeSongFromCurrentPlaylist(Context context, Song song) {
         String[] selectionArgs = {"0", Long.toString(song.getID())};
 
@@ -152,6 +178,7 @@ public class MusicContent {
 
     }
 
+    // TODO: make a method to add a list of songs (to enable easy select all
     public static void addSongToCurrentPlaylist(Context context, Song song) {
         addSongToPlaylist(context, 0 /*current playlist*/, song.getID());
     }

@@ -10,8 +10,11 @@ import android.view.ViewGroup;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
+import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
 import asbridge.me.uk.MMusic.utils.MusicContent;
+
+import java.util.ArrayList;
 
 
 /**
@@ -218,12 +221,15 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     }
 
     private void clearAllSongsInGroup(ArtistGroup ag) {
+        ArrayList<Song> songList = new ArrayList<>();
         for (ArtistGroup.SelectedSong ss : ag.songs) {
             if (ss.selected) {
                 ss.selected = false;
-                MusicContent.removeSongFromCurrentPlaylist(activity, ss.song);
+                songList.add(ss.song);
+                //MusicContent.removeSongFromCurrentPlaylist(activity, ss.song);
             }
         }
+        MusicContent.removeSongsFromCurrentPlaylist(activity, songList);
     }
 
     private void selectAllSongsInGroup(ArtistGroup ag) {
@@ -232,6 +238,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
                 ss.selected = true;
                 MusicContent.addSongToCurrentPlaylist(activity, ss.song);
             }
+
         }
     }
 
