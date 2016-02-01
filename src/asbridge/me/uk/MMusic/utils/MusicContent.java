@@ -4,7 +4,9 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -179,7 +181,6 @@ public class MusicContent {
 
     }
 
-
     public static void removeSongFromCurrentPlaylist(Context context, Song song) {
         String[] selectionArgs = {"0", Long.toString(song.getID())};
 
@@ -189,6 +190,40 @@ public class MusicContent {
                 PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ? AND " + PlaylistSongsTable.COLUMN_NAME_SONG_ID + " = ?",
                 selectionArgs);
 
+    }
+
+    public static void addSongsToCurrentPlaylist(Context context, ArrayList<Song> songsToAdd) {
+        Log.d(TAG, "Add "+ songsToAdd.size()+ " songs to current playlist");
+        if (songsToAdd.size()==0) { return; }
+
+        PlaylistsDatabaseHelper database = new PlaylistsDatabaseHelper(context);
+        SQLiteDatabase sdb = database.getWritableDatabase();
+
+        sdb.beginTransaction();
+        SQLiteStatement stmt = sdb.compileStatement(
+                "INSERT INTO '" + PlaylistSongsTable.TABLE_NAME + "'('" + PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "', '" + PlaylistSongsTable.COLUMN_NAME_SONG_ID + "') VALUES (?, ?);"
+        );
+        for(Song songToAdd : songsToAdd){
+            stmt.bindLong(1, 0);
+            stmt.bindLong(2, songToAdd.getID());
+            stmt.executeInsert();
+        }
+        sdb.setTransactionSuccessful();
+        sdb.endTransaction();
+
+/*
+        //long id = sqlDB.insert(PlaylistSongsTable.TABLE_NAME, null, values);
+        // TODO : here we are still looping ... can we do this in one go
+        for (Song songToAdd : songsToAdd) {
+            mNewValues.put(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID, 0);
+            mNewValues.put(PlaylistSongsTable.COLUMN_NAME_SONG_ID, songToAdd.getID());
+
+            mNewUri = context.getContentResolver().insert(
+                    PlaybucketsContentProvider.CONTENT_URI_SONGS,
+                    mNewValues                          // the values to insert
+            );
+        }
+*/
     }
 
     // TODO: make a method to add a list of songs (to enable easy select all

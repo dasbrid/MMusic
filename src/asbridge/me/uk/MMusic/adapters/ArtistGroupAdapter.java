@@ -186,10 +186,17 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     // call from the 'select all' or 'select none' buttons
     public void selectAllorNone(boolean newState) {
         // loop round the groups
+        ArrayList<Song> songsToAdd = new ArrayList<>();
         for (int i = 0; i < groups.size(); i++) {
             ArtistGroup ag = (ArtistGroup) getGroup(i);
             if (newState == true) { // We are selecting the songs
-                selectAllSongsInGroup(ag); // clears the state of the songs in the adapter and removes them from the DB playbucket
+                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                    if (!ss.selected) {
+                        ss.selected = true;
+                        // add the selected song to a list to add to the DB
+                        songsToAdd.add(ss.song);
+                    }
+                }
             } else {
                 // when clearing the songs, here we just clear them in the adapter and later update DB in one go
                 for (ArtistGroup.SelectedSong ss : ag.songs) {
@@ -199,9 +206,14 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
                 }
             }
         }
-        if (newState == false) { // removing songs from DB in one go
+        if (newState == false) {
+            // removing songs from DB in one go
             MusicContent.removeAllSongsFromCurrentPlaylist(activity);
+        } else {
+            // removing songs from DB in one go
+            MusicContent.addSongsToCurrentPlaylist(activity, songsToAdd);
         }
+
         notifyDataSetChanged();
     }
 
@@ -241,13 +253,15 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     }
 
     private void selectAllSongsInGroup(ArtistGroup ag) {
+        // remember a list of songs in the group, so we can add them to DB in one go
+        ArrayList<Song> songsToAdd = new ArrayList<>();
         for (ArtistGroup.SelectedSong ss : ag.songs) {
             if (!ss.selected) {
                 ss.selected = true;
-                MusicContent.addSongToCurrentPlaylist(activity, ss.song);
+                songsToAdd.add(ss.song);
             }
-
         }
+        MusicContent.addSongsToCurrentPlaylist(activity, songsToAdd);
     }
 
     @Override
