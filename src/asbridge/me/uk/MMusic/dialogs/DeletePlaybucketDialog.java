@@ -66,7 +66,7 @@ public class DeletePlaybucketDialog extends DialogFragment {
         //as well as the layout information
         dataAdapter = new SimpleCursorAdapter(
                 getActivity(),
-                R.layout.row_deleteplaybucket,
+                R.layout.row_playbucket,
                 playBucketsCursor,
                 columns,
                 to,

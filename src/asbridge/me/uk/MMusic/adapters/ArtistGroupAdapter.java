@@ -183,14 +183,24 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
+    // call from the 'select all' or 'select none' buttons
     public void selectAllorNone(boolean newState) {
-        for(int i = 0; i < groups.size(); i++) {
+        // loop round the groups
+        for (int i = 0; i < groups.size(); i++) {
             ArtistGroup ag = (ArtistGroup) getGroup(i);
-            if (newState) {
-                selectAllSongsInGroup(ag);
+            if (newState == true) { // We are selecting the songs
+                selectAllSongsInGroup(ag); // clears the state of the songs in the adapter and removes them from the DB playbucket
             } else {
-                clearAllSongsInGroup(ag);
+                // when clearing the songs, here we just clear them in the adapter and later update DB in one go
+                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                    if (ss.selected) {
+                        ss.selected = false;
+                    }
+                }
             }
+        }
+        if (newState == false) { // removing songs from DB in one go
+            MusicContent.removeAllSongsFromCurrentPlaylist(activity);
         }
         notifyDataSetChanged();
     }
@@ -210,10 +220,8 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
             final ArtistGroup artistGroup = (ArtistGroup) getGroup(groupPosition);
             int groupState = artistGroup.getSelectedState();
             if (groupState == 2) { /* all currently selected */
-                // artistGroup.doSelectNone();
                 clearAllSongsInGroup(artistGroup);
             } else {
-                //artistGroup.doSelectAll();
                 selectAllSongsInGroup(artistGroup);
             }
             notifyDataSetChanged();
@@ -221,15 +229,15 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     }
 
     private void clearAllSongsInGroup(ArtistGroup ag) {
-        ArrayList<Song> songList = new ArrayList<>();
+        // remember a list of songs in the group, so we can delete them from DB in one go
+        ArrayList<Song> songsToRemove = new ArrayList<>();
         for (ArtistGroup.SelectedSong ss : ag.songs) {
             if (ss.selected) {
                 ss.selected = false;
-                songList.add(ss.song);
-                //MusicContent.removeSongFromCurrentPlaylist(activity, ss.song);
+                songsToRemove.add(ss.song);
             }
         }
-        MusicContent.removeSongsFromCurrentPlaylist(activity, songList);
+        MusicContent.removeSongsFromCurrentPlaylist(activity, songsToRemove);
     }
 
     private void selectAllSongsInGroup(ArtistGroup ag) {

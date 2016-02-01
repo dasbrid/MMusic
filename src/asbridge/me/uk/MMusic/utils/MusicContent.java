@@ -141,16 +141,29 @@ public class MusicContent {
         }
     }
 
+    // Does DB call to just remove all the songs in the current playlist
+    // Used when doing 'select none'
+    public static void removeAllSongsFromCurrentPlaylist(Context context) {
+        Log.d(TAG, "Remove all songs from current playlist");
+
+        String selection = PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + " = ?";
+        String[] selectionArgs = {"0"};
+
+        int numDeleted;
+        numDeleted = context.getContentResolver().delete(
+                PlaybucketsContentProvider.CONTENT_URI_SONGS,
+                selection,
+                selectionArgs);
+    }
+
     public static void removeSongsFromCurrentPlaylist(Context context, ArrayList<Song> songs) {
-        Log.d(TAG, "Remove "+ songs.size()+ " songs from group");
+        Log.d(TAG, "Remove "+ songs.size()+ " songs from current playlist");
         if (songs.size()==0) { return; }
         int i = 0;
         String inClause = "";
         for (; i < (songs.size() -1) ; i++) {
             inClause += songs.get(i).getID();
-            //inClause += "'";
             inClause += ",";
-            //inClause += "'";
         }
         inClause += songs.get(i).getID();
 
