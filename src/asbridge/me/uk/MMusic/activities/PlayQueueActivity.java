@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.*;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -97,7 +98,18 @@ public class PlayQueueActivity extends FragmentActivity
                 updateNowPlaying(songArtist, songTitle);
                 btnPlayPause.setImageResource(R.drawable.ic_av_pause);
                 updatePlayQueue();
-            } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_SONG_PAUSED)) {
+            }
+        }
+    }
+
+
+    private SongPausedReceiver songPausedReceiver;
+    // When the service starts playing a song it will broadcast the title
+    private class SongPausedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive "+intent.getAction());
+            if (intent.getAction().equals(AppConstants.INTENT_ACTION_SONG_PAUSED)) {
                 btnPlayPause.setImageResource(R.drawable.ic_av_play);
             }
         }
@@ -148,6 +160,9 @@ public class PlayQueueActivity extends FragmentActivity
         if (songPlayingReceiver == null) songPlayingReceiver = new SongPlayingReceiver();
         IntentFilter intentFilter = new IntentFilter(AppConstants.INTENT_ACTION_SONG_PLAYING);
         registerReceiver(songPlayingReceiver, intentFilter);
+        if (songPausedReceiver == null) songPausedReceiver = new SongPausedReceiver();
+        IntentFilter songPausedIntentFilter = new IntentFilter(AppConstants.INTENT_ACTION_SONG_PAUSED);
+        registerReceiver(songPausedReceiver, songPausedIntentFilter);
 
         // set up the listener for broadcast from the service for play queue changes
         if (nextSongChangedReceiver == null) nextSongChangedReceiver = new NextSongChangedReceiver();

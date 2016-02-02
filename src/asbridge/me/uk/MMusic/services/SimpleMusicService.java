@@ -509,6 +509,12 @@ public class SimpleMusicService extends Service
             player.seekTo(currentPos);
             player.start();
             currentState = PLAYING;
+            // Broadcast the fact that a new song is now playing
+            // can be used by the activity to update its textview
+            Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PLAYING);
+            songPlayingIntent.putExtra(AppConstants.INTENT_EXTRA_SONG_TITLE, currentSong.getTitle());
+            songPlayingIntent.putExtra(AppConstants.INTENT_EXTRA_SONG_ARTIST, currentSong.getArtist());
+            sendBroadcast(songPlayingIntent);
         }
     }
 
