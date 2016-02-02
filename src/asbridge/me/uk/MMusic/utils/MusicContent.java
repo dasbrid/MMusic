@@ -197,36 +197,26 @@ public class MusicContent {
         if (songsToAdd.size()==0) { return; }
 
         PlaylistsDatabaseHelper database = new PlaylistsDatabaseHelper(context);
-        SQLiteDatabase sdb = database.getWritableDatabase();
+        SQLiteDatabase db = database.getWritableDatabase();
 
-        sdb.beginTransaction();
-        SQLiteStatement stmt = sdb.compileStatement(
-                "INSERT INTO '" + PlaylistSongsTable.TABLE_NAME + "'('" + PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "', '" + PlaylistSongsTable.COLUMN_NAME_SONG_ID + "') VALUES (?, ?);"
-        );
-        for(Song songToAdd : songsToAdd){
-            stmt.bindLong(1, 0);
-            stmt.bindLong(2, songToAdd.getID());
-            stmt.executeInsert();
-        }
-        sdb.setTransactionSuccessful();
-        sdb.endTransaction();
-
-/*
-        //long id = sqlDB.insert(PlaylistSongsTable.TABLE_NAME, null, values);
-        // TODO : here we are still looping ... can we do this in one go
-        for (Song songToAdd : songsToAdd) {
-            mNewValues.put(PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID, 0);
-            mNewValues.put(PlaylistSongsTable.COLUMN_NAME_SONG_ID, songToAdd.getID());
-
-            mNewUri = context.getContentResolver().insert(
-                    PlaybucketsContentProvider.CONTENT_URI_SONGS,
-                    mNewValues                          // the values to insert
+        db.beginTransactionNonExclusive(); // allows queries by other threads
+        try {
+            SQLiteStatement stmt = db.compileStatement(
+                    "INSERT INTO '" + PlaylistSongsTable.TABLE_NAME + "'('" + PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "', '" + PlaylistSongsTable.COLUMN_NAME_SONG_ID + "') VALUES (?, ?);"
             );
+            for(Song songToAdd : songsToAdd){
+                stmt.bindLong(1, 0);
+                stmt.bindLong(2, songToAdd.getID());
+                stmt.executeInsert();
+            }
+        } finally {
+            db.endTransaction();
         }
-*/
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 
-    // TODO: make a method to add a list of songs (to enable easy select all
     public static void addSongToCurrentPlaylist(Context context, Song song) {
         addSongToPlaylist(context, 0 /*current playlist*/, song.getID());
     }
@@ -306,11 +296,19 @@ public class MusicContent {
         PlaylistsDatabaseHelper database;
         database = new PlaylistsDatabaseHelper(context);
         SQLiteDatabase db = database.getWritableDatabase();
-        String selectQuery = "insert into playlistsongs select NULL, "+ savePlaybucketID + ", songid from playlistsongs pids where playlistid = 0 and not exists (select 1 from playlistsongs where playlistid = " + savePlaybucketID + " AND songid = pids.songid);";
-        db.execSQL(selectQuery);
+        db.beginTransactionNonExclusive(); // allows queries by other threads
+        try {
+            String selectQuery = "insert into playlistsongs select NULL, "+ savePlaybucketID + ", songid from playlistsongs pids where playlistid = 0 and not exists (select 1 from playlistsongs where playlistid = " + savePlaybucketID + " AND songid = pids.songid);";
+            db.execSQL(selectQuery);
 
-        selectQuery = "delete from playlistsongs where playlistsongs.playlistid = "+ savePlaybucketID + " and not exists (select 1 from playlistsongs AS pids where pids.playlistid = 0 and playlistsongs.songid = pids.songid);";
-        db.execSQL(selectQuery);
+            selectQuery = "delete from playlistsongs where playlistsongs.playlistid = "+ savePlaybucketID + " and not exists (select 1 from playlistsongs AS pids where pids.playlistid = 0 and playlistsongs.songid = pids.songid);";
+            db.execSQL(selectQuery);
+        } finally {
+            db.endTransaction();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 
     // delete a given playbucket from the database
@@ -320,6 +318,9 @@ public class MusicContent {
     }
 
     // Create a new playbucket with the given name and the list of songs to it
+    // TODO: Transactionify, more complicated as we have a content provider call
+    // to add the new playlist, then a call to an existin gtransactionified method
+    // to add the current songs to the playlist.
     public static void createNewBucket(Context context, String playlistName) {
         // First insert the playlist
         Uri mNewUri; // result of insertion, returns the id of the created playbucket
@@ -333,17 +334,17 @@ public class MusicContent {
                 PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS,
                 mNewValues                          // the values to insert
         );
+
+        // use mNewUri to get the recently inserted playlist exist
         String newPlayBucketidString = mNewUri.getLastPathSegment();
         Log.d(TAG, "NEW PLAYLIST HAS ID:"+newPlayBucketidString);
-        // use mNewUri to get the recently inserted playlist exist
-
         int newPlayBucketID = Integer.parseInt(newPlayBucketidString);
 
         // just update to the current
         updateSavedPlaybucket(context, newPlayBucketID);
     }
 
-    // Return a cursor of playlists, used to display a list of all the plazbuckets
+    // Return a cursor of playlists, used to display a list of all the playbuckets
     public static Cursor getPlaybucketsCursor(Context context) {
         Uri uri = PlaybucketsContentProvider.CONTENT_URI_PLAYBUCKETSVIEW;
         String[] projection = {PlaybucketsView.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsView.COLUMN_NAME_PLAYBUCKET_NAME, PlaybucketsView.COLUMN_NAME_NUMSONGS };
@@ -351,14 +352,6 @@ public class MusicContent {
         String[] selectionArgs = null;
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         return cursor;
-        /*
-        Uri uri = PlaybucketsContentProvider.CONTENT_URI_PLAYLISTS;
-        String[] projection = {PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID, PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_NAME };
-        String selection = null;
-        String[] selectionArgs = null;
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        return cursor;
-        */
     }
 
     public static ArrayList<Integer> getPlaylists(Context context) {
@@ -388,10 +381,19 @@ public class MusicContent {
         PlaylistsDatabaseHelper database;
         database = new PlaylistsDatabaseHelper(context);
         SQLiteDatabase db = database.getWritableDatabase();
-        String selectQuery = "insert into playlistsongs select NULL, 0, songid from playlistsongs pids where playlistid = " + playBucketID + " and not exists (select 1 from playlistsongs where playlistid = 0 AND songid = pids.songid);";
-        db.execSQL(selectQuery);
+        db.beginTransactionNonExclusive(); // allows queries by other threads
+        try {
+            String selectQuery = "insert into playlistsongs select NULL, 0, songid from playlistsongs pids where playlistid = " + playBucketID + " and not exists (select 1 from playlistsongs where playlistid = 0 AND songid = pids.songid);";
+            db.execSQL(selectQuery);
 
-        selectQuery = "delete from playlistsongs where playlistsongs.playlistid = 0 and not exists (select 1 from playlistsongs AS pids where pids.playlistid = " + playBucketID + " and playlistsongs.songid = pids.songid);";
-        db.execSQL(selectQuery);
+            selectQuery = "delete from playlistsongs where playlistsongs.playlistid = 0 and not exists (select 1 from playlistsongs AS pids where pids.playlistid = " + playBucketID + " and playlistsongs.songid = pids.songid);";
+            db.execSQL(selectQuery);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 }
