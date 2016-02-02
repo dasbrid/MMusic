@@ -147,10 +147,16 @@ public class PlaybucketsContentProvider extends ContentProvider {
                 String deleteSongsSelection = PlaylistSongsTable.COLUMN_NAME_PLAYLIST_ID + "=?";
                 String deletePlaybucketSelection = PlaybucketsTable.COLUMN_NAME_PLAYBUCKET_ID + "=?";
                 String[] deleteSelectionArgs = {playlistIDString};
-                rowsDeleted = sqlDB.delete(PlaylistSongsTable.TABLE_NAME, deleteSongsSelection,
-                        deleteSelectionArgs);
-                rowsDeleted = sqlDB.delete(PlaybucketsTable.TABLE_NAME, deletePlaybucketSelection,
-                        deleteSelectionArgs);
+                sqlDB.beginTransaction();
+                try {
+                    rowsDeleted = sqlDB.delete(PlaylistSongsTable.TABLE_NAME, deleteSongsSelection,
+                            deleteSelectionArgs);
+                    rowsDeleted = sqlDB.delete(PlaybucketsTable.TABLE_NAME, deletePlaybucketSelection,
+                            deleteSelectionArgs);
+                    sqlDB.setTransactionSuccessful();
+                } finally {
+                    sqlDB.endTransaction();
+                }
                 break;
             default:
                 throw new IllegalArgumentException("delete unknown URI: " + uri);
