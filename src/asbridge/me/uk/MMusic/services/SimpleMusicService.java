@@ -491,7 +491,12 @@ public class SimpleMusicService extends Service
 
     private void pausePlayback() {
         Log.d(TAG, "pausePlayback");
+        // Broadcast the fact that the player is now paused
+        // can be used by the activity to update its button image ...
+        Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PAUSED);
+        sendBroadcast(songPlayingIntent);
         if (currentState == PLAYING) {
+
             player.pause();
             currentPos = player.getCurrentPosition();
             currentState = PAUSED;

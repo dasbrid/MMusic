@@ -12,6 +12,7 @@ public class AppConstants {
     public static final String INTENT_ACTION_PAUSEORRESUME_PLAYBACK = "asbridge.me.uk.MMusic.ACTION_PAUSEORRESUME_PLAYBACK";
 
     public static final String INTENT_ACTION_SONG_PLAYING = "asbridge.me.uk.MMusic.SONG_PLAYING";
+    public static final String INTENT_ACTION_SONG_PAUSED = "asbridge.me.uk.MMusic.SONG_PAUSED";
     public static final String INTENT_EXTRA_SONG_TITLE = "asbridge.me.uk.MMusic.SONG_TITLE";
     public static final String INTENT_EXTRA_SONG_ARTIST = "asbridge.me.uk.MMusic.SONG_ARTIST";
 

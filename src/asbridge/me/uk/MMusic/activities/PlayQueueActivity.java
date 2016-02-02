@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.PlayQueueFragment;
@@ -40,7 +41,7 @@ public class PlayQueueActivity extends FragmentActivity
 
     private RetainFragment retainFragment = null;
     private TextView tvNowPlaying;
-
+    private ImageButton btnPlayPause;
     private boolean shuffleOn = true;
 
     private PlayQueueFragment mPlayQueueFragment = null;
@@ -56,6 +57,8 @@ public class PlayQueueActivity extends FragmentActivity
         // probably OK if this is the first activity started
         // actually the same call is made from the content resolver onCreate
         PlaylistsDatabaseHelper db = new PlaylistsDatabaseHelper(this);
+
+        btnPlayPause = (ImageButton) findViewById(R.id.pqa_btnPlayPause);
 
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
@@ -92,7 +95,10 @@ public class PlayQueueActivity extends FragmentActivity
                 String songTitle = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_TITLE);
                 String songArtist = intent.getStringExtra(AppConstants.INTENT_EXTRA_SONG_ARTIST);
                 updateNowPlaying(songArtist, songTitle);
+                btnPlayPause.setImageResource(R.drawable.ic_av_pause);
                 updatePlayQueue();
+            } else if (intent.getAction().equals(AppConstants.INTENT_ACTION_SONG_PAUSED)) {
+                btnPlayPause.setImageResource(R.drawable.ic_av_play);
             }
         }
     }
