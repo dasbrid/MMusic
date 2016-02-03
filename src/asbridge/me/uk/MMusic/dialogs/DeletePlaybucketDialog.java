@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.adapters.PlaybucketCursorAdapter;
 import asbridge.me.uk.MMusic.database.PlaybucketsTable;
 import asbridge.me.uk.MMusic.database.PlaybucketsView;
 import asbridge.me.uk.MMusic.utils.MusicContent;
@@ -35,7 +36,7 @@ public class DeletePlaybucketDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.dialog_deleteplaybucket, container, false);
 
-        getDialog().setTitle("Playbuckets");
+        getDialog().setTitle("Delete playbucket");
 
         Button btnCancel = (Button) rootView.findViewById(R.id.btnDeletePlaybucketDialogCancel);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -61,12 +62,12 @@ public class DeletePlaybucketDialog extends DialogFragment {
         Cursor playBucketsCursor = MusicContent.getPlaybucketsCursor(getActivity());
 
         lvPlaybuckets = (ListView) rootView.findViewById(R.id.frag_lvPlaybuckets);
-        SimpleCursorAdapter dataAdapter;
+        PlaybucketCursorAdapter dataAdapter;
         // create the adapter using the cursor pointing to the desired data
         //as well as the layout information
-        dataAdapter = new SimpleCursorAdapter(
+        dataAdapter = new PlaybucketCursorAdapter(
                 getActivity(),
-                R.layout.row_playbucket,
+                R.layout.row_delete_playbucket,
                 playBucketsCursor,
                 columns,
                 to,

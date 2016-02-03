@@ -8,14 +8,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Choose a playbucket or enter the name of a new bucket"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:text="Choose a playbucket or enter the name of a new bucket"
             android:textSize="16sp" />
     <ListView
             android:id="@+id/frag_lvSavePlaybuckets"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:divider="#00000000"
+            android:dividerHeight="10dp"
             android:textColor="#FF999999"
             android:textSize="16sp">
     </ListView>
@@ -31,7 +34,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:textColor="#FF999999"
-                android:hint="New Blaybucket"
+                android:singleLine="true"
+                android:hint="New Playbucket"
                 android:textSize="16sp">
         </EditText>
         <Button

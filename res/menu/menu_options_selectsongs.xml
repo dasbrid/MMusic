@@ -10,17 +10,17 @@
             android:id="@+id/action_save_playbucket"
             android:orderInCategory="150"
             android:showAsAction="never"
-            android:title="Save playlist"/>
+            android:title="Save playbucket"/>
     <item
             android:id="@+id/action_load_playbucket"
             android:orderInCategory="160"
             android:showAsAction="never"
-            android:title="Load playlist"/>
+            android:title="Load playbucket"/>
     <item
             android:id="@+id/action_delete_playbucket"
             android:orderInCategory="180"
             android:showAsAction="never"
-            android:title="Delete playlist"/>
+            android:title="Delete playbucket"/>
     <item
             android:id="@+id/action_end"
             android:icon="@drawable/ic_action_exit"
