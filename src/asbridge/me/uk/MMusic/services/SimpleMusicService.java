@@ -49,10 +49,11 @@ public class SimpleMusicService extends Service
 
     private int nextSongPID = 0;
 
-    private static final int STOPPED = 0;
-    private static final int PAUSED = 1;
-    private static final int PLAYING = 2;
-    private int currentState = STOPPED;
+    public static final int STATE_STOPPED = 0;
+    public static final int STATE_PAUSED = 1;
+    public static final int STATE_PLAYING = 2;
+
+    private int currentState = STATE_STOPPED;
 
     // music sleeplistener fires when sleep timer is reached
     public interface OnMusicSleepListener {
@@ -74,6 +75,10 @@ public class SimpleMusicService extends Service
                 pausePlayback();
             }
         }
+    }
+
+    public int getPlayState() {
+        return currentState;
     }
 
     // broadcast receiver receives actions from notification
@@ -237,7 +242,7 @@ public class SimpleMusicService extends Service
     public void onPrepared(MediaPlayer mp) {
         // start playback
         mp.start();
-        currentState = PLAYING;
+        currentState = STATE_PLAYING;
 
         // Broadcast the fact that a new song is now playing
         // can be used by the activity to update its textview
@@ -469,7 +474,7 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService stopPlayback");
         //TODO: Cancel notification
         player.reset();
-        currentState = STOPPED;
+        currentState = STATE_STOPPED;
         Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PAUSED);
         sendBroadcast(songPlayingIntent);
 
@@ -480,13 +485,13 @@ public class SimpleMusicService extends Service
         Log.d(TAG, "SimpleMusicService pauseOrResumePlayack");
 
         switch (currentState) {
-            case (STOPPED):
+            case (STATE_STOPPED):
                 playNextSongInPlayQueue();
                 break;
-            case (PLAYING):
+            case (STATE_PLAYING):
                 pausePlayback();
                 break;
-            case (PAUSED):
+            case (STATE_PAUSED):
                 resumePlaying();
                 break;
         }
@@ -498,20 +503,20 @@ public class SimpleMusicService extends Service
         // can be used by the activity to update its button image ...
         Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PAUSED);
         sendBroadcast(songPlayingIntent);
-        if (currentState == PLAYING) {
+        if (currentState == STATE_PLAYING) {
 
             player.pause();
             currentPos = player.getCurrentPosition();
-            currentState = PAUSED;
+            currentState = STATE_PAUSED;
         }
     }
 
     public void resumePlaying() {
         Log.d(TAG, "resumePlaying");
-        if (currentState == PAUSED) {
+        if (currentState == STATE_PAUSED) {
             player.seekTo(currentPos);
             player.start();
-            currentState = PLAYING;
+            currentState = STATE_PLAYING;
             // Broadcast the fact that a new song is now playing
             // can be used by the activity to update its textview
             Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PLAYING);

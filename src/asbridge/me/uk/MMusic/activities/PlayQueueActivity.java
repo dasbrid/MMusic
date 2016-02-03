@@ -177,6 +177,12 @@ public class PlayQueueActivity extends FragmentActivity
             ArrayList <Song> newPlayedList = retainFragment.serviceReference.getPlayedList();
             mPlayedListFragment.updatePlayedList(newPlayedList);
             retainFragment.serviceReference.setOnMusicSleepListener(this);
+            Log.d(TAG, "set pp btn, state = " + retainFragment.serviceReference.getPlayState());
+            if (retainFragment.serviceReference.getPlayState() == SimpleMusicService.STATE_PLAYING) {
+                btnPlayPause.setImageResource(R.drawable.ic_av_pause);
+            } else {
+                btnPlayPause.setImageResource(R.drawable.ic_av_play);
+            }
         }
     }
 
