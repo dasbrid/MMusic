@@ -33,20 +33,19 @@
                 />
                 <ImageButton
                         android:id="@+id/pqbtnRemoveSong"
-
                         android:contentDescription="remove from playqueue"
-                        android:src="@android:drawable/ic_menu_delete"
-                        android:layout_height="24dp"
-                        android:layout_width="24dp"
+                        android:src="@drawable/ic_remove_song"
+                        android:layout_height="34dp"
+                        android:layout_width="34dp"
                         android:layout_marginRight="10dp"
                         android:layout_toLeftOf="@+id/pqbtnMoveToTop"
                 />
                 <ImageButton
                         android:id="@+id/pqbtnMoveToTop"
-                        android:layout_height="24dp"
-                        android:layout_width="24dp"
+                        android:layout_height="34dp"
+                        android:layout_width="34dp"
                         android:contentDescription="Play next"
-                        android:src="@android:drawable/ic_menu_upload"
+                        android:src="@drawable/ic_move_to_top"
                         android:layout_alignParentRight="true"
                 />
         </RelativeLayout>
