@@ -470,6 +470,9 @@ public class SimpleMusicService extends Service
         //TODO: Cancel notification
         player.reset();
         currentState = STOPPED;
+        Intent songPlayingIntent = new Intent(AppConstants.INTENT_ACTION_SONG_PAUSED);
+        sendBroadcast(songPlayingIntent);
+
     }
 
     // pause or resume (depending on the current state)

@@ -209,12 +209,12 @@ public class MusicContent {
                 stmt.bindLong(2, songToAdd.getID());
                 stmt.executeInsert();
             }
+            db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
+            db.close();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
+
     }
 
     public static void addSongToCurrentPlaylist(Context context, Song song) {
@@ -303,12 +303,13 @@ public class MusicContent {
 
             selectQuery = "delete from playlistsongs where playlistsongs.playlistid = "+ savePlaybucketID + " and not exists (select 1 from playlistsongs AS pids where pids.playlistid = 0 and playlistsongs.songid = pids.songid);";
             db.execSQL(selectQuery);
+            db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
+            db.close();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
+
+
     }
 
     // delete a given playbucket from the database
@@ -319,7 +320,7 @@ public class MusicContent {
 
     // Create a new playbucket with the given name and the list of songs to it
     // TODO: Transactionify, more complicated as we have a content provider call
-    // to add the new playlist, then a call to an existin gtransactionified method
+    // to add the new playlist, then a call to an existing transactionified method
     // to add the current songs to the playlist.
     public static void createNewBucket(Context context, String playlistName) {
         // First insert the playlist
@@ -335,7 +336,7 @@ public class MusicContent {
                 mNewValues                          // the values to insert
         );
 
-        // use mNewUri to get the recently inserted playlist exist
+        // use mNewUri to get the recently inserted playlist
         String newPlayBucketidString = mNewUri.getLastPathSegment();
         Log.d(TAG, "NEW PLAYLIST HAS ID:"+newPlayBucketidString);
         int newPlayBucketID = Integer.parseInt(newPlayBucketidString);
@@ -391,9 +392,7 @@ public class MusicContent {
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
+            db.close();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-        db.close();
     }
 }
