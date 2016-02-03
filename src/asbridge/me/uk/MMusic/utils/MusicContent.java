@@ -54,10 +54,17 @@ public class MusicContent {
     }
 
 
-    public static void getAllSongs(Context context, ArrayList<Song> songList) {
+    public static void getAllSongsGroupedByArtist(Context context, ArrayList<Song> songList) {
         String selection = null;
         String[] selectionargs = null;
         String sortOrder = MediaStore.Audio.Media.ARTIST + " ASC";
+        getSongs(context, selection, selectionargs, sortOrder, songList);
+    }
+
+    public static void getAllSongsGroupedByAlbum(Context context, ArrayList<Song> songList) {
+        String selection = null;
+        String[] selectionargs = null;
+        String sortOrder = MediaStore.Audio.Media.ALBUM + " ASC";
         getSongs(context, selection, selectionargs, sortOrder, songList);
     }
 
@@ -74,7 +81,7 @@ public class MusicContent {
         getSongs(context, selection, selectionargs, songList);
     }
 
-    public static void getAllSongsByAlbum(Context context, String album, ArrayList<Song> songList) {
+    public static void getAllSongsInAlbum(Context context, String album, ArrayList<Song> songList) {
         String selection = MediaStore.Audio.Media.ALBUM + "=?";
         String[] selectionargs = new String[1];
         selectionargs[0] = album;

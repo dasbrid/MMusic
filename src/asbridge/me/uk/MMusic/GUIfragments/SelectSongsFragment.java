@@ -1,7 +1,6 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.*;
@@ -63,13 +62,28 @@ public class SelectSongsFragment extends Fragment implements
     public void setSongList() {
         // This displays ALL songs on the device
         songs = new ArrayList<>();
-        MusicContent.getAllSongs(getContext(), songs);
+        MusicContent.getAllSongsGroupedByArtist(getContext(), songs);
         // Songs are set selected (ticked) based on the current playlist
         ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
-        setListViewContents(songs, selectedSongs);
+        setListViewContentsGroupedByArtist(songs, selectedSongs);
     }
 
-    private void setListViewContents(ArrayList<Song> songs, ArrayList<Long> selectedSongs) {
+    private void setListViewContentsGroupedByAlbum(ArrayList<Song> songs, ArrayList<Long> selectedSongs) {
+        int i=0;
+        ArtistGroup newGroup = null;
+        for (Song s : songs) {
+
+            if (newGroup == null || !newGroup.artistName.equals(s.getAlbum())) {
+                newGroup = new ArtistGroup(s.getAlbum());
+                artistGroups.append(i++, newGroup);
+            }
+            newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
+
+        }
+        artistGroupAdapter.notifyDataSetChanged();
+    }
+
+    private void setListViewContentsGroupedByArtist(ArrayList<Song> songs, ArrayList<Long> selectedSongs) {
         int i=0;
         ArtistGroup newGroup = null;
         for (Song s : songs) {
@@ -202,7 +216,7 @@ public class SelectSongsFragment extends Fragment implements
             for (Song s : selectedSongs) {
                 selectedSongIDs.add(s.getID());
             }
-            setListViewContents(songs, selectedSongIDs);
+            setListViewContentsGroupedByArtist(songs, selectedSongIDs);
         } else {
             // if there is no saved instance then we will get songs from the device content provider
             setSongList();
