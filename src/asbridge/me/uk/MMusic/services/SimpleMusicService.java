@@ -271,9 +271,9 @@ public class SimpleMusicService extends Service
         Notification.Builder builder = new Notification.Builder(this);
 
         builder.setContentIntent(pendInt)
-                .addAction(R.drawable.playpause, "Pause/Play", pendingpauseorresumeIntent)
-                .addAction(R.drawable.stop, "Stop", pendingStopIntent)
-                .addAction(R.drawable.next, "Next", pendingNextIntent)
+                .addAction(R.drawable.ic_av_play, "Pause/Play", pendingpauseorresumeIntent)
+                .addAction(R.drawable.ic_av_stop, "Stop", pendingStopIntent)
+                .addAction(R.drawable.ic_av_next, "Next", pendingNextIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(currentSong.getTitle())
                 .setOngoing(true)
