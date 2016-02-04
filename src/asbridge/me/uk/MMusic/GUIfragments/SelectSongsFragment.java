@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
@@ -10,8 +11,7 @@ import asbridge.me.uk.MMusic.adapters.ArtistGroupAdapter;
 import asbridge.me.uk.MMusic.classes.ArtistGroup;
 import asbridge.me.uk.MMusic.classes.Song;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import android.support.v4.app.Fragment;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
@@ -26,7 +26,8 @@ public class SelectSongsFragment extends Fragment implements
 {
 
     private String TAG = "SelectSongsFragment";
-
+    Button btnGroupByAlbum;
+    Button btnGroupByArtist;
     private static final int GROUPBY_ARTIST = 0;
     private static final int GROUPBY_ALBUM = 1;
     private int groupby;
@@ -72,62 +73,35 @@ public class SelectSongsFragment extends Fragment implements
         MusicContent.getAllSongsGroupedByArtist(getContext(), songs);
         // Songs are set selected (ticked) based on the current playlist
         ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
-        setListViewContentsGrouped(/*songs, */selectedSongs);
+        setListViewContentsGrouped(selectedSongs);
     }
 
-    private void changeGroupBy() {
-        if (groupby == GROUPBY_ALBUM)
-            groupby = GROUPBY_ARTIST;
-        else
-            groupby = GROUPBY_ALBUM;
+    private void changeGroupBy(int newGroupBy) {
+        groupby = newGroupBy;
+
 
         setListViewContentsGrouped(getSelectedSongIDs());
     }
 
-    private void setListViewContentsGrouped(/*ArrayList<Song> songs, */ArrayList<Long> selectedSongs) {
+    // The songs are loadad and we have the selected songs.
+    // Group the songs into either artists or albums, depending on the groups
+    private void setListViewContentsGrouped(ArrayList<Long> selectedSongs) {
+        HashMap<String, ArtistGroup> groupMap = new HashMap<>();
+        ArtistGroup group = null;
+        artistGroups.clear();
         int i=0;
-        ArtistGroup newGroup = null;
         for (Song s : songs) {
-            if (newGroup == null
-                    || (groupby == GROUPBY_ALBUM && !newGroup.artistName.equals(s.getAlbum()))
-                    || (groupby == GROUPBY_ARTIST && !newGroup.artistName.equals(s.getArtist()))
-            ) {
-                newGroup = new ArtistGroup(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
-                artistGroups.append(i++, newGroup);
+            if (groupMap.containsKey(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist())) {
+                group = groupMap.get(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
+            } else {
+                group = new ArtistGroup(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
+                artistGroups.append(i++, group);
+                groupMap.put(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist(), group);
             }
-            newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
-
+            group.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
         }
-        artistGroupAdapter.notifyDataSetChanged();
-    }
-
-    private void setListViewContentsGroupedByAlbum(/*ArrayList<Song> songs, */ArrayList<Long> selectedSongs) {
-        int i=0;
-        ArtistGroup newGroup = null;
-        for (Song s : songs) {
-
-            if (newGroup == null || !newGroup.artistName.equals(s.getAlbum())) {
-                newGroup = new ArtistGroup(s.getAlbum());
-                artistGroups.append(i++, newGroup);
-            }
-            newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
-
-        }
-        artistGroupAdapter.notifyDataSetChanged();
-    }
-
-    private void setListViewContentsGroupedByArtist(/*ArrayList<Song> songs, */ArrayList<Long> selectedSongs) {
-        int i=0;
-        ArtistGroup newGroup = null;
-        for (Song s : songs) {
-
-            if (newGroup == null || !newGroup.artistName.equals(s.getArtist())) {
-                newGroup = new ArtistGroup(s.getArtist());
-                artistGroups.append(i++, newGroup);
-            }
-            newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
-
-        }
+        btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
+        btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
         artistGroupAdapter.notifyDataSetChanged();
     }
 
@@ -137,8 +111,11 @@ public class SelectSongsFragment extends Fragment implements
             case R.id.btnSongsSelect:
                 selectSongs();
                 break;
-            case R.id.btnGroupBy:
-                changeGroupBy();
+            case R.id.btnGroupByArtist:
+                changeGroupBy(GROUPBY_ARTIST);
+                break;
+            case R.id.btnGroupByAlbum:
+                changeGroupBy(GROUPBY_ALBUM);
                 break;
         }
     }
@@ -233,8 +210,10 @@ public class SelectSongsFragment extends Fragment implements
         btnSongsSelect = (TriStateButton) v.findViewById(R.id.btnSongsSelect);
         btnSongsSelect.setOnClickListener(this);
 
-        Button btnGroupBy = (Button) v.findViewById(R.id.btnGroupBy);
-        btnGroupBy.setOnClickListener(this);
+        btnGroupByAlbum = (Button) v.findViewById(R.id.btnGroupByAlbum);
+        btnGroupByAlbum.setOnClickListener(this);
+        btnGroupByArtist = (Button) v.findViewById(R.id.btnGroupByArtist);
+        btnGroupByArtist.setOnClickListener(this);
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 
@@ -256,7 +235,7 @@ public class SelectSongsFragment extends Fragment implements
             for (Song s : selectedSongs) {
                 selectedSongIDs.add(s.getID());
             }
-            setListViewContentsGroupedByArtist(/*songs, */selectedSongIDs);
+            setListViewContentsGrouped(selectedSongIDs);
         } else {
             // if there is no saved instance then we will get songs from the device content provider
             groupby = GROUPBY_ALBUM;
