@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.*;
@@ -26,6 +27,10 @@ public class SelectSongsFragment extends Fragment implements
 
     private String TAG = "SelectSongsFragment";
 
+    private static final int GROUPBY_ARTIST = 0;
+    private static final int GROUPBY_ALBUM = 1;
+    private int groupby;
+
     private SparseArray<ArtistGroup> artistGroups;
     private ArrayList<Song> songs = new ArrayList<>() ;
 
@@ -49,12 +54,14 @@ public class SelectSongsFragment extends Fragment implements
 
     private static final String STATE_ALLSONGS = "ALLSONGS";
     private static final String STATE_SELECTEDSONGS = "SELECTEDSONGS";
+    private static final String STATE_GROUPBY = "GROUPBY";
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // Make sure to call the super method so that the states of our views are saved
         super.onSaveInstanceState(outState);
         // Save our own state now
+        outState.putInt(STATE_GROUPBY, groupby);
         outState.putParcelableArrayList(STATE_ALLSONGS, songs);
         outState.putParcelableArrayList(STATE_SELECTEDSONGS, getSelectedSongs());
     }
@@ -65,10 +72,36 @@ public class SelectSongsFragment extends Fragment implements
         MusicContent.getAllSongsGroupedByArtist(getContext(), songs);
         // Songs are set selected (ticked) based on the current playlist
         ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
-        setListViewContentsGroupedByArtist(songs, selectedSongs);
+        setListViewContentsGrouped(/*songs, */selectedSongs);
     }
 
-    private void setListViewContentsGroupedByAlbum(ArrayList<Song> songs, ArrayList<Long> selectedSongs) {
+    private void changeGroupBy() {
+        if (groupby == GROUPBY_ALBUM)
+            groupby = GROUPBY_ARTIST;
+        else
+            groupby = GROUPBY_ALBUM;
+
+        setListViewContentsGrouped(getSelectedSongIDs());
+    }
+
+    private void setListViewContentsGrouped(/*ArrayList<Song> songs, */ArrayList<Long> selectedSongs) {
+        int i=0;
+        ArtistGroup newGroup = null;
+        for (Song s : songs) {
+            if (newGroup == null
+                    || (groupby == GROUPBY_ALBUM && !newGroup.artistName.equals(s.getAlbum()))
+                    || (groupby == GROUPBY_ARTIST && !newGroup.artistName.equals(s.getArtist()))
+            ) {
+                newGroup = new ArtistGroup(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
+                artistGroups.append(i++, newGroup);
+            }
+            newGroup.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
+
+        }
+        artistGroupAdapter.notifyDataSetChanged();
+    }
+
+    private void setListViewContentsGroupedByAlbum(/*ArrayList<Song> songs, */ArrayList<Long> selectedSongs) {
         int i=0;
         ArtistGroup newGroup = null;
         for (Song s : songs) {
@@ -83,7 +116,7 @@ public class SelectSongsFragment extends Fragment implements
         artistGroupAdapter.notifyDataSetChanged();
     }
 
-    private void setListViewContentsGroupedByArtist(ArrayList<Song> songs, ArrayList<Long> selectedSongs) {
+    private void setListViewContentsGroupedByArtist(/*ArrayList<Song> songs, */ArrayList<Long> selectedSongs) {
         int i=0;
         ArtistGroup newGroup = null;
         for (Song s : songs) {
@@ -103,6 +136,9 @@ public class SelectSongsFragment extends Fragment implements
         switch (v.getId()) {
             case R.id.btnSongsSelect:
                 selectSongs();
+                break;
+            case R.id.btnGroupBy:
+                changeGroupBy();
                 break;
         }
     }
@@ -137,8 +173,8 @@ public class SelectSongsFragment extends Fragment implements
 
         ExpandableListView.ExpandableListContextMenuInfo menuInfo = (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
         int type = ExpandableListView.getPackedPositionType(menuInfo.packedPosition);
-        int groupPos = -1;
-        int childPos = -1;
+        int groupPos;
+        int childPos;
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
             groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
             childPos = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
@@ -197,6 +233,9 @@ public class SelectSongsFragment extends Fragment implements
         btnSongsSelect = (TriStateButton) v.findViewById(R.id.btnSongsSelect);
         btnSongsSelect.setOnClickListener(this);
 
+        Button btnGroupBy = (Button) v.findViewById(R.id.btnGroupBy);
+        btnGroupBy.setOnClickListener(this);
+
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 
         artistGroups = new SparseArray<>();
@@ -211,14 +250,16 @@ public class SelectSongsFragment extends Fragment implements
         if (savedInstanceState != null) {
             // Restore last state for checked position.
             songs = savedInstanceState.getParcelableArrayList(STATE_ALLSONGS);
+            groupby = savedInstanceState.getInt(STATE_GROUPBY);
             ArrayList<Song> selectedSongs = savedInstanceState.getParcelableArrayList(STATE_SELECTEDSONGS);
             ArrayList<Long> selectedSongIDs = new ArrayList<>();
             for (Song s : selectedSongs) {
                 selectedSongIDs.add(s.getID());
             }
-            setListViewContentsGroupedByArtist(songs, selectedSongIDs);
+            setListViewContentsGroupedByArtist(/*songs, */selectedSongIDs);
         } else {
             // if there is no saved instance then we will get songs from the device content provider
+            groupby = GROUPBY_ALBUM;
             setSongList();
         }
         return v;
