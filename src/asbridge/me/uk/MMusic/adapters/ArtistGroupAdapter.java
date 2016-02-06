@@ -2,7 +2,6 @@ package asbridge.me.uk.MMusic.adapters;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,7 +93,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         TextView text = null;
         CheckBox checkbox = null;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.artistrow_details, null);
+            convertView = inflater.inflate(R.layout.row_details, null);
         }
         text = (TextView) convertView.findViewById(R.id.textView1);
         text.setText(checkedSong.song.getTitle());
@@ -168,7 +167,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.artistrow_group, null);
+            convertView = inflater.inflate(R.layout.row_group, null);
         }
         ArtistGroup group = (ArtistGroup) getGroup(groupPosition);
 

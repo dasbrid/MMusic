@@ -3,7 +3,6 @@ package asbridge.me.uk.MMusic.dialogs;
 import android.app.DialogFragment;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +79,7 @@ public class SavePlaybucketDialog extends DialogFragment {
         //as well as the layout information
         dataAdapter = new PlaybucketCursorAdapter(
                 getActivity(),
-                R.layout.row_delete_playbucket,
+                R.layout.row_playbucket,
                 playBucketsCursor,
                 columns,
                 to,
