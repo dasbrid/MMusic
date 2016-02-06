@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.classes.ArtistGroup;
+import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
 import asbridge.me.uk.MMusic.utils.MusicContent;
@@ -19,11 +19,11 @@ import java.util.ArrayList;
 /**
  * Created by AsbridgeD on 21/12/2015.
  */
-public class ArtistGroupAdapter extends BaseExpandableListAdapter {
+public class GroupAdapter extends BaseExpandableListAdapter {
 
-    private final static String TAG = "ArtistGroupAdapter";
+    private final static String TAG = "GroupAdapter";
 
-    private final SparseArray<ArtistGroup> groups;
+    private final SparseArray<SongGroup> groups;
     private int selectionState;
     public LayoutInflater inflater;
     public Activity activity;
@@ -38,7 +38,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         listener = l;
     }
 
-    public ArtistGroupAdapter(Activity act, SparseArray<ArtistGroup> groups) {
+    public GroupAdapter(Activity act, SparseArray<SongGroup> groups) {
         activity = act;
         this.groups = groups;
         inflater = act.getLayoutInflater();
@@ -55,7 +55,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         for(int i = 0; i < groups.size(); i++) {
             int key = groups.keyAt(i);
             // get the object by the key.
-            ArtistGroup ag = groups.get(key);
+            SongGroup ag = groups.get(key);
             numSongs += ag.getNumSongs();
             numSelected += ag.getNumSelected();
         }
@@ -89,14 +89,17 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
-        final ArtistGroup.SelectedSong checkedSong = (ArtistGroup.SelectedSong) getChild(groupPosition, childPosition);
-        TextView text = null;
-        CheckBox checkbox = null;
+        final SongGroup.SelectedSong checkedSong = (SongGroup.SelectedSong) getChild(groupPosition, childPosition);
+        TextView songTitle;
+        TextView songDetail;
+        CheckBox checkbox;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.row_details, null);
         }
-        text = (TextView) convertView.findViewById(R.id.textView1);
-        text.setText(checkedSong.song.getTitle());
+        songTitle = (TextView) convertView.findViewById(R.id.textView1);
+        songDetail = (TextView) convertView.findViewById(R.id.tvRowDetailsSongDetail);
+        songTitle.setText(checkedSong.song.getTitle());
+        songDetail.setText(checkedSong.songDetails);
 
         checkbox = (CheckBox) convertView.findViewById(R.id.songcheckbox);
         checkbox.setChecked(checkedSong.selected);
@@ -120,7 +123,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         @Override
         public void onClick(View v) {
             // checkbox clicked
-            final ArtistGroup.SelectedSong checkedSong = (ArtistGroup.SelectedSong) getChild(groupPosition, childPosition);
+            final SongGroup.SelectedSong checkedSong = (SongGroup.SelectedSong) getChild(groupPosition, childPosition);
             if (checkedSong.selected) {
                 checkedSong.selected = false;
                 MusicContent.removeSongFromCurrentPlaylist(activity, checkedSong.song);
@@ -169,12 +172,12 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.row_group, null);
         }
-        ArtistGroup group = (ArtistGroup) getGroup(groupPosition);
+        SongGroup group = (SongGroup) getGroup(groupPosition);
 
         int selectedState = group.getSelectedState();
 
         TextView ctv = (TextView) convertView.findViewById(R.id.textView1);
-        ctv.setText(group.artistName);
+        ctv.setText(group.groupName + (group.groupDetail == null?"":(" - " + group.groupDetail)));
 
         TriStateButton btnAgSelect = (TriStateButton) convertView.findViewById(R.id.btnAgSelect);
         btnAgSelect.setState(selectedState);
@@ -187,9 +190,9 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         // loop round the groups
         ArrayList<Song> songsToAdd = new ArrayList<>();
         for (int i = 0; i < groups.size(); i++) {
-            ArtistGroup ag = (ArtistGroup) getGroup(i);
+            SongGroup ag = (SongGroup) getGroup(i);
             if (newState == true) { // We are selecting the songs
-                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                for (SongGroup.SelectedSong ss : ag.songs) {
                     if (!ss.selected) {
                         ss.selected = true;
                         // add the selected song to a list to add to the DB
@@ -198,7 +201,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
                 }
             } else {
                 // when clearing the songs, here we just clear them in the adapter and later update DB in one go
-                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                for (SongGroup.SelectedSong ss : ag.songs) {
                     if (ss.selected) {
                         ss.selected = false;
                     }
@@ -228,7 +231,7 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         @Override
         public void onClick(View v)
         {
-            final ArtistGroup artistGroup = (ArtistGroup) getGroup(groupPosition);
+            final SongGroup artistGroup = (SongGroup) getGroup(groupPosition);
             int groupState = artistGroup.getSelectedState();
             if (groupState == 2) { /* all currently selected */
                 clearAllSongsInGroup(artistGroup);
@@ -239,10 +242,10 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    private void clearAllSongsInGroup(ArtistGroup ag) {
+    private void clearAllSongsInGroup(SongGroup ag) {
         // remember a list of songs in the group, so we can delete them from DB in one go
         ArrayList<Song> songsToRemove = new ArrayList<>();
-        for (ArtistGroup.SelectedSong ss : ag.songs) {
+        for (SongGroup.SelectedSong ss : ag.songs) {
             if (ss.selected) {
                 ss.selected = false;
                 songsToRemove.add(ss.song);
@@ -251,10 +254,10 @@ public class ArtistGroupAdapter extends BaseExpandableListAdapter {
         MusicContent.removeSongsFromCurrentPlaylist(activity, songsToRemove);
     }
 
-    private void selectAllSongsInGroup(ArtistGroup ag) {
+    private void selectAllSongsInGroup(SongGroup ag) {
         // remember a list of songs in the group, so we can add them to DB in one go
         ArrayList<Song> songsToAdd = new ArrayList<>();
-        for (ArtistGroup.SelectedSong ss : ag.songs) {
+        for (SongGroup.SelectedSong ss : ag.songs) {
             if (!ss.selected) {
                 ss.selected = true;
                 songsToAdd.add(ss.song);

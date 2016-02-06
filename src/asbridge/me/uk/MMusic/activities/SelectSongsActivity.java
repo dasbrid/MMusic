@@ -12,7 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.classes.ArtistGroup;
+import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.dialogs.DeletePlaybucketDialog;
@@ -113,10 +113,10 @@ public class SelectSongsActivity extends FragmentActivity
 
     /* listener from the artistFragment */
     @Override
-    public void addArtistsSongsToPlayQueue(ArtistGroup ag) {
+    public void addArtistsSongsToPlayQueue(SongGroup ag) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
-                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                for (SongGroup.SelectedSong ss : ag.songs) {
                     retainFragment.serviceReference.insertThisSongIntoPlayQueue(ss.song);
                 }
             }
@@ -125,13 +125,13 @@ public class SelectSongsActivity extends FragmentActivity
 
     /* listener from the artistFragment */
     @Override
-    public void clearPlayQueueAndaddArtistsSongsToPlayQueue(ArtistGroup ag) {
+    public void clearPlayQueueAndaddArtistsSongsToPlayQueue(SongGroup ag) {
         if (ag.songs.size() == 0)
             return;
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
                 retainFragment.serviceReference.clearPlayQueue();
-                for (ArtistGroup.SelectedSong ss : ag.songs) {
+                for (SongGroup.SelectedSong ss : ag.songs) {
                     retainFragment.serviceReference.insertThisSongIntoPlayQueue(ss.song);
                 }
             }

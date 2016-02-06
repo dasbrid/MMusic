@@ -1,23 +1,15 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.ListView;
-import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.adapters.ArtistGroupAdapter;
 import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
-import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.services.SimpleMusicService;
 
 import java.util.ArrayList;
 

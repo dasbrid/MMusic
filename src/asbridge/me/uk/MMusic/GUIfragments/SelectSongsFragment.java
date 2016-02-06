@@ -1,14 +1,12 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.adapters.ArtistGroupAdapter;
-import asbridge.me.uk.MMusic.classes.ArtistGroup;
+import asbridge.me.uk.MMusic.adapters.GroupAdapter;
+import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.Song;
 
 import java.util.*;
@@ -22,7 +20,7 @@ import asbridge.me.uk.MMusic.utils.MusicContent;
  */
 public class SelectSongsFragment extends Fragment implements
         View.OnClickListener,
-        ArtistGroupAdapter.OnSelectionStateChangedListener
+        GroupAdapter.OnSelectionStateChangedListener
 {
 
     private String TAG = "SelectSongsFragment";
@@ -32,11 +30,11 @@ public class SelectSongsFragment extends Fragment implements
     private static final int GROUPBY_ALBUM = 1;
     private int groupby;
 
-    private SparseArray<ArtistGroup> artistGroups;
+    private SparseArray<SongGroup> artistGroups;
     private ArrayList<Song> songs = new ArrayList<>() ;
 
     private ExpandableListView elvArtistGroupList;
-    private ArtistGroupAdapter artistGroupAdapter;
+    private GroupAdapter groupAdapter;
     private TriStateButton btnSongsSelect;
 
     private OnSongsChangedListener listener = null;
@@ -45,8 +43,8 @@ public class SelectSongsFragment extends Fragment implements
         void playThisSongNext(Song s);
         void addThisSongToPlayQueue(Song s);
         void playThisSongNow(Song s);
-        void addArtistsSongsToPlayQueue(ArtistGroup ag);
-        void clearPlayQueueAndaddArtistsSongsToPlayQueue(ArtistGroup ag);
+        void addArtistsSongsToPlayQueue(SongGroup ag);
+        void clearPlayQueueAndaddArtistsSongsToPlayQueue(SongGroup ag);
     }
 
     public void setOnSongsChangedListener(OnSongsChangedListener l) {
@@ -84,23 +82,28 @@ public class SelectSongsFragment extends Fragment implements
     // The songs are loadad and we have the selected songs.
     // Group the songs into either artists or albums, depending on the groups
     private void setListViewContentsGrouped(ArrayList<Long> selectedSongs) {
-        HashMap<String, ArtistGroup> groupMap = new HashMap<>();
-        ArtistGroup group = null;
+        HashMap<String, SongGroup> groupMap = new HashMap<>();
+        SongGroup group = null;
         artistGroups.clear();
         int i=0;
         for (Song s : songs) {
             if (groupMap.containsKey(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist())) {
                 group = groupMap.get(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
+                if (groupby == GROUPBY_ALBUM) {
+                    if (!s.getArtist().equals(group.groupDetail)) {
+                        group.groupDetail = "various artists";
+                    }
+                }
             } else {
-                group = new ArtistGroup(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
+                group = new SongGroup(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist(), groupby == GROUPBY_ALBUM? s.getArtist():null);
                 artistGroups.append(i++, group);
                 groupMap.put(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist(), group);
             }
-            group.songs.add(new ArtistGroup.SelectedSong(s, selectedSongs.contains(s.getID())));
+            group.songs.add(new SongGroup.SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM? s.getArtist():s.getAlbum()));
         }
         btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
         btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
-        artistGroupAdapter.notifyDataSetChanged();
+        groupAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -120,13 +123,13 @@ public class SelectSongsFragment extends Fragment implements
 
     // The select (all/none) button has been pressed
     private void selectSongs() {
-        int currentState = artistGroupAdapter.getSelectionState();
+        int currentState = groupAdapter.getSelectionState();
         if (currentState == 2) {
             btnSongsSelect.setState(0);
-            artistGroupAdapter.selectAllorNone(false);
+            groupAdapter.selectAllorNone(false);
         } else {
             btnSongsSelect.setState(2);
-            artistGroupAdapter.selectAllorNone(true);
+            groupAdapter.selectAllorNone(true);
         }
     }
 
@@ -156,7 +159,7 @@ public class SelectSongsFragment extends Fragment implements
 
             int key = artistGroups.keyAt(groupPos);
             // get the object by the key.
-            ArtistGroup ag = artistGroups.get(key);
+            SongGroup ag = artistGroups.get(key);
             Song s = ag.songs.get(childPos).song;
 
             switch (item.getItemId()) {
@@ -176,7 +179,7 @@ public class SelectSongsFragment extends Fragment implements
 
             int key = artistGroups.keyAt(groupPos);
             // get the object by the key.
-            ArtistGroup ag = artistGroups.get(key);
+            SongGroup ag = artistGroups.get(key);
 
             switch (item.getItemId()) {
                 case R.id.menu_artist_long_click_addsongstoqueue:
@@ -217,10 +220,10 @@ public class SelectSongsFragment extends Fragment implements
 
         artistGroups = new SparseArray<>();
 
-        artistGroupAdapter = new ArtistGroupAdapter(getActivity(), artistGroups);
-        elvArtistGroupList.setAdapter(artistGroupAdapter);
+        groupAdapter = new GroupAdapter(getActivity(), artistGroups);
+        elvArtistGroupList.setAdapter(groupAdapter);
         registerForContextMenu(elvArtistGroupList);
-        artistGroupAdapter.setOnSelectionStateChangedListener(this);
+        groupAdapter.setOnSelectionStateChangedListener(this);
 
         // if we have a saved instance then we are returning (e.g. rotate)
         // get the list of songs and the list of selected songs from the saved instance
@@ -247,10 +250,10 @@ public class SelectSongsFragment extends Fragment implements
         for(int i = 0; i < artistGroups.size(); i++) {
             int key = artistGroups.keyAt(i);
             // get the object by the key.
-            ArtistGroup ag = artistGroups.get(key);
+            SongGroup ag = artistGroups.get(key);
             {
-                List<ArtistGroup.SelectedSong> songs = ag.songs;
-                for (ArtistGroup.SelectedSong ss : songs) {
+                List<SongGroup.SelectedSong> songs = ag.songs;
+                for (SongGroup.SelectedSong ss : songs) {
                     if (ss.selected) {
                         selectedSongIDs.add(ss.song.getID());
                     }
@@ -265,10 +268,10 @@ public class SelectSongsFragment extends Fragment implements
         for(int i = 0; i < artistGroups.size(); i++) {
             int key = artistGroups.keyAt(i);
             // get the object by the key.
-            ArtistGroup ag = artistGroups.get(key);
+            SongGroup ag = artistGroups.get(key);
             {
-                List<ArtistGroup.SelectedSong> songs = ag.songs;
-                for (ArtistGroup.SelectedSong ss : songs) {
+                List<SongGroup.SelectedSong> songs = ag.songs;
+                for (SongGroup.SelectedSong ss : songs) {
                     if (ss.selected) {
                         selectedSongs.add(ss.song);
                     }

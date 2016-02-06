@@ -1,30 +1,37 @@
 package asbridge.me.uk.MMusic.classes;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by AsbridgeD on 21/12/2015.
  */
-public class ArtistGroup {
+public class SongGroup {
 
-    public String artistName;
+    public String groupName;
+    public String groupDetail;
+
     public final List<SelectedSong> songs = new ArrayList<>();
 
-    public ArtistGroup(String string) {
-        this.artistName = string;
+    public SongGroup(String name) {
+        this.groupName = name;
+        this.groupDetail = null;
+    }
+
+    public SongGroup(String name, String detail) {
+        this.groupName = name;
+        this.groupDetail = detail;
     }
 
     public static class SelectedSong {
         public Song song;
         public boolean selected;
+        public String songDetails;
 
-        public SelectedSong(Song theSong, boolean isSelected) {
+        public SelectedSong(Song theSong, boolean isSelected, String theSongDetails) {
             song = theSong;
             selected = isSelected;
+            songDetails = theSongDetails;
         }
     }
 
