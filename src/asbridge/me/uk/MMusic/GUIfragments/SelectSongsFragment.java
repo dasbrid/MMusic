@@ -78,8 +78,6 @@ public class SelectSongsFragment extends Fragment implements
 
     private void changeGroupBy(int newGroupBy) {
         groupby = newGroupBy;
-
-
         setListViewContentsGrouped(getSelectedSongIDs());
     }
 
