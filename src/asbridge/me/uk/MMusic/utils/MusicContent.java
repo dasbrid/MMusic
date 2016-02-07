@@ -136,14 +136,21 @@ public class MusicContent {
                     (MediaStore.Audio.Media.ARTIST);
             int albumColumn = musicCursor.getColumnIndex
                     (MediaStore.Audio.Media.ALBUM);
+            int durationColumn = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Media.DURATION);
             //add songs to list
             do {
-                long thisId = musicCursor.getLong(idColumn);
+                long thisDuration = musicCursor.getLong((durationColumn));
                 String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                String thisAlbum = musicCursor.getString(albumColumn);
-                // Log.d(TAG, "adding song, title = " + thisTitle);
-                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1));
+                Log.d(TAG, "adding song, title = " + thisTitle + " duration =  + " + thisDuration);
+                if (thisDuration > 20000) {
+                    long thisId = musicCursor.getLong(idColumn);
+
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    String thisAlbum = musicCursor.getString(albumColumn);
+
+                    songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1, thisDuration));
+                }
             } while (musicCursor.moveToNext());
             // always close the cursor
             musicCursor.close();

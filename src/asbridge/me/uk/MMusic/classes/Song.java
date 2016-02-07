@@ -12,13 +12,15 @@ public class Song implements Parcelable {
     private String artist;
     private String album;
     private int PID;
+    private long duration; // in ms
 
-    public Song(long songID, String songTitle, String songArtist, String songAlbum, int songPID) {
+    public Song(long songID, String songTitle, String songArtist, String songAlbum, int songPID, long songDuration) {
         id=songID;
         title=songTitle;
         artist=songArtist;
         album=songAlbum;
         PID = songPID;
+        duration = songDuration;
     }
 
     public Song(Song theSong, int songPID) {
@@ -27,6 +29,7 @@ public class Song implements Parcelable {
         artist=theSong.artist;
         album=theSong.album;
         PID = songPID;
+        duration = theSong.duration;
     }
 
     public long getID(){return id;}
@@ -34,6 +37,7 @@ public class Song implements Parcelable {
     public String getArtist(){return artist;}
     public String getAlbum(){return album;}
     public int getPID(){return PID;}
+    public long getDuration(){return duration;}
 
     // Parcelling part
     public Song(Parcel in){
@@ -45,8 +49,8 @@ public class Song implements Parcelable {
         this.artist = data[3];
         this.album = data[4];
         this.PID = Integer.parseInt(data[5]);
+        this.duration = Long.parseLong(data[6]);
     }
-
 
     @Override
     public int describeContents(){
@@ -60,9 +64,11 @@ public class Song implements Parcelable {
                 this.title,
                 this.artist,
                 this.album,
-                Integer.toString(this.PID)
+                Integer.toString(this.PID),
+                Long.toString(this.duration)
         });
     }
+
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         public Song createFromParcel(Parcel in) {
             return new Song(in);
