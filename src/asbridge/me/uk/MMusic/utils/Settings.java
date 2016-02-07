@@ -17,6 +17,14 @@ public class Settings {
         return Integer.parseInt(playQueueSize);
     }
 
+    public static int getMinDurationInSeconds(Context context) {
+
+        SharedPreferences defaultSharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String playQueueSize = defaultSharedPref.getString("mindurationinseconds", "20");
+
+        return Integer.parseInt(playQueueSize);
+    }
+
     public static void setShuffleState(Context context, boolean shuffleState) {
         SharedPreferences defaultSharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor1 = defaultSharedPref.edit();

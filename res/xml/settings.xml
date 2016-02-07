@@ -8,4 +8,13 @@
             android:maxLength="2"
             android:defaultValue="10"
     />
+
+    <EditTextPreference
+            android:key="mindurationinseconds"
+            android:summary="Minimum duration for songs (in seconds)"
+            android:title="Duration"
+            android:numeric="integer"
+            android:maxLength="2"
+            android:defaultValue="20"
+    />
 </PreferenceScreen>

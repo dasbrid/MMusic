@@ -143,7 +143,7 @@ public class MusicContent {
                 long thisDuration = musicCursor.getLong((durationColumn));
                 String thisTitle = musicCursor.getString(titleColumn);
                 Log.d(TAG, "adding song, title = " + thisTitle + " duration =  + " + thisDuration);
-                if (thisDuration > 20000) {
+                if (thisDuration > Settings.getMinDurationInSeconds(context) * 1000) {
                     long thisId = musicCursor.getLong(idColumn);
 
                     String thisArtist = musicCursor.getString(artistColumn);
