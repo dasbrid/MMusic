@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.classes.SelectedSong;
 import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -116,7 +117,7 @@ public class SelectSongsActivity extends FragmentActivity
     public void addArtistsSongsToPlayQueue(SongGroup ag) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
-                for (SongGroup.SelectedSong ss : ag.songs) {
+                for (SelectedSong ss : ag.songs) {
                     retainFragment.serviceReference.insertThisSongIntoPlayQueue(ss.song);
                 }
             }
@@ -131,7 +132,7 @@ public class SelectSongsActivity extends FragmentActivity
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
                 retainFragment.serviceReference.clearPlayQueue();
-                for (SongGroup.SelectedSong ss : ag.songs) {
+                for (SelectedSong ss : ag.songs) {
                     retainFragment.serviceReference.insertThisSongIntoPlayQueue(ss.song);
                 }
             }

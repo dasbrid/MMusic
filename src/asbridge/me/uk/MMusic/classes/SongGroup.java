@@ -22,7 +22,7 @@ public class SongGroup {
         this.groupName = name;
         this.groupDetail = detail;
     }
-
+/*
     public static class SelectedSong {
         public Song song;
         public boolean selected;
@@ -34,19 +34,7 @@ public class SongGroup {
             songDetails = theSongDetails;
         }
     }
-
-    public void doSelectNone() {
-        for (SelectedSong ss : songs) {
-            ss.selected = false;
-        }
-    }
-
-    public void doSelectAll() {
-        for (SelectedSong ss : songs) {
-            ss.selected = true;
-        }
-    }
-
+*/
     public int getNumSelected() {
         int n = 0;
         for (SelectedSong ss : songs) {
@@ -58,12 +46,6 @@ public class SongGroup {
 
     public int getNumSongs() {
         return songs.size();
-    }
-
-    public void changeStateofAllSongs(boolean newState) {
-        for (SelectedSong ss : songs) {
-            ss.selected = newState;
-        }
     }
 
       // returns:
@@ -82,7 +64,6 @@ public class SongGroup {
             return 2;
         else
             return 1;
-
     }
 
 }

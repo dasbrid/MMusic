@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.classes.SelectedSong;
 import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
@@ -89,7 +90,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
-        final SongGroup.SelectedSong checkedSong = (SongGroup.SelectedSong) getChild(groupPosition, childPosition);
+        final SelectedSong checkedSong = (SelectedSong) getChild(groupPosition, childPosition);
         TextView songTitle;
         TextView songDetail;
         CheckBox checkbox;
@@ -123,7 +124,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
         @Override
         public void onClick(View v) {
             // checkbox clicked
-            final SongGroup.SelectedSong checkedSong = (SongGroup.SelectedSong) getChild(groupPosition, childPosition);
+            final SelectedSong checkedSong = (SelectedSong) getChild(groupPosition, childPosition);
             if (checkedSong.selected) {
                 checkedSong.selected = false;
                 MusicContent.removeSongFromCurrentPlaylist(activity, checkedSong.song);
@@ -192,7 +193,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
         for (int i = 0; i < groups.size(); i++) {
             SongGroup ag = (SongGroup) getGroup(i);
             if (newState == true) { // We are selecting the songs
-                for (SongGroup.SelectedSong ss : ag.songs) {
+                for (SelectedSong ss : ag.songs) {
                     if (!ss.selected) {
                         ss.selected = true;
                         // add the selected song to a list to add to the DB
@@ -201,7 +202,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
                 }
             } else {
                 // when clearing the songs, here we just clear them in the adapter and later update DB in one go
-                for (SongGroup.SelectedSong ss : ag.songs) {
+                for (SelectedSong ss : ag.songs) {
                     if (ss.selected) {
                         ss.selected = false;
                     }
@@ -245,7 +246,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
     private void clearAllSongsInGroup(SongGroup ag) {
         // remember a list of songs in the group, so we can delete them from DB in one go
         ArrayList<Song> songsToRemove = new ArrayList<>();
-        for (SongGroup.SelectedSong ss : ag.songs) {
+        for (SelectedSong ss : ag.songs) {
             if (ss.selected) {
                 ss.selected = false;
                 songsToRemove.add(ss.song);
@@ -257,7 +258,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
     private void selectAllSongsInGroup(SongGroup ag) {
         // remember a list of songs in the group, so we can add them to DB in one go
         ArrayList<Song> songsToAdd = new ArrayList<>();
-        for (SongGroup.SelectedSong ss : ag.songs) {
+        for (SelectedSong ss : ag.songs) {
             if (!ss.selected) {
                 ss.selected = true;
                 songsToAdd.add(ss.song);

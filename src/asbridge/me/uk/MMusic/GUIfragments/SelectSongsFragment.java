@@ -6,6 +6,7 @@ import android.view.*;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.GroupAdapter;
+import asbridge.me.uk.MMusic.classes.SelectedSong;
 import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.Song;
 
@@ -99,7 +100,7 @@ public class SelectSongsFragment extends Fragment implements
                 artistGroups.append(i++, group);
                 groupMap.put(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist(), group);
             }
-            group.songs.add(new SongGroup.SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM? s.getArtist():s.getAlbum()));
+            group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM? s.getArtist():s.getAlbum()));
         }
         btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
         btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
@@ -252,8 +253,8 @@ public class SelectSongsFragment extends Fragment implements
             // get the object by the key.
             SongGroup ag = artistGroups.get(key);
             {
-                List<SongGroup.SelectedSong> songs = ag.songs;
-                for (SongGroup.SelectedSong ss : songs) {
+                List<SelectedSong> songs = ag.songs;
+                for (SelectedSong ss : songs) {
                     if (ss.selected) {
                         selectedSongIDs.add(ss.song.getID());
                     }
@@ -270,8 +271,8 @@ public class SelectSongsFragment extends Fragment implements
             // get the object by the key.
             SongGroup ag = artistGroups.get(key);
             {
-                List<SongGroup.SelectedSong> songs = ag.songs;
-                for (SongGroup.SelectedSong ss : songs) {
+                List<SelectedSong> songs = ag.songs;
+                for (SelectedSong ss : songs) {
                     if (ss.selected) {
                         selectedSongs.add(ss.song);
                     }
