@@ -1,6 +1,7 @@
 package asbridge.me.uk.MMusic.services;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.*;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
@@ -283,6 +285,9 @@ public class SimpleMusicService extends Service
         Notification not = builder.build();
 
         startForeground(NOTIFY_ID, not);
+
+
+
     }
 
     // callback from media player when song finishes
