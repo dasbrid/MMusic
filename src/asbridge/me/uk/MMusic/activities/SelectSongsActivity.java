@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.SelectedSong;
@@ -41,6 +44,11 @@ public class SelectSongsActivity extends FragmentActivity
     private RetainFragment retainFragment = null;
     private SelectSongsFragment artistsFragment = null;
 
+
+
+
+
+
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
@@ -53,6 +61,8 @@ public class SelectSongsActivity extends FragmentActivity
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_songs);
+
+
 
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);

@@ -142,15 +142,14 @@ public class MusicContent {
             do {
                 long thisDuration = musicCursor.getLong((durationColumn));
                 String thisTitle = musicCursor.getString(titleColumn);
-                Log.d(TAG, "adding song, title = " + thisTitle + " duration =  + " + thisDuration);
-                if (thisDuration > Settings.getMinDurationInSeconds(context) * 1000) {
-                    long thisId = musicCursor.getLong(idColumn);
 
-                    String thisArtist = musicCursor.getString(artistColumn);
-                    String thisAlbum = musicCursor.getString(albumColumn);
+                long thisId = musicCursor.getLong(idColumn);
 
-                    songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1, thisDuration));
-                }
+                String thisArtist = musicCursor.getString(artistColumn);
+                String thisAlbum = musicCursor.getString(albumColumn);
+
+                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, -1, thisDuration));
+
             } while (musicCursor.moveToNext());
             // always close the cursor
             musicCursor.close();

@@ -1,6 +1,8 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.*;
@@ -15,6 +17,7 @@ import java.util.*;
 import android.support.v4.app.Fragment;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
 import asbridge.me.uk.MMusic.utils.MusicContent;
+import asbridge.me.uk.MMusic.utils.Settings;
 
 /**
  * Created by AsbridgeD on 08/12/2015.
@@ -37,6 +40,15 @@ public class SelectSongsFragment extends Fragment implements
     private ExpandableListView elvArtistGroupList;
     private GroupAdapter groupAdapter;
     private TriStateButton btnSongsSelect;
+
+    // Use instance field for listener
+// It will not be gc'd as long as this instance is kept referenced
+    SharedPreferences.OnSharedPreferenceChangeListener prefslistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+            changeGroupBy(groupby); // NOT ACTUALLY CHANGING, JUST UPDATE THE LIST
+        }
+    };
+
 
     private OnSongsChangedListener listener = null;
     public interface OnSongsChangedListener {
@@ -88,19 +100,21 @@ public class SelectSongsFragment extends Fragment implements
         artistGroups.clear();
         int i=0;
         for (Song s : songs) {
-            if (groupMap.containsKey(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist())) {
-                group = groupMap.get(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist());
-                if (groupby == GROUPBY_ALBUM) {
-                    if (!s.getArtist().equals(group.groupDetail)) {
-                        group.groupDetail = "various artists";
+            if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
+                if (groupMap.containsKey(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist())) {
+                    group = groupMap.get(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist());
+                    if (groupby == GROUPBY_ALBUM) {
+                        if (!s.getArtist().equals(group.groupDetail)) {
+                            group.groupDetail = "various artists";
+                        }
                     }
+                } else {
+                    group = new SongGroup(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist(), groupby == GROUPBY_ALBUM ? s.getArtist() : null);
+                    artistGroups.append(i++, group);
+                    groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist(), group);
                 }
-            } else {
-                group = new SongGroup(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist(), groupby == GROUPBY_ALBUM? s.getArtist():null);
-                artistGroups.append(i++, group);
-                groupMap.put(groupby == GROUPBY_ALBUM? s.getAlbum():s.getArtist(), group);
+                group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM ? s.getArtist() : s.getAlbum()));
             }
-            group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM? s.getArtist():s.getAlbum()));
         }
         btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
         btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
@@ -206,6 +220,10 @@ public class SelectSongsFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefs.registerOnSharedPreferenceChangeListener(prefslistener);
 
         View v = inflater.inflate(R.layout.fragment_artist, container, false);
 
