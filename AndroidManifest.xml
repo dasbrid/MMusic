@@ -10,7 +10,7 @@
         <activity android:name=".settings.SettingsActivity">
         </activity>
         <activity android:name=".activities.SelectSongsActivity" android:label="Select songs"/>
-        <activity android:name=".activities.PlayQueueActivity" android:label="play queue">
+        <activity android:name=".activities.PlayQueueActivity" android:label="play queue" android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

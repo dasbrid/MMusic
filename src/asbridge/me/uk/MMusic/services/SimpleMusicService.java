@@ -253,7 +253,7 @@ public class SimpleMusicService extends Service
 
         // we can broadcast song started and set notification
         Intent notIntent = new Intent(this, PlayQueueActivity.class);
-        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        notIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         // pending intent to go back to the activity
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
