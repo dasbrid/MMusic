@@ -225,7 +225,7 @@ public class SelectSongsFragment extends Fragment implements
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         prefs.registerOnSharedPreferenceChangeListener(prefslistener);
 
-        View v = inflater.inflate(R.layout.fragment_artist, container, false);
+        View v = inflater.inflate(R.layout.fragment_select_songs, container, false);
 
         btnSongsSelect = (TriStateButton) v.findViewById(R.id.btnSongsSelect);
         btnSongsSelect.setOnClickListener(this);
