@@ -30,8 +30,10 @@ public class SelectSongsFragment extends Fragment implements
     private String TAG = "SelectSongsFragment";
     Button btnGroupByAlbum;
     Button btnGroupByArtist;
+    Button btnGroupBySong;
     private static final int GROUPBY_ARTIST = 0;
     private static final int GROUPBY_ALBUM = 1;
+    private static final int GROUPBY_SONG = 2;
     private int groupby;
 
     private SparseArray<SongGroup> artistGroups;
@@ -101,23 +103,26 @@ public class SelectSongsFragment extends Fragment implements
         int i=0;
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
-                if (groupMap.containsKey(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist())) {
-                    group = groupMap.get(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist());
+                if (groupMap.containsKey(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)))) {
+                    // We already have a group with this key
+                    group = groupMap.get(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)));
                     if (groupby == GROUPBY_ALBUM) {
                         if (!s.getArtist().equals(group.groupDetail)) {
                             group.groupDetail = "various artists";
                         }
                     }
                 } else {
-                    group = new SongGroup(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist(), groupby == GROUPBY_ALBUM ? s.getArtist() : null);
+                    // New key, make new group
+                    group = new SongGroup(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)), groupby == GROUPBY_ALBUM ? s.getArtist() : null);
                     artistGroups.append(i++, group);
-                    groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : s.getArtist(), group);
+                    groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)), group);
                 }
-                group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM ? s.getArtist() : s.getAlbum()));
+                group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM ? s.getArtist() : (groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getTitle())));
             }
         }
         btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
         btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
+        btnGroupBySong.setEnabled(groupby!=GROUPBY_SONG);
         groupAdapter.notifyDataSetChanged();
     }
 
@@ -132,6 +137,9 @@ public class SelectSongsFragment extends Fragment implements
                 break;
             case R.id.btnGroupByAlbum:
                 changeGroupBy(GROUPBY_ALBUM);
+                break;
+            case R.id.btnGroupBySong:
+                changeGroupBy(GROUPBY_SONG);
                 break;
         }
     }
@@ -234,6 +242,8 @@ public class SelectSongsFragment extends Fragment implements
         btnGroupByAlbum.setOnClickListener(this);
         btnGroupByArtist = (Button) v.findViewById(R.id.btnGroupByArtist);
         btnGroupByArtist.setOnClickListener(this);
+        btnGroupBySong = (Button) v.findViewById(R.id.btnGroupBySong);
+        btnGroupBySong.setOnClickListener(this);
 
         elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 

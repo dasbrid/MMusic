@@ -27,7 +27,13 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_toRightOf="@id/btnGroupByArtist"
             android:text="album"
-    />
+        />
+        <Button
+                android:id="@+id/btnGroupBySong"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/btnGroupByAlbum"
+                android:text="song"
+        />
     </RelativeLayout>
     <ExpandableListView
             android:id="@+id/lvSongsByArtist"
