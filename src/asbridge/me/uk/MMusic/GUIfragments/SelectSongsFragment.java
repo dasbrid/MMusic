@@ -31,6 +31,8 @@ public class SelectSongsFragment extends Fragment implements
     Button btnGroupByAlbum;
     Button btnGroupByArtist;
     Button btnGroupBySong;
+    ImageButton btnSearchSongs;
+
     private static final int GROUPBY_ARTIST = 0;
     private static final int GROUPBY_ALBUM = 1;
     private static final int GROUPBY_SONG = 2;
@@ -39,12 +41,14 @@ public class SelectSongsFragment extends Fragment implements
     private SparseArray<SongGroup> artistGroups;
     private ArrayList<Song> songs = new ArrayList<>() ;
 
-    private ExpandableListView elvArtistGroupList;
+    private ExpandableListView elvGroupList;
     private GroupAdapter groupAdapter;
     private TriStateButton btnSongsSelect;
 
+    private String filterString;
+
     // Use instance field for listener
-// It will not be gc'd as long as this instance is kept referenced
+    // It will not be gc'd as long as this instance is kept referenced
     SharedPreferences.OnSharedPreferenceChangeListener prefslistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             changeGroupBy(groupby); // NOT ACTUALLY CHANGING, JUST UPDATE THE LIST
@@ -69,6 +73,8 @@ public class SelectSongsFragment extends Fragment implements
     private static final String STATE_ALLSONGS = "ALLSONGS";
     private static final String STATE_SELECTEDSONGS = "SELECTEDSONGS";
     private static final String STATE_GROUPBY = "GROUPBY";
+    private static final String STATE_FILTERSTRING = "FILTERSTRING";
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -78,6 +84,7 @@ public class SelectSongsFragment extends Fragment implements
         outState.putInt(STATE_GROUPBY, groupby);
         outState.putParcelableArrayList(STATE_ALLSONGS, songs);
         outState.putParcelableArrayList(STATE_SELECTEDSONGS, getSelectedSongs());
+        outState.putString(STATE_FILTERSTRING, filterString);
     }
 
     public void setSongList() {
@@ -94,6 +101,30 @@ public class SelectSongsFragment extends Fragment implements
         setListViewContentsGrouped(getSelectedSongIDs());
     }
 
+    private void filterSongs() {
+        if (filterString == null) {
+            filterString = "the";
+            btnSearchSongs.setImageResource(R.drawable.ic_search_off);
+        } else {
+            filterString = null; // no filter
+            btnSearchSongs.setImageResource(R.drawable.ic_search);
+
+        }
+        setListViewContentsGrouped(getSelectedSongIDs());
+    }
+
+    private boolean songMatchesFilterCriteria(Song s) {
+        String searchStringUpperCase = filterString.toUpperCase();
+        if (s.getTitle().toUpperCase().contains(searchStringUpperCase))
+            return true;
+        if (s.getArtist().toUpperCase().contains(searchStringUpperCase))
+            return true;
+        if (s.getAlbum().toUpperCase().contains(searchStringUpperCase))
+            return true;
+
+        return false;
+    }
+
     // The songs are loadad and we have the selected songs.
     // Group the songs into either artists or albums, depending on the groups
     private void setListViewContentsGrouped(ArrayList<Long> selectedSongs) {
@@ -103,27 +134,33 @@ public class SelectSongsFragment extends Fragment implements
         int i=0;
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
-                if (groupMap.containsKey(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)))) {
-                    // We already have a group with this key
-                    group = groupMap.get(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)));
-                    if (groupby == GROUPBY_ALBUM) {
-                        if (!s.getArtist().equals(group.groupDetail)) {
-                            group.groupDetail = "various artists";
+                if (filterString == null || songMatchesFilterCriteria(s)) {
+                    if (groupMap.containsKey(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)))) {
+                        // We already have a group with this key
+                        group = groupMap.get(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)));
+                        if (groupby == GROUPBY_ALBUM) {
+                            if (!s.getArtist().equals(group.groupDetail)) {
+                                group.groupDetail = "various artists";
+                            }
                         }
+                    } else {
+                        // New key, make new group
+                        group = new SongGroup(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)), groupby == GROUPBY_ALBUM ? s.getArtist() : null);
+                        artistGroups.append(i++, group);
+                        groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)), group);
                     }
-                } else {
-                    // New key, make new group
-                    group = new SongGroup(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)), groupby == GROUPBY_ALBUM ? s.getArtist() : null);
-                    artistGroups.append(i++, group);
-                    groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0,1)), group);
+                    group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM ? s.getArtist() : (groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getTitle())));
                 }
-                group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM ? s.getArtist() : (groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getTitle())));
             }
         }
         btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
         btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
         btnGroupBySong.setEnabled(groupby!=GROUPBY_SONG);
         groupAdapter.notifyDataSetChanged();
+        for (int g=0 ; g < groupAdapter.getGroupCount() ; g++)
+        {
+            elvGroupList.collapseGroup(g);
+        }
     }
 
     @Override
@@ -140,6 +177,9 @@ public class SelectSongsFragment extends Fragment implements
                 break;
             case R.id.btnGroupBySong:
                 changeGroupBy(GROUPBY_SONG);
+                break;
+            case R.id.btnSearchSongs:
+                filterSongs();
                 break;
         }
     }
@@ -244,14 +284,16 @@ public class SelectSongsFragment extends Fragment implements
         btnGroupByArtist.setOnClickListener(this);
         btnGroupBySong = (Button) v.findViewById(R.id.btnGroupBySong);
         btnGroupBySong.setOnClickListener(this);
+        btnSearchSongs = (ImageButton) v.findViewById(R.id.btnSearchSongs);
+        btnSearchSongs.setOnClickListener(this);
 
-        elvArtistGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
+        elvGroupList = (ExpandableListView) v.findViewById(R.id.lvSongsByArtist);
 
         artistGroups = new SparseArray<>();
 
         groupAdapter = new GroupAdapter(getActivity(), artistGroups);
-        elvArtistGroupList.setAdapter(groupAdapter);
-        registerForContextMenu(elvArtistGroupList);
+        elvGroupList.setAdapter(groupAdapter);
+        registerForContextMenu(elvGroupList);
         groupAdapter.setOnSelectionStateChangedListener(this);
 
         // if we have a saved instance then we are returning (e.g. rotate)
@@ -261,6 +303,13 @@ public class SelectSongsFragment extends Fragment implements
             songs = savedInstanceState.getParcelableArrayList(STATE_ALLSONGS);
             groupby = savedInstanceState.getInt(STATE_GROUPBY);
             ArrayList<Song> selectedSongs = savedInstanceState.getParcelableArrayList(STATE_SELECTEDSONGS);
+            filterString = savedInstanceState.getString(STATE_FILTERSTRING);
+            if (filterString == null) {
+                btnSearchSongs.setImageResource(R.drawable.ic_search);
+            } else {
+                btnSearchSongs.setImageResource(R.drawable.ic_search_off);
+
+            }
             ArrayList<Long> selectedSongIDs = new ArrayList<>();
             for (Song s : selectedSongs) {
                 selectedSongIDs.add(s.getID());
@@ -268,6 +317,7 @@ public class SelectSongsFragment extends Fragment implements
             setListViewContentsGrouped(selectedSongIDs);
         } else {
             // if there is no saved instance then we will get songs from the device content provider
+            filterString = null;
             groupby = GROUPBY_ALBUM;
             setSongList();
         }

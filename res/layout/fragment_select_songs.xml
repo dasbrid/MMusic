@@ -34,6 +34,14 @@
                 android:layout_toRightOf="@id/btnGroupByAlbum"
                 android:text="song"
         />
+        <ImageButton
+                android:id="@+id/btnSearchSongs"
+                android:src="@drawable/ic_search"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_toRightOf="@id/btnGroupBySong"
+                android:text="search"
+        />
     </RelativeLayout>
     <ExpandableListView
             android:id="@+id/lvSongsByArtist"

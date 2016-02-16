@@ -50,6 +50,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
+
         int oldState = selectionState;
         int numSongs = 0;
         int numSelected = 0;
