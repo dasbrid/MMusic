@@ -97,12 +97,12 @@ public class SelectSongsFragment extends Fragment implements
         MusicContent.getAllSongsGroupedByArtist(getContext(), songs);
         // Songs are set selected (ticked) based on the current playlist
         ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
-        setListViewContentsGrouped(selectedSongs);
+        setListViewContentsGrouped(/*selectedSongs*/);
     }
 
     private void changeGroupBy(int newGroupBy) {
         groupby = newGroupBy;
-        setListViewContentsGrouped(getSelectedSongIDs());
+        setListViewContentsGrouped(/*getSelectedSongIDs()*/);
     }
 
     private void filterSongs() {
@@ -110,32 +110,36 @@ public class SelectSongsFragment extends Fragment implements
             FragmentManager fm = getFragmentManager();
             SearchSongsDialog searchSongsDialog = new SearchSongsDialog();
             searchSongsDialog.setOnSearchStringEntered(this);
-            searchSongsDialog.show(fm, "sear_songs_dialog");
+            searchSongsDialog.show(fm, "search_songs_dialog");
         } else {
             filterString = null; // no filter
             btnSearchSongs.setImageResource(R.drawable.ic_search);
-            setListViewContentsGrouped(getSelectedSongIDs());
+            setListViewContentsGrouped(/*allSelectedSongIDs*/);
         }
-
     }
+
+    ArrayList<Long> allSelectedSongIDs;
 
     // callback from search dialog when a search string is entered
     @Override
     public void onSearchStringEntered(String searchString) {
         filterString = searchString;
         btnSearchSongs.setImageResource(R.drawable.ic_search_off);
-        setListViewContentsGrouped(getSelectedSongIDs());
+        allSelectedSongIDs = getSelectedSongIDs();
+        setListViewContentsGrouped(/*allSelectedSongIDs*/);
     }
 
     private boolean songMatchesFilterCriteria(Song s) {
         String searchStringUpperCase = filterString.toUpperCase();
-        if (s.getTitle().toUpperCase().contains(searchStringUpperCase))
-            return true;
-        if (s.getArtist().toUpperCase().contains(searchStringUpperCase))
-            return true;
-        if (s.getAlbum().toUpperCase().contains(searchStringUpperCase))
-            return true;
-
+        String[] searchWords = searchStringUpperCase.split("\\s+");
+        for (String word : searchWords) {
+            if (s.getTitle().toUpperCase().contains(word))
+                return true;
+            if (s.getArtist().toUpperCase().contains(word))
+                return true;
+            if (s.getAlbum().toUpperCase().contains(word))
+                return true;
+        }
         return false;
     }
 
@@ -154,7 +158,9 @@ public class SelectSongsFragment extends Fragment implements
 
     // The songs are loadad and we have the selected songs.
     // Group the songs into either artists or albums, depending on the groups
-    private void setListViewContentsGrouped(ArrayList<Long> selectedSongs) {
+    private void setListViewContentsGrouped() {
+        ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
+
         HashMap<String, SongGroup> groupMap = new HashMap<>();
         SongGroup group = null;
         artistGroups.clear();
@@ -163,9 +169,10 @@ public class SelectSongsFragment extends Fragment implements
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
                 if (filterString == null || songMatchesFilterCriteria(s)) {
-                    if (groupMap.containsKey(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)))) {
+                    String key = groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1));
+                    if (groupMap.containsKey(key.toUpperCase())) {
                         // We already have a group with this key
-                        group = groupMap.get(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)));
+                        group = groupMap.get(key.toUpperCase());
                         if (groupby == GROUPBY_ALBUM) {
                             if (!s.getArtist().equals(group.groupDetail)) {
                                 group.groupDetail = "various artists";
@@ -173,9 +180,9 @@ public class SelectSongsFragment extends Fragment implements
                         }
                     } else {
                         // New key, make new group
-                        group = new SongGroup(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)), groupby == GROUPBY_ALBUM ? s.getArtist() : null);
+                        group = new SongGroup(key, groupby == GROUPBY_ALBUM ? s.getArtist() : null);
                         artistGroups.append(i++, group);
-                        groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)), group);
+                        groupMap.put(key.toUpperCase(), group);
                     }
                     group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getArtist()));
                 }
@@ -330,19 +337,17 @@ public class SelectSongsFragment extends Fragment implements
             // Restore last state for checked position.
             songs = savedInstanceState.getParcelableArrayList(STATE_ALLSONGS);
             groupby = savedInstanceState.getInt(STATE_GROUPBY);
-            ArrayList<Song> selectedSongs = savedInstanceState.getParcelableArrayList(STATE_SELECTEDSONGS);
-            filterString = savedInstanceState.getString(STATE_FILTERSTRING);
-            if (filterString == null) {
-                btnSearchSongs.setImageResource(R.drawable.ic_search);
-            } else {
-                btnSearchSongs.setImageResource(R.drawable.ic_search_off);
 
-            }
+            filterString = savedInstanceState.getString(STATE_FILTERSTRING);
+            btnSearchSongs.setImageResource(filterString == null ? R.drawable.ic_search : R.drawable.ic_search_off);
+            /*
+            ArrayList<Song> selectedSongs = savedInstanceState.getParcelableArrayList(STATE_SELECTEDSONGS);
             ArrayList<Long> selectedSongIDs = new ArrayList<>();
             for (Song s : selectedSongs) {
                 selectedSongIDs.add(s.getID());
             }
-            setListViewContentsGrouped(selectedSongIDs);
+            */
+            setListViewContentsGrouped();
         } else {
             // if there is no saved instance then we will get songs from the device content provider
             filterString = null;

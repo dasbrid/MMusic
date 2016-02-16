@@ -183,7 +183,7 @@ public class GroupAdapter extends BaseExpandableListAdapter {
 
         TriStateButton btnAgSelect = (TriStateButton) convertView.findViewById(R.id.btnAgSelect);
         btnAgSelect.setState(selectedState);
-        btnAgSelect.setOnClickListener(new OnAgSelectClickListener(groupPosition) );
+        btnAgSelect.setOnClickListener(new OnGroupSelectClickListener(groupPosition) );
         return convertView;
     }
 
@@ -223,10 +223,10 @@ public class GroupAdapter extends BaseExpandableListAdapter {
 
     // when group checkbox is clicked.
     // select or unselct all the child songs
-    class OnAgSelectClickListener implements View.OnClickListener {
+    class OnGroupSelectClickListener implements View.OnClickListener {
         int groupPosition;
         // constructor
-        public OnAgSelectClickListener(int groupPosition) {
+        public OnGroupSelectClickListener(int groupPosition) {
             this.groupPosition = groupPosition;
         }
 

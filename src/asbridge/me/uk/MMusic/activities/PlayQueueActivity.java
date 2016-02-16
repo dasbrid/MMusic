@@ -148,8 +148,7 @@ public class PlayQueueActivity extends FragmentActivity
         super.onPause();
         if (songPlayingReceiver != null) unregisterReceiver(songPlayingReceiver);
         if (nextSongChangedReceiver != null) unregisterReceiver(nextSongChangedReceiver);
-
-        // paused=true; // TODO: used to remember the paused state (see onResume)
+        if (nextSongChangedReceiver != null) unregisterReceiver(songPausedReceiver);
     }
 
     // uses the saved paused state
