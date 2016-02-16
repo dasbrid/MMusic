@@ -1,5 +1,6 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
+import android.support.v4.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,6 +17,8 @@ import java.util.*;
 
 import android.support.v4.app.Fragment;
 import asbridge.me.uk.MMusic.controls.TriStateButton;
+import asbridge.me.uk.MMusic.dialogs.DeletePlaybucketDialog;
+import asbridge.me.uk.MMusic.dialogs.SearchSongsDialog;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 import asbridge.me.uk.MMusic.utils.Settings;
 
@@ -24,7 +27,8 @@ import asbridge.me.uk.MMusic.utils.Settings;
  */
 public class SelectSongsFragment extends Fragment implements
         View.OnClickListener,
-        GroupAdapter.OnSelectionStateChangedListener
+        GroupAdapter.OnSelectionStateChangedListener,
+        SearchSongsDialog.OnSearchSongsActionListener
 {
 
     private String TAG = "SelectSongsFragment";
@@ -103,13 +107,23 @@ public class SelectSongsFragment extends Fragment implements
 
     private void filterSongs() {
         if (filterString == null) {
-            filterString = "the";
-            btnSearchSongs.setImageResource(R.drawable.ic_search_off);
+            FragmentManager fm = getFragmentManager();
+            SearchSongsDialog searchSongsDialog = new SearchSongsDialog();
+            searchSongsDialog.setOnSearchStringEntered(this);
+            searchSongsDialog.show(fm, "sear_songs_dialog");
         } else {
             filterString = null; // no filter
             btnSearchSongs.setImageResource(R.drawable.ic_search);
-
+            setListViewContentsGrouped(getSelectedSongIDs());
         }
+
+    }
+
+    // callback from search dialog when a search string is entered
+    @Override
+    public void onSearchStringEntered(String searchString) {
+        filterString = searchString;
+        btnSearchSongs.setImageResource(R.drawable.ic_search_off);
         setListViewContentsGrouped(getSelectedSongIDs());
     }
 
@@ -163,7 +177,7 @@ public class SelectSongsFragment extends Fragment implements
                         artistGroups.append(i++, group);
                         groupMap.put(groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1)), group);
                     }
-                    group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ALBUM ? s.getArtist() : (groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getTitle())));
+                    group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getArtist()));
                 }
             }
         }
