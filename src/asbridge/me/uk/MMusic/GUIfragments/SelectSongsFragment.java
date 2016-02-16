@@ -125,6 +125,19 @@ public class SelectSongsFragment extends Fragment implements
         return false;
     }
 
+    Comparator<Song> getComparator() {
+        switch (groupby) {
+            case GROUPBY_ARTIST:
+                return Song.SongArtistComparator;
+            case GROUPBY_ALBUM:
+                return Song.SongAlbumComparator;
+            case GROUPBY_SONG:
+                return Song.SongTitleComparator;
+            default:
+                return null;
+        }
+    }
+
     // The songs are loadad and we have the selected songs.
     // Group the songs into either artists or albums, depending on the groups
     private void setListViewContentsGrouped(ArrayList<Long> selectedSongs) {
@@ -132,6 +145,7 @@ public class SelectSongsFragment extends Fragment implements
         SongGroup group = null;
         artistGroups.clear();
         int i=0;
+        Collections.sort(songs, getComparator());
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
                 if (filterString == null || songMatchesFilterCriteria(s)) {

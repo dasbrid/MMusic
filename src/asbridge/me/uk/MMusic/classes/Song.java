@@ -3,6 +3,8 @@ package asbridge.me.uk.MMusic.classes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Comparator;
+
 /**
  * Created by David on 04/12/2015.
  */
@@ -13,6 +15,41 @@ public class Song implements Parcelable {
     private String album;
     private int PID;
     private long duration; // in ms
+
+    /* Comparator for sorting songs by title */
+    public static Comparator<Song> SongTitleComparator = new Comparator<Song>() {
+
+        public int compare(Song s1, Song s2) {
+            String SongProperty1 = s1.getTitle().toUpperCase();
+            String SongProperty2 = s2.getTitle().toUpperCase();
+
+            //ascending order
+            return SongProperty1.compareTo(SongProperty2);
+        }};
+
+    /* Comparator for sorting songs by artist */
+    public static Comparator<Song> SongArtistComparator = new Comparator<Song>() {
+
+        public int compare(Song s1, Song s2) {
+            String SongProperty1 = s1.getArtist().toUpperCase();
+            String SongProperty2 = s2.getArtist().toUpperCase();
+
+            //ascending order
+            return SongProperty1.compareTo(SongProperty2);
+        }};
+
+    /* Comparator for sorting songs by album */
+    public static Comparator<Song> SongAlbumComparator = new Comparator<Song>() {
+
+        public int compare(Song s1, Song s2) {
+            String SongProperty1 = s1.getAlbum().toUpperCase();
+            String SongProperty2 = s2.getAlbum().toUpperCase();
+
+            //ascending order
+            return SongProperty1.compareTo(SongProperty2);
+        }};
+
+
 
     public Song(long songID, String songTitle, String songArtist, String songAlbum, int songPID, long songDuration) {
         id=songID;
