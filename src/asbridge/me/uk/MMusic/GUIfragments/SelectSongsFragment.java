@@ -83,6 +83,8 @@ public class SelectSongsFragment extends Fragment implements
     private static final String STATE_GROUPBY = "GROUPBY";
     private static final String STATE_FILTERSTRING = "FILTERSTRING";
 
+    private static final String SYMBOL_GROUP_STRING = "*?!"; // group heading for songs starting with non-alphanumeric
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // Make sure to call the super method so that the states of our views are saved
@@ -95,6 +97,7 @@ public class SelectSongsFragment extends Fragment implements
     }
 
     public void setSongList() {
+        Log.d(TAG, "setSongList");
         // This displays ALL songs on the device
         songs = new ArrayList<>();
         MusicContent.getAllSongsGroupedByArtist(getContext(), songs);
@@ -164,7 +167,7 @@ public class SelectSongsFragment extends Fragment implements
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loadingProgressDialog = ProgressDialog.show(getContext(),"Please Wait", "Loading Songs ...", false);
+            loadingProgressDialog = ProgressDialog.show(getContext(),"Please Wait", "Organising Songs ...", false);
         }
 
         @Override
@@ -205,11 +208,31 @@ public class SelectSongsFragment extends Fragment implements
         loadingProgressDialog.dismiss();
     }
 
+    // get the 'key' for grouping a song.
+    // depends on the current 'groupby' (artist, album or song (initial letter)
+    // If grouped by song then additionally group all non alphanumeric together
+    private String getGroupKey(Song s) {
+        switch (groupby) {
+            case GROUPBY_ALBUM:
+                return s.getAlbum();
+            case GROUPBY_ARTIST:
+                return s.getArtist();
+            default: // grouping by first letter of title
+                String key = s.getTitle().substring(0, 1).toUpperCase();
+                char c = key.charAt(0);
+                if (Character.isDigit(c) || Character.isLetter(c))
+                    return key;
+                else
+                    return SYMBOL_GROUP_STRING;
+        }
+    }
+
     // This is called from the AsyncTask and happens in the background
     // Group the songs into either artists, albums or songs, depending on the current groupBy
     // Songs in the current playlist will be marked as selected
     // Songs are filtered depending on current search
     private void getSongGroups() {
+        Log.d(TAG, "getSongGroups");
         ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
 
         HashMap<String, SongGroup> groupMap = new HashMap<>();
@@ -220,7 +243,8 @@ public class SelectSongsFragment extends Fragment implements
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
                 if (filterString == null || songMatchesFilterCriteria(s)) {
-                    String key = groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1).toUpperCase());
+                    // String key = groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1).toUpperCase());
+                    String key = getGroupKey(s);
                     if (groupMap.containsKey(key.toUpperCase())) {
                         // We already have a group with this key
                         group = groupMap.get(key.toUpperCase());
@@ -383,13 +407,6 @@ public class SelectSongsFragment extends Fragment implements
 
             filterString = savedInstanceState.getString(STATE_FILTERSTRING);
             btnSearchSongs.setImageResource(filterString == null ? R.drawable.ic_search : R.drawable.ic_search_off);
-            /*
-            ArrayList<Song> selectedSongs = savedInstanceState.getParcelableArrayList(STATE_SELECTEDSONGS);
-            ArrayList<Long> selectedSongIDs = new ArrayList<>();
-            for (Song s : selectedSongs) {
-                selectedSongIDs.add(s.getID());
-            }
-            */
             setListViewContentsGrouped();
         } else {
             // if there is no saved instance then we will get songs from the device content provider
