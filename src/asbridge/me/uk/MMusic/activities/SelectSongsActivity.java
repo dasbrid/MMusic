@@ -49,10 +49,11 @@ public class SelectSongsActivity extends FragmentActivity
 
 
 
+    // call back from retainfragment which binds to the music service
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
-        artistsFragment.setSongList();
+//        artistsFragment.setSongList();
     }
 
 
