@@ -220,7 +220,7 @@ public class SelectSongsFragment extends Fragment implements
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
                 if (filterString == null || songMatchesFilterCriteria(s)) {
-                    String key = groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1));
+                    String key = groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1).toUpperCase());
                     if (groupMap.containsKey(key.toUpperCase())) {
                         // We already have a group with this key
                         group = groupMap.get(key.toUpperCase());
