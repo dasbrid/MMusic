@@ -162,7 +162,8 @@ public class SelectSongsFragment extends Fragment implements
     }
 
     // Used to load the grouped, filtered and selected songs in the background (Async)
-    private class LoadSongsAsyncTask extends AsyncTask <Void, Integer, Void> {
+    // Be careful with non-static inner Handler classes. The can be a risk for memory leaks
+    private class LoadSongsAsyncTask extends AsyncTask <Void, Integer, ArrayList<Long>> {
 
         @Override
         protected void onPreExecute() {
@@ -171,15 +172,18 @@ public class SelectSongsFragment extends Fragment implements
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            getSongGroups();
-            return null;
+        protected ArrayList<Long> doInBackground(Void... params) {
+            // set up non-UI things in the background
+            Collections.sort(songs, getComparator());
+            ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
+            return selectedSongs;
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
+        protected void onPostExecute(ArrayList<Long> resultSelectedSongs) {
+            super.onPostExecute(resultSelectedSongs);
             Log.d(TAG, "Async oPE");
+            getSongGroups(resultSelectedSongs);
             updateUIAfterLoadingSongs();
         }
     }
@@ -231,15 +235,40 @@ public class SelectSongsFragment extends Fragment implements
     // Group the songs into either artists, albums or songs, depending on the current groupBy
     // Songs in the current playlist will be marked as selected
     // Songs are filtered depending on current search
-    private void getSongGroups() {
+    private void getSongGroups(ArrayList<Long> selectedSongs) {
         Log.d(TAG, "getSongGroups");
-        ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getContext(), 0);
+//        = MusicContent.getSongsInPlaylist(getContext(), 0);
 
-        HashMap<String, SongGroup> groupMap = new HashMap<>();
+//        HashMap<String, SongGroup> groupMap = new HashMap<>();
         SongGroup group = null;
         artistGroups.clear();
-        int i=0;
-        Collections.sort(songs, getComparator());
+        int i = 0;
+
+        // No need for the MAP approach, because the songs are always ordered
+        String currentKey = null;
+        for (Song s : songs) {
+            if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
+                if (filterString == null || songMatchesFilterCriteria(s)) {
+                    String key = getGroupKey(s);
+                    if (currentKey == null || !(currentKey.equals(key.toUpperCase()))) {
+                        // new group
+                        currentKey = key.toUpperCase();
+                        group = new SongGroup(key, groupby == GROUPBY_ALBUM ? s.getArtist() : null);
+                        artistGroups.append(i++, group);
+                    } else {
+                        if (groupby == GROUPBY_ALBUM) {
+                            if (!s.getArtist().equals(group.groupDetail)) {
+                                group.groupDetail = "various artists";
+                            }
+                        }
+                    }
+                    group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getArtist()));
+                }
+            }
+        }
+    }
+
+    /* the old way using MAP
         for (Song s : songs) {
             if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
                 if (filterString == null || songMatchesFilterCriteria(s)) {
@@ -264,6 +293,7 @@ public class SelectSongsFragment extends Fragment implements
             }
         }
     }
+*/
 
     @Override
     public void onClick(View v) {

@@ -297,8 +297,9 @@ public class MusicContent {
     public static Song getSongInCurrentPlaylist(Context context, int  songINDEX) {
         ArrayList<Long> songIDs = getSongsInPlaylist(context, 0 /*Current playlist*/);
         Long songID = songIDs.get(songINDEX);
+        Log.d(TAG, "get "+songINDEX+"th song in current playlist. ID="+songID);
         Song song = getSongBySongID(context, songID);
-
+        Log.d(TAG, "song ID="+songID+(song!=null?" title="+song.getTitle():" not found"));
         return song;
     }
 

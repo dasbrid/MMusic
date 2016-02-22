@@ -336,29 +336,37 @@ public class SimpleMusicService extends Service
             Log.v(TAG, "No songs in playbucket");
             return;
         }
+        ArrayList<Integer> notFoundSongIndicess = new ArrayList<>(); // list of 'bad' songs in current playlist. Deleted from device
         int numItemsInQueue = playQueue.size();
         int queueSize = Settings.getPlayQueueSize(getApplicationContext());
         Song nextSong;
         // repeat while ...
         // the playqueue is not full && there are still some songs left for us to choose
-
-        while ( playQueue.size() < queueSize && (numSongsInBucket > playQueue.size() )) {
+        Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsInBucket="+numSongsInBucket);
+        while ( playQueue.size() < queueSize && ((numSongsInBucket - notFoundSongIndicess.size()) > playQueue.size() )) {
+            Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsInBucket="+numSongsInBucket);
             int nextSongIndex;
             if (shuffleOn) {
                 do {
                     nextSongIndex = getRandomSongIndex();
                     nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
-                } while (playqueueContainsSong(nextSong.getID()));
+                } while (nextSong!=null && playqueueContainsSong(nextSong.getID()));
             } else {
                 currentPickedSong++;
                 if (currentPickedSong >= numSongsInBucket) currentPickedSong = 0;
                 nextSongIndex = currentPickedSong;
                 nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
             }
-            if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
-
-            Song pqSong = new Song(nextSong,nextSongPID);
-            playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
+            if (nextSong==null) {
+                if (!notFoundSongIndicess.contains(nextSongIndex))
+                    notFoundSongIndicess.add(nextSongIndex);
+                // this song in the bucket doesn't exist (deleted from device...???)
+                Log.d(TAG, "SONG NOT FOUND - index="+nextSongIndex+" numsongsinbucket="+numSongsInBucket);
+            } else {
+                if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
+                Song pqSong = new Song(nextSong, nextSongPID);
+                playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
+            }
         }
         // broadcast that the play queue has changed
         // can be used by the activity to update its playqueue
