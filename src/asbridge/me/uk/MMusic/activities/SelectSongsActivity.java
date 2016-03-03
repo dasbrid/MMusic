@@ -12,10 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -48,8 +45,8 @@ import java.util.List;
  */
 public class SelectSongsActivity extends FragmentActivity
         implements
-        SelectSongsFragment.OnSongsChangedListener
-        , RetainFragment.RetainFragmentListener
+//        SelectSongsFragment.OnSongsChangedListener,
+        RetainFragment.RetainFragmentListener
         , LoadPlaybucketDialog.OnLoadPlaybucketSelectedListener
         , SavePlaybucketDialog.OnSavePlaybucketActionListener
         , DeletePlaybucketDialog.OnDeletePlaybucketClickedListener
@@ -68,7 +65,7 @@ public class SelectSongsActivity extends FragmentActivity
     Button btnGroupBySong;
     ImageButton btnSearchSongs;
 
-
+    private ProgressDialog loadingProgressDialog;
 
     private static final int GROUPBY_ARTIST = 0;
     private static final int GROUPBY_ALBUM = 1;
@@ -175,6 +172,8 @@ public class SelectSongsActivity extends FragmentActivity
 */
     }
 
+
+
     // bind to the Service instance when the Activity instance starts
     @Override
     protected void onStart() {
@@ -183,9 +182,71 @@ public class SelectSongsActivity extends FragmentActivity
         retainFragment.doBindService();
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        ExpandableListView.ExpandableListContextMenuInfo elvcmi = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView.getPackedPositionType(elvcmi.packedPosition);
+        MenuInflater menuInflater = getMenuInflater();
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            menuInflater.inflate(R.menu.menu_song_long_click, menu);
+        } else {
+            menuInflater.inflate(R.menu.menu_artist_long_click, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        ExpandableListView.ExpandableListContextMenuInfo menuInfo = (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
+        int type = ExpandableListView.getPackedPositionType(menuInfo.packedPosition);
+        int groupPos;
+        int childPos;
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+            childPos = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
+
+            int key = artistGroups.keyAt(groupPos);
+            // get the object by the key.
+            SongGroup ag = artistGroups.get(key);
+            Song s = ag.songs.get(childPos).song;
+
+            switch (item.getItemId()) {
+                case R.id.menu_song_long_click_playnext:
+                    playThisSongNext(s);
+                    return true;
+                case R.id.menu_song_long_click_addtoqueue:
+                    addThisSongToPlayQueue(s);
+                    return true;
+                case R.id.menu_song_long_click_playnow:
+                    playThisSongNow(s);
+                    return true;
+            }
+
+        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
+
+            int key = artistGroups.keyAt(groupPos);
+            // get the object by the key.
+            SongGroup ag = artistGroups.get(key);
+
+            switch (item.getItemId()) {
+                case R.id.menu_artist_long_click_addsongstoqueue:
+                    addArtistsSongsToPlayQueue(ag);
+                    return true;
+            }
+
+            switch (item.getItemId()) {
+                case R.id.menu_artist_long_click_clearandaddsongstoqueue:
+                    clearPlayQueueAndaddArtistsSongsToPlayQueue(ag);
+                    return true;
+            }
+        }
+        return super.onContextItemSelected(item);
+    }
 
     /* listener from the artistFragment */
-    @Override
+    //@Override
     public void playThisSongNext(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -195,7 +256,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
-    @Override
+    //@Override
     public void addThisSongToPlayQueue(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -205,7 +266,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
-    @Override
+    //@Override
     public void playThisSongNow(Song s) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -215,7 +276,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
-    @Override
+    //@Override
     public void addArtistsSongsToPlayQueue(SongGroup ag) {
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
@@ -227,7 +288,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
-    @Override
+    //@Override
     public void clearPlayQueueAndaddArtistsSongsToPlayQueue(SongGroup ag) {
         if (ag.songs.size() == 0)
             return;
@@ -242,7 +303,7 @@ public class SelectSongsActivity extends FragmentActivity
     }
 
     /* listener from the artistFragment */
-    @Override
+    //@Override
     public void onSongsChanged() {
         Log.d(TAG, "onSongsChanged");
         Log.d(TAG, "retain fragment is " + (retainFragment==null?"null":"not null"));
@@ -397,7 +458,7 @@ public class SelectSongsActivity extends FragmentActivity
         // Songs are set selected (ticked) based on the current playlist
         setListViewContentsGrouped();
     }
-    private ProgressDialog loadingProgressDialog;// =new ProgressDialog(this);
+
     // Used to load the grouped, filtered and selected songs in the background (Async)
     // Be careful with non-static inner Handler classes. The can be a risk for memory leaks
     private class LoadSongsAsyncTask extends AsyncTask<Void, Integer, ArrayList<Long>> {
