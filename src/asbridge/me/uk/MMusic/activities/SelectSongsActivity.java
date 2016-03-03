@@ -2,51 +2,102 @@ package asbridge.me.uk.MMusic.activities;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.adapters.GroupAdapter;
 import asbridge.me.uk.MMusic.classes.SelectedSong;
 import asbridge.me.uk.MMusic.classes.SongGroup;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.controls.TriStateButton;
 import asbridge.me.uk.MMusic.dialogs.DeletePlaybucketDialog;
 import asbridge.me.uk.MMusic.dialogs.LoadPlaybucketDialog;
 import asbridge.me.uk.MMusic.dialogs.SavePlaybucketDialog;
+import asbridge.me.uk.MMusic.dialogs.SearchSongsDialog;
 import asbridge.me.uk.MMusic.services.SimpleMusicService;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
+import asbridge.me.uk.MMusic.utils.Settings;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by David on 20/12/2015.
  */
 public class SelectSongsActivity extends FragmentActivity
-        implements SelectSongsFragment.OnSongsChangedListener
+        implements
+        SelectSongsFragment.OnSongsChangedListener
         , RetainFragment.RetainFragmentListener
         , LoadPlaybucketDialog.OnLoadPlaybucketSelectedListener
         , SavePlaybucketDialog.OnSavePlaybucketActionListener
         , DeletePlaybucketDialog.OnDeletePlaybucketClickedListener
+        , View.OnClickListener
+        , SearchSongsDialog.OnSearchSongsActionListener
+        , GroupAdapter.OnSelectionStateChangedListener
 {
     private static final String TAG = "SelectSongsActivity";
 
     private RetainFragment retainFragment = null;
-    private SelectSongsFragment artistsFragment = null;
+//    private SelectSongsFragment artistsFragment = null;
+
+    // from fragment
+    Button btnGroupByAlbum;
+    Button btnGroupByArtist;
+    Button btnGroupBySong;
+    ImageButton btnSearchSongs;
 
 
 
+    private static final int GROUPBY_ARTIST = 0;
+    private static final int GROUPBY_ALBUM = 1;
+    private static final int GROUPBY_SONG = 2;
+    private int groupby;
 
+    private SparseArray<SongGroup> artistGroups;
+    private ArrayList<Song> songs = new ArrayList<>() ;
+
+    private ExpandableListView elvGroupList;
+    private GroupAdapter groupAdapter;
+    private TriStateButton btnSongsSelect;
+
+    private String filterString;
+    // Use instance field for listener
+    // It will not be gc'd as long as this instance is kept referenced
+    SharedPreferences.OnSharedPreferenceChangeListener prefslistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+            changeGroupBy(groupby); // NOT ACTUALLY CHANGING, JUST UPDATE THE LIST
+        }
+    };
+
+    private static final String STATE_ALLSONGS = "ALLSONGS";
+    private static final String STATE_SELECTEDSONGS = "SELECTEDSONGS";
+    private static final String STATE_GROUPBY = "GROUPBY";
+    private static final String STATE_FILTERSTRING = "FILTERSTRING";
+
+    private static final String SYMBOL_GROUP_STRING = "*?!"; // group heading for songs starting with non-alphanumeric
+     // end from fragment
 
 
     // call back from retainfragment which binds to the music service
@@ -63,8 +114,6 @@ public class SelectSongsActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_songs);
 
-
-
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
 
@@ -76,12 +125,54 @@ public class SelectSongsActivity extends FragmentActivity
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
 
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(prefslistener);
+
+        btnSongsSelect = (TriStateButton) findViewById(R.id.btnSongsSelect);
+        btnSongsSelect.setOnClickListener(this);
+
+        btnGroupByAlbum = (Button) findViewById(R.id.btnGroupByAlbum);
+        btnGroupByAlbum.setOnClickListener(this);
+        btnGroupByArtist = (Button) findViewById(R.id.btnGroupByArtist);
+        btnGroupByArtist.setOnClickListener(this);
+        btnGroupBySong = (Button) findViewById(R.id.btnGroupBySong);
+        btnGroupBySong.setOnClickListener(this);
+        btnSearchSongs = (ImageButton) findViewById(R.id.btnSearchSongs);
+        btnSearchSongs.setOnClickListener(this);
+
+        elvGroupList = (ExpandableListView) findViewById(R.id.lvSongsByArtist);
+
+        artistGroups = new SparseArray<>();
+
+        groupAdapter = new GroupAdapter(this, artistGroups);
+        elvGroupList.setAdapter(groupAdapter);
+        registerForContextMenu(elvGroupList);
+        groupAdapter.setOnSelectionStateChangedListener(this);
+
+        // if we have a saved instance then we are returning (e.g. rotate)
+        // get the list of songs and the list of selected songs from the saved instance
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            songs = savedInstanceState.getParcelableArrayList(STATE_ALLSONGS);
+            groupby = savedInstanceState.getInt(STATE_GROUPBY);
+
+            filterString = savedInstanceState.getString(STATE_FILTERSTRING);
+            btnSearchSongs.setImageResource(filterString == null ? R.drawable.ic_search : R.drawable.ic_search_off);
+            setListViewContentsGrouped();
+        } else {
+            // if there is no saved instance then we will get songs from the device content provider
+            filterString = null;
+            groupby = GROUPBY_ALBUM;
+            setSongList();
+        }
+/* fragment moved to activity
         artistsFragment = (SelectSongsFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
         if (artistsFragment != null)
         {
             artistsFragment.setOnSongsChangedListener(this);
         }
-
+*/
     }
 
     // bind to the Service instance when the Activity instance starts
@@ -159,7 +250,7 @@ public class SelectSongsActivity extends FragmentActivity
             Log.d(TAG, "serviceref fragment is " + (retainFragment.serviceReference==null?"null":"not null"));
             if (retainFragment.serviceReference != null) {
                 ArrayList<Song> selectedSongs;
-                selectedSongs = artistsFragment.getSelectedSongs();
+                selectedSongs = getSelectedSongs();
                 Log.d(TAG, "setting list: "+ selectedSongs.size() + " songs");
             }
         }
@@ -247,7 +338,7 @@ public class SelectSongsActivity extends FragmentActivity
     @Override
     public void onSavePlayBucketSelected(int savePlaybucketID) {
         MusicContent.updateSavedPlaybucket(this, savePlaybucketID);
-        artistsFragment.setSongList();
+        setSongList();
     }
 
     private void loadPlaybucket() {
@@ -261,6 +352,239 @@ public class SelectSongsActivity extends FragmentActivity
     @Override
     public void onLoadPlayBucketSelected(int playbucketID) {
         MusicContent.setCurrentBucketFromSavedBucket(this, playbucketID);
-        artistsFragment.setSongList();
+        setSongList();
+    }
+
+    // From Fragment
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnSongsSelect:
+                selectSongs();
+                break;
+            case R.id.btnGroupByArtist:
+                changeGroupBy(GROUPBY_ARTIST);
+                break;
+            case R.id.btnGroupByAlbum:
+                changeGroupBy(GROUPBY_ALBUM);
+                break;
+            case R.id.btnGroupBySong:
+                changeGroupBy(GROUPBY_SONG);
+                break;
+            case R.id.btnSearchSongs:
+                filterSongs();
+                break;
+        }
+    }
+
+    // The select (all/none) button has been pressed
+    private void selectSongs() {
+        int currentState = groupAdapter.getSelectionState();
+        if (currentState == 2) {
+            btnSongsSelect.setState(0);
+            groupAdapter.selectAllorNone(false);
+        } else {
+            btnSongsSelect.setState(2);
+            groupAdapter.selectAllorNone(true);
+        }
+    }
+
+    public void setSongList() {
+        Log.d(TAG, "setSongList");
+        // This displays ALL songs on the device
+        songs = new ArrayList<>();
+        MusicContent.getAllSongsGroupedByArtist(this, songs);
+        // Songs are set selected (ticked) based on the current playlist
+        setListViewContentsGrouped();
+    }
+    private ProgressDialog loadingProgressDialog;// =new ProgressDialog(this);
+    // Used to load the grouped, filtered and selected songs in the background (Async)
+    // Be careful with non-static inner Handler classes. The can be a risk for memory leaks
+    private class LoadSongsAsyncTask extends AsyncTask<Void, Integer, ArrayList<Long>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            loadingProgressDialog = ProgressDialog.show(SelectSongsActivity.this,"Please Wait", "Organising Songs ...", false);
+        }
+
+        @Override
+        protected ArrayList<Long> doInBackground(Void... params) {
+            // set up non-UI things in the background
+            Collections.sort(songs, getComparator());
+            ArrayList<Long> selectedSongs = MusicContent.getSongsInPlaylist(getApplicationContext(), 0);
+            return selectedSongs;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Long> resultSelectedSongs) {
+            super.onPostExecute(resultSelectedSongs);
+            Log.d(TAG, "Async oPE");
+            getSongGroups(resultSelectedSongs);
+            updateUIAfterLoadingSongs();
+            loadingProgressDialog.dismiss();
+        }
+    }
+    ////////////End of Async task ///////////////
+
+    // Wrapper method to load the grouped list and update the GUI
+    // Creates an async task to do it in the background
+    private void setListViewContentsGrouped() {
+        new LoadSongsAsyncTask().execute();
+        // will call updateUIAfterLoadingSongs when async task is finished
+    }
+
+    // Called by post execute of AsyncTask
+    // Back on the main UI thread with the groups all loaded
+    // Update the UI accordingly
+    private void updateUIAfterLoadingSongs() {
+        Log.d(TAG, "Finish up after task...");
+        btnGroupByAlbum.setEnabled(groupby!=GROUPBY_ALBUM);
+        btnGroupByArtist.setEnabled(groupby!=GROUPBY_ARTIST);
+        btnGroupBySong.setEnabled(groupby!=GROUPBY_SONG);
+        groupAdapter.notifyDataSetChanged();
+        for (int g=0 ; g < groupAdapter.getGroupCount() ; g++)
+        {
+            elvGroupList.collapseGroup(g);
+        }
+
+    }
+
+    // get the 'key' for grouping a song.
+    // depends on the current 'groupby' (artist, album or song (initial letter)
+    // If grouped by song then additionally group all non alphanumeric together
+    private String getGroupKey(Song s) {
+        switch (groupby) {
+            case GROUPBY_ALBUM:
+                return s.getAlbum();
+            case GROUPBY_ARTIST:
+                return s.getArtist();
+            default: // grouping by first letter of title
+                String key = s.getTitle().substring(0, 1).toUpperCase();
+                char c = key.charAt(0);
+                if (Character.isDigit(c) || Character.isLetter(c))
+                    return key;
+                else
+                    return SYMBOL_GROUP_STRING;
+        }
+    }
+
+    // This is called from the AsyncTask and happens in the background
+    // Group the songs into either artists, albums or songs, depending on the current groupBy
+    // Songs in the current playlist will be marked as selected
+    // Songs are filtered depending on current search
+    private void getSongGroups(ArrayList<Long> selectedSongs) {
+        Log.d(TAG, "getSongGroups");
+//        = MusicContent.getSongsInPlaylist(getContext(), 0);
+
+//        HashMap<String, SongGroup> groupMap = new HashMap<>();
+        SongGroup group = null;
+        artistGroups.clear();
+        int i = 0;
+
+        // No need for the MAP approach, because the songs are always ordered
+        String currentKey = null;
+        for (Song s : songs) {
+            if (s.getDuration() > Settings.getMinDurationInSeconds(this) * 1000) {
+                if (filterString == null || songMatchesFilterCriteria(s)) {
+                    String key = getGroupKey(s);
+                    if (currentKey == null || !(currentKey.equals(key.toUpperCase()))) {
+                        // new group
+                        currentKey = key.toUpperCase();
+                        group = new SongGroup(key, groupby == GROUPBY_ALBUM ? s.getArtist() : null);
+                        artistGroups.append(i++, group);
+                    } else {
+                        if (groupby == GROUPBY_ALBUM) {
+                            if (!s.getArtist().equals(group.groupDetail)) {
+                                group.groupDetail = "various artists";
+                            }
+                        }
+                    }
+                    group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getArtist()));
+                }
+            }
+        }
+    }
+
+    // returns the comparator to use for sorting songs
+    // used for grouping
+    private Comparator<Song> getComparator() {
+        switch (groupby) {
+            case GROUPBY_ARTIST:
+                return Song.SongArtistComparator;
+            case GROUPBY_ALBUM:
+                return Song.SongAlbumComparator;
+            case GROUPBY_SONG:
+                return Song.SongTitleComparator;
+            default:
+                return null;
+        }
+    }
+
+    // helper method, returns true if song is OK for the current filter
+    private boolean songMatchesFilterCriteria(Song s) {
+        String searchStringUpperCase = filterString.toUpperCase();
+        String[] searchWords = searchStringUpperCase.split("\\s+");
+        for (String word : searchWords) {
+            if (s.getTitle().toUpperCase().contains(word))
+                return true;
+            if (s.getArtist().toUpperCase().contains(word))
+                return true;
+            if (s.getAlbum().toUpperCase().contains(word))
+                return true;
+        }
+        return false;
+    }
+
+    private void changeGroupBy(int newGroupBy) {
+        groupby = newGroupBy;
+        setListViewContentsGrouped();
+    }
+
+    private void filterSongs() {
+        if (filterString == null) {
+            android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+            SearchSongsDialog searchSongsDialog = new SearchSongsDialog();
+            searchSongsDialog.setOnSearchStringEntered(this);
+            searchSongsDialog.show(fm, "search_songs_dialog");
+        } else {
+            filterString = null; // no filter
+            btnSearchSongs.setImageResource(R.drawable.ic_search);
+            setListViewContentsGrouped();
+        }
+    }
+
+    // callback from search dialog when a search string is entered
+    @Override
+    public void onSearchStringEntered(String searchString) {
+        filterString = searchString;
+        btnSearchSongs.setImageResource(R.drawable.ic_search_off);
+        setListViewContentsGrouped();
+    }
+
+    public ArrayList<Song> getSelectedSongs() {
+        ArrayList<Song> selectedSongs = new ArrayList<>();
+        for(int i = 0; i < artistGroups.size(); i++) {
+            int key = artistGroups.keyAt(i);
+            // get the object by the key.
+            SongGroup ag = artistGroups.get(key);
+            {
+                List<SelectedSong> songs = ag.songs;
+                for (SelectedSong ss : songs) {
+                    if (ss.selected) {
+                        selectedSongs.add(ss.song);
+                    }
+                }
+            }
+        }
+        return selectedSongs;
+    }
+
+    // an Event from the List Adapter
+    // A song has been selected or deselcted and as a result the selected state has changed
+    @Override
+    public void onSelectionStateChanged(int state) {
+        btnSongsSelect.setState(state);
     }
 }

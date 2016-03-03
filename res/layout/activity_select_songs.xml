@@ -4,9 +4,49 @@
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical"
 >
-    <fragment android:name="asbridge.me.uk.MMusic.GUIfragments.SelectSongsFragment"
-              android:id="@+id/fragArtists"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent" />
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+    >
+        <asbridge.me.uk.MMusic.controls.TriStateButton
+                android:id="@+id/btnSongsSelect"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentRight="true"
+        />
+        <Button
+                android:id="@+id/btnGroupByArtist"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="artist"
+        />
+        <Button
+                android:id="@+id/btnGroupByAlbum"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/btnGroupByArtist"
+                android:text="album"
+        />
+        <Button
+                android:id="@+id/btnGroupBySong"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/btnGroupByAlbum"
+                android:text="song"
+        />
+        <ImageButton
+                android:id="@+id/btnSearchSongs"
+                android:src="@drawable/ic_search"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_toRightOf="@id/btnGroupBySong"
+                android:text="search"
+        />
+    </RelativeLayout>
+    <ExpandableListView
+            android:id="@+id/lvSongsByArtist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+    </ExpandableListView>
 
 </LinearLayout>

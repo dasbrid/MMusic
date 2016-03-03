@@ -268,33 +268,6 @@ public class SelectSongsFragment extends Fragment implements
         }
     }
 
-    /* the old way using MAP
-        for (Song s : songs) {
-            if (s.getDuration() > Settings.getMinDurationInSeconds(getContext()) * 1000) {
-                if (filterString == null || songMatchesFilterCriteria(s)) {
-                    // String key = groupby == GROUPBY_ALBUM ? s.getAlbum() : (groupby == GROUPBY_ARTIST ? s.getArtist() : s.getTitle().substring(0, 1).toUpperCase());
-                    String key = getGroupKey(s);
-                    if (groupMap.containsKey(key.toUpperCase())) {
-                        // We already have a group with this key
-                        group = groupMap.get(key.toUpperCase());
-                        if (groupby == GROUPBY_ALBUM) {
-                            if (!s.getArtist().equals(group.groupDetail)) {
-                                group.groupDetail = "various artists";
-                            }
-                        }
-                    } else {
-                        // New key, make new group
-                        group = new SongGroup(key, groupby == GROUPBY_ALBUM ? s.getArtist() : null);
-                        artistGroups.append(i++, group);
-                        groupMap.put(key.toUpperCase(), group);
-                    }
-                    group.songs.add(new SelectedSong(s, selectedSongs.contains(s.getID()), groupby == GROUPBY_ARTIST ? s.getAlbum() : s.getArtist()));
-                }
-            }
-        }
-    }
-*/
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
