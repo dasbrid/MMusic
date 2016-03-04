@@ -100,7 +100,7 @@ public class SelectSongsFragment extends Fragment implements
         Log.d(TAG, "setSongList");
         // This displays ALL songs on the device
         songs = new ArrayList<>();
-        MusicContent.getAllSongsGroupedByArtist(getContext(), songs);
+        MusicContent.getAllSongsOrderedByArtist(getContext(), songs);
         // Songs are set selected (ticked) based on the current playlist
         setListViewContentsGrouped();
     }

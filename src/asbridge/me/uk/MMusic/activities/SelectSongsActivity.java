@@ -69,7 +69,7 @@ public class SelectSongsActivity extends FragmentActivity
     private static final int GROUPBY_SONG = 2;
     private int groupby;
 
-    private SparseArray<SongGroup> artistGroups;
+    private SparseArray<SongGroup> songGroups;
     private ArrayList<Song> songs = new ArrayList<>() ;
 
     private ExpandableListView elvGroupList;
@@ -122,7 +122,7 @@ public class SelectSongsActivity extends FragmentActivity
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
 
-        // register the dhared pref listener. The only pref that affects us is the Song Duration one.
+        // register the shared pref listener. The only pref that affects us is the Song Duration one.
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(prefslistener);
@@ -141,9 +141,9 @@ public class SelectSongsActivity extends FragmentActivity
 
         elvGroupList = (ExpandableListView) findViewById(R.id.lvSongsByArtist);
 
-        artistGroups = new SparseArray<>();
+        songGroups = new SparseArray<>();
 
-        groupAdapter = new GroupAdapter(this, artistGroups);
+        groupAdapter = new GroupAdapter(this, songGroups);
         elvGroupList.setAdapter(groupAdapter);
         registerForContextMenu(elvGroupList);
         groupAdapter.setOnSelectionStateChangedListener(this);
@@ -200,9 +200,9 @@ public class SelectSongsActivity extends FragmentActivity
             groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
             childPos = ExpandableListView.getPackedPositionChild(menuInfo.packedPosition);
 
-            int key = artistGroups.keyAt(groupPos);
+            int key = songGroups.keyAt(groupPos);
             // get the object by the key.
-            SongGroup ag = artistGroups.get(key);
+            SongGroup ag = songGroups.get(key);
             Song s = ag.songs.get(childPos).song;
 
             switch (item.getItemId()) {
@@ -220,9 +220,9 @@ public class SelectSongsActivity extends FragmentActivity
         } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             groupPos = ExpandableListView.getPackedPositionGroup(menuInfo.packedPosition);
 
-            int key = artistGroups.keyAt(groupPos);
+            int key = songGroups.keyAt(groupPos);
             // get the object by the key.
-            SongGroup ag = artistGroups.get(key);
+            SongGroup ag = songGroups.get(key);
 
             switch (item.getItemId()) {
                 case R.id.menu_artist_long_click_addsongstoqueue:
@@ -448,7 +448,7 @@ public class SelectSongsActivity extends FragmentActivity
         Log.d(TAG, "setSongList");
         // This displays ALL songs on the device
         songs = new ArrayList<>();
-        MusicContent.getAllSongsGroupedByArtist(this, songs);
+        MusicContent.getAllSongsOrderedByArtist(this, songs);
         // Songs are set selected (ticked) based on the current playlist
         setListViewContentsGrouped();
     }
@@ -535,7 +535,7 @@ public class SelectSongsActivity extends FragmentActivity
 
 //        HashMap<String, SongGroup> groupMap = new HashMap<>();
         SongGroup group = null;
-        artistGroups.clear();
+        songGroups.clear();
         int i = 0;
 
         // No need for the MAP approach, because the songs are always ordered
@@ -548,7 +548,7 @@ public class SelectSongsActivity extends FragmentActivity
                         // new group
                         currentKey = key.toUpperCase();
                         group = new SongGroup(key, groupby == GROUPBY_ALBUM ? s.getArtist() : null);
-                        artistGroups.append(i++, group);
+                        songGroups.append(i++, group);
                     } else {
                         if (groupby == GROUPBY_ALBUM) {
                             if (!s.getArtist().equals(group.groupDetail)) {
@@ -620,10 +620,10 @@ public class SelectSongsActivity extends FragmentActivity
 
     public ArrayList<Song> getSelectedSongs() {
         ArrayList<Song> selectedSongs = new ArrayList<>();
-        for(int i = 0; i < artistGroups.size(); i++) {
-            int key = artistGroups.keyAt(i);
+        for(int i = 0; i < songGroups.size(); i++) {
+            int key = songGroups.keyAt(i);
             // get the object by the key.
-            SongGroup ag = artistGroups.get(key);
+            SongGroup ag = songGroups.get(key);
             {
                 List<SelectedSong> songs = ag.songs;
                 for (SelectedSong ss : songs) {
