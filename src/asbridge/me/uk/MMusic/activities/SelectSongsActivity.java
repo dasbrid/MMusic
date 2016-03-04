@@ -57,7 +57,6 @@ public class SelectSongsActivity extends FragmentActivity
     private static final String TAG = "SelectSongsActivity";
 
     private RetainFragment retainFragment = null;
-//    private SelectSongsFragment artistsFragment = null;
 
     // from fragment
     Button btnGroupByAlbum;
@@ -82,14 +81,17 @@ public class SelectSongsActivity extends FragmentActivity
     private String filterString;
     // Use instance field for listener
     // It will not be gc'd as long as this instance is kept referenced
+    // Listener for shared pref change. The only pref that affects us is the Song Duration one.
     SharedPreferences.OnSharedPreferenceChangeListener prefslistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            changeGroupBy(groupby); // NOT ACTUALLY CHANGING, JUST UPDATE THE LIST
+            Log.d(TAG, "pref changed "+key);
+            if (key.equals(Settings.PREF_MINDURATIONINSECONDS) )
+                changeGroupBy(groupby); // NOT ACTUALLY CHANGING, just reprocess the list because the min duration pref has changed
         }
     };
 
     private static final String STATE_ALLSONGS = "ALLSONGS";
-    private static final String STATE_SELECTEDSONGS = "SELECTEDSONGS";
+    private static final String STATE_SELECTEDSONGS = "SELECTEDSONGS"; // we just load this from the DB each time
     private static final String STATE_GROUPBY = "GROUPBY";
     private static final String STATE_FILTERSTRING = "FILTERSTRING";
 
@@ -101,7 +103,7 @@ public class SelectSongsActivity extends FragmentActivity
     @Override
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
-//        artistsFragment.setSongList();
+//        artistsFragment.setSongList(); // no need to wait for the music service to be ready. We can display songs before this (but not process long clicks etc)
     }
 
 
@@ -122,6 +124,7 @@ public class SelectSongsActivity extends FragmentActivity
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
 
+        // register the dhared pref listener. The only pref that affects us is the Song Duration one.
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(prefslistener);
@@ -164,15 +167,8 @@ public class SelectSongsActivity extends FragmentActivity
             setSongList();
         }
 /* fragment moved to activity
-        artistsFragment = (SelectSongsFragment)getSupportFragmentManager().findFragmentById(R.id.fragArtists);
-        if (artistsFragment != null)
-        {
-            artistsFragment.setOnSongsChangedListener(this);
-        }
 */
     }
-
-
 
     // bind to the Service instance when the Activity instance starts
     @Override
