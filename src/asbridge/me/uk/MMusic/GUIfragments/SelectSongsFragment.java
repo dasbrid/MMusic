@@ -237,9 +237,6 @@ public class SelectSongsFragment extends Fragment implements
     // Songs are filtered depending on current search
     private void getSongGroups(ArrayList<Long> selectedSongs) {
         Log.d(TAG, "getSongGroups");
-//        = MusicContent.getSongsInPlaylist(getContext(), 0);
-
-//        HashMap<String, SongGroup> groupMap = new HashMap<>();
         SongGroup group = null;
         artistGroups.clear();
         int i = 0;

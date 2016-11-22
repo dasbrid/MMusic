@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.activities.PlayQueueActivity;
 import asbridge.me.uk.MMusic.classes.Song;
@@ -328,6 +329,61 @@ public class SimpleMusicService extends Service
         return false;
     }
 
+    /* New version Doesn't use playbuckets.
+    Just fills randomly from ALL songs on the device
+     */
+    public void fillPlayQueue() {
+        // get number of songs in the current playbucket
+        int numSongsOnDevice;
+        numSongsOnDevice = MusicContent.getNumSongsOnDevice(getApplicationContext());
+        if (numSongsOnDevice == 0) {
+            Toast.makeText(getApplicationContext(), "No Songs Found", Toast.LENGTH_SHORT).show();
+            Log.v(TAG, "No songs found");
+            return;
+        }
+        ArrayList<Integer> notFoundSongIndicess = new ArrayList<>(); // list of 'bad' songs. Deleted from device
+
+        int queueSize = Settings.getPlayQueueSize(getApplicationContext());
+        Song nextSong;
+        // repeat while ...
+        // the playqueue is not full && there are still some songs left for us to choose
+            Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsOnDevice="+numSongsOnDevice);
+            while ( playQueue.size() < queueSize && ((numSongsOnDevice - notFoundSongIndicess.size()) > playQueue.size() )) {
+        Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsOnDevice="+numSongsOnDevice);
+        int nextSongIndex;
+        if (shuffleOn) {
+            do {
+                nextSong =  MusicContent.getRandomSongFromAllSongsOnDevice(getApplicationContext());
+                //nextSongIndex = getRandomSongIndex();
+                //nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
+            } while (nextSong!=null && playqueueContainsSong(nextSong.getID()));
+        } else {
+            currentPickedSong++;
+            if (currentPickedSong >= numSongsOnDevice) currentPickedSong = 0;
+            nextSongIndex = currentPickedSong;
+            nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
+        }
+        if (nextSong==null) {
+                    /*
+                    if (!notFoundSongIndicess.contains(nextSongIndex))
+                        notFoundSongIndicess.add(nextSongIndex);
+                        */
+            // this song in the bucket doesn't exist (deleted from device...???)
+            Log.d(TAG, "SONG NOT FOUND - index="+" nextSongIndex"+" numsongsinbucket="+numSongsOnDevice);
+        } else {
+            if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
+            Song pqSong = new Song(nextSong, nextSongPID);
+            playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
+        }
+    }
+    // broadcast that the play queue has changed
+    // can be used by the activity to update its playqueue
+    Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
+    sendBroadcast(changeNextSongIntent);
+}
+
+    /*
+    OLD version, uses playbuckets. But runs out of memory when trying to fill the playbucket...
     public void fillPlayQueue() {
         // get number of songs in the current playbucket
         int numSongsInBucket;
@@ -348,6 +404,7 @@ public class SimpleMusicService extends Service
             int nextSongIndex;
             if (shuffleOn) {
                 do {
+
                     nextSongIndex = getRandomSongIndex();
                     nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
                 } while (nextSong!=null && playqueueContainsSong(nextSong.getID()));
@@ -358,10 +415,12 @@ public class SimpleMusicService extends Service
                 nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
             }
             if (nextSong==null) {
+
                 if (!notFoundSongIndicess.contains(nextSongIndex))
                     notFoundSongIndicess.add(nextSongIndex);
+
                 // this song in the bucket doesn't exist (deleted from device...???)
-                Log.d(TAG, "SONG NOT FOUND - index="+nextSongIndex+" numsongsinbucket="+numSongsInBucket);
+                Log.d(TAG, "SONG NOT FOUND - index="+" nextSongIndex"+" numsongsinbucket="+numSongsInBucket);
             } else {
                 if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
                 Song pqSong = new Song(nextSong, nextSongPID);
@@ -373,7 +432,7 @@ public class SimpleMusicService extends Service
         Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
         sendBroadcast(changeNextSongIntent);
     }
-
+*/
     public void removeSongFromPlayQueue(int songPID) {
         Log.d(TAG, "SimpleMusicService removeSongFromPlayQueue:id="+songPID+" size="+playQueue.size());
         for (Song s : playQueue) {
@@ -414,7 +473,7 @@ public class SimpleMusicService extends Service
 
     // overload of PNSIPQ which DOESN'T check the sleep timer
     public void playNextSongInPlayQueue() {
-        playNextSongInPlayQueue(false);
+        playNextSongInPlayQueue(false /* don't check for sleep */);
     }
 
     // play button pressed in the activity or current song finished
@@ -427,8 +486,12 @@ public class SimpleMusicService extends Service
         player.reset();
 
         if (playQueue.size() < Settings.getPlayQueueSize(getApplicationContext())) {
-            // nothing in the queue, so initialise
+            // queue not full, so initialise
             fillPlayQueue();
+        }
+        if (playQueue.size() == 0) {
+            // Maybe no songs exist on the device ...
+            return;
         }
         // get the next song to play (from the queue)
         Song nextSong = playQueue.remove(); // retrieve and remove

@@ -272,6 +272,24 @@ public class MusicContent {
         return songIDs;
     }
 
+    public static int getNumSongsOnDevice(Context context) {
+        ContentResolver musicResolver = context.getContentResolver();
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {"count(*)"};
+
+        Cursor musicCursor = musicResolver.query(musicUri, projection, null /*selection*/, null /*selectionArgs*/, null);
+        if (musicCursor != null  && musicCursor.getCount() == 0) {
+            musicCursor.close();
+            return 0;
+        } else {
+            musicCursor.moveToFirst();
+            int result = musicCursor.getInt(0);
+            musicCursor.close();
+            return result;
+        }
+    }
+
     public static int getNumSongsInPlaylist(Context context, int playlistID ) {
 
         Uri uri = Uri.parse(PlaybucketsContentProvider.CONTENT_URI_SONGS + "/" + playlistID);
@@ -289,6 +307,40 @@ public class MusicContent {
             cursor.close();
             return result;
         }
+    }
+
+    /* Get a random song from ALL songs on the phone
+    Igonore playbuckets
+    More efficient version of the code (does not load all songs into memory)
+     */
+    public static Song getRandomSongFromAllSongsOnDevice(Context context) {
+        long randomSongID = 0;
+
+        // First select ONE song ID (randomly)
+        // Uses random ordering in DB (not efficient, but does not use memory)
+        ContentResolver musicResolver = context.getContentResolver();
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {
+                MediaStore.Audio.Media._ID,     // context id/ uri id of the file
+        };
+
+        Cursor musicCursor = musicResolver.query(musicUri, projection, null /*selection*/, null /*selectionArgs*/, "RANDOM() LIMIT 1");
+        if(musicCursor!=null && musicCursor.moveToFirst()){
+            //get columns
+
+            int idColumn = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Media._ID);
+            //add song to list
+
+                randomSongID = musicCursor.getLong(idColumn);
+
+            musicCursor.close();
+        }
+        // Now get the song by the randomly chosen ID
+        Song song = getSongBySongID(context, randomSongID);
+        Log.d(TAG, "song ID="+randomSongID+(song!=null?" title="+song.getTitle():" not found"));
+        return song;
     }
 
     /* This would be MUCH better if we didn't return ALL the songs in a playlist get the nth one*/
