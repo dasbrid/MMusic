@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="6dip"
+                android:descendantFocusability="blocksDescendants">
+
+    <TextView
+            android:id="@+id/tv_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Artist: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    <ImageButton
+            android:id="@+id/btnAddToPlayqueue"
+            android:layout_height="34dp"
+            android:layout_width="34dp"
+            android:contentDescription="Add to Playqueue"
+            android:src="@drawable/ic_move_to_top"
+            android:layout_alignParentRight="true"
+    />
+</RelativeLayout>

@@ -16,6 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activities.ArtistListActivity"/>
+        <activity android:name=".activities.SongsByArtistActivity"/>
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
 
         <provider

@@ -230,7 +230,7 @@ public class PlayQueueActivity extends FragmentActivity
                 startActivity(intent);
                 return true;
             case R.id.action_playbuckets:
-                startActivity(new Intent(this, SelectSongsActivity.class));
+                startActivity(new Intent(this, ArtistListActivity.class /*SelectSongsActivity.class*/));
                 return true;
             case R.id.action_timer:
                 showTimerDialog();
