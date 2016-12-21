@@ -125,10 +125,11 @@ public class SongsByArtistActivity extends Activity
 
                 Song s;
                 s = MusicContent.getSongBySongID(getApplicationContext(), songId);
-                Toast.makeText(getApplicationContext(),s.getTitle(), Toast.LENGTH_SHORT).show();
+
                 if (retainFragment != null) {
                     if (retainFragment.serviceReference != null) {
                         retainFragment.serviceReference.insertThisSongIntoPlayQueue(s);
+                        Toast.makeText(getApplicationContext(),s.getTitle(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }

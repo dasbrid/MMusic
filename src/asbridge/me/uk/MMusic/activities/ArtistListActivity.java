@@ -46,15 +46,17 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
         ArrayList<Song> songsByArtist = new ArrayList<>();
         MusicContent.getSongsForGivenArtist(this, artist, songsByArtist);
         Log.d(TAG, "adding " + songsByArtist.size() + " by " + artist);
+        Toast.makeText(getApplicationContext(),"adding " + songsByArtist.size() + " by " + artist, Toast.LENGTH_SHORT).show();
         if (retainFragment != null) {
             if (retainFragment.serviceReference != null) {
                 for (Song s : songsByArtist) {
-                    Log.d(TAG, "adding "+ s.getTitle());
                     retainFragment.serviceReference.insertThisSongIntoPlayQueue(s);
+
                 }
             }
         }
     }
+
     // bind to the Service instance when the Activity instance starts
     @Override
     protected void onStart() {

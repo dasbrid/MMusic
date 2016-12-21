@@ -16,6 +16,10 @@ public class Song implements Parcelable {
     private int PID;
     private long duration; // in ms
 
+    public void setPID(int PID) {
+        this.PID = PID;
+    }
+
     /* Comparator for sorting songs by title */
     public static Comparator<Song> SongTitleComparator = new Comparator<Song>() {
 

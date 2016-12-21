@@ -371,9 +371,10 @@ public class SimpleMusicService extends Service
             // this song in the bucket doesn't exist (deleted from device...???)
             Log.d(TAG, "SONG NOT FOUND - index="+" nextSongIndex"+" numsongsinbucket="+numSongsOnDevice);
         } else {
-            if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
-            Song pqSong = new Song(nextSong, nextSongPID);
-            playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
+            if (nextSongPID++ > 1000) nextSongPID = 0; // PID for managing the playqueue (not song ID or PID)
+            nextSong.setPID(nextSongPID);
+            //Song pqSong = new Song(nextSong, nextSongPID);
+            playQueue.add(nextSong/*pqSong*/);
         }
     }
     // broadcast that the play queue has changed
@@ -457,6 +458,8 @@ public class SimpleMusicService extends Service
     }
 
     public void insertThisSongAtTopOfPlayQueue(Song s) {
+        if (nextSongPID++ > 1000) nextSongPID = 0; // PID for managing the playqueue (not song ID or PID)
+        s.setPID(nextSongPID);
         playQueue.add(0,s); // Add at the BEGINNING of the list
     }
 
@@ -464,6 +467,8 @@ public class SimpleMusicService extends Service
         int playQueueIndex = 0;
         if (playQueue.size() > 0)
             playQueueIndex = rand.nextInt(playQueue.size());
+        if (nextSongPID++ > 1000) nextSongPID = 0; // PID for managing the playqueue (not song ID or PID)
+        s.setPID(nextSongPID);
         playQueue.add(playQueueIndex,s);
     }
 
