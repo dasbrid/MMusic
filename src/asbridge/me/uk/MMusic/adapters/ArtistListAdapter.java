@@ -2,7 +2,6 @@ package asbridge.me.uk.MMusic.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +11,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.classes.RetainFragment;
-import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 
 import static android.content.ContentValues.TAG;
 
@@ -21,9 +19,6 @@ import static android.content.ContentValues.TAG;
  * Created by asbridged on 20/12/2016.
  */
 public class ArtistListAdapter extends CursorAdapter {
-    private Context context;
-
-
 
     private artistListActionsListener artistListActionsListener = null;
     public interface artistListActionsListener {
@@ -32,7 +27,6 @@ public class ArtistListAdapter extends CursorAdapter {
 
     public ArtistListAdapter (Context activity, Cursor cursor) {
         super(activity, cursor, 0);
-        this.context = context;
         artistListActionsListener = (artistListActionsListener)activity;
     }
 
@@ -42,7 +36,8 @@ public class ArtistListAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view =  LayoutInflater.from(context).inflate(R.layout.row_artist, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        viewHolder.artistName = (TextView) view.findViewById(R.id.tv_artist);
+        viewHolder.tv_artist = (TextView) view.findViewById(R.id.tv_artist);
+        viewHolder.tv_numTracks = (TextView) view.findViewById(R.id.tv_numTracks);
         viewHolder.btnAddToPlayqueue = (ImageButton) view.findViewById(R.id.btnAddToPlayqueue);
         int position = cursor.getPosition();
         String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST));
@@ -67,8 +62,9 @@ public class ArtistListAdapter extends CursorAdapter {
         }
     }
     public static class ViewHolder{
-        public TextView artistName;
+        public TextView tv_artist;
         public ImageButton btnAddToPlayqueue;
+        public TextView tv_numTracks;
         public View view;
     }
 
@@ -77,31 +73,10 @@ public class ArtistListAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST));
-        viewHolder.artistName.setText(artistName);
-
-        // Find fields to populate in inflated template
-        //TextView tv_artist = (TextView) view.findViewById(R.id.tv_artist);
-
-        // Extract properties from cursor
-
-        //String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST));
-
-        // Populate fields with extracted properties
-        //tv_artist.setText(artistName);
-    }
-
-    @Override
-    public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-        if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
-
-        final Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        final String _id = MediaStore.Audio.Albums._ID;
-        final String album_name =MediaStore.Audio.Albums.ALBUM;
-        final String artist = MediaStore.Audio.Albums.ARTIST;
-        final String[] cursorColumns={_id,album_name, artist};
-        return context.getContentResolver().query(uri,cursorColumns,null,null, null); // the cursor
-
+        String artistName = cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor.ARTIST));
+        int numTracks = cursor.getInt(cursor.getColumnIndexOrThrow(ArtistCursor.NUMBER_OF_TRACKS));
+        viewHolder.tv_artist.setText(artistName);
+        viewHolder.tv_numTracks.setText(Integer.toString(numTracks));
     }
 
 }

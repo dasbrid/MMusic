@@ -18,6 +18,7 @@ import android.widget.Toast;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 
@@ -118,10 +119,7 @@ public class SongsByArtistActivity extends Activity
 
                 // Get the state's capital from this row in the database.
                 Long songId =
-                        cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
-                String artistName =
-                        cursor.getString(cursor.getColumnIndexOrThrow("artist"));
-
+                        cursor.getLong(cursor.getColumnIndexOrThrow(ArtistCursor._ID));
 
                 Song s;
                 s = MusicContent.getSongBySongID(getApplicationContext(), songId);

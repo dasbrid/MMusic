@@ -18,6 +18,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistListAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
@@ -79,33 +80,17 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
             retainFragment = new RetainFragment();
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
-
+/*
         String where = null;
         ContentResolver cr = this.getContentResolver();
-        final Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        final String _id = MediaStore.Audio.Albums._ID;
-        final String album_name =MediaStore.Audio.Albums.ALBUM;
-        final String artist = MediaStore.Audio.Albums.ARTIST;
-        final String[] cursorColumns={_id,album_name, artist};
+        final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+        final String _ID = MediaStore.Audio.Artists._ID;
+        final String NUMBER_OF_TRACKS = MediaStore.Audio.Artists.NUMBER_OF_TRACKS;
+        final String ARTIST = MediaStore.Audio.Artists.ARTIST;
+        final String[] cursorColumns={_ID, NUMBER_OF_TRACKS, ARTIST};
         Cursor cursor = cr.query(uri,cursorColumns,where,null, null);
-
-
-
-        // The desired columns to be bound
-        String[] columns = new String[] {
-                artist /*,
-        CountriesDbAdapter.KEY_NAME,
-        CountriesDbAdapter.KEY_CONTINENT,
-        CountriesDbAdapter.KEY_REGION*/
-        };
-
-        // the XML defined views which the data will be bound to
-        int[] to = new int[] { R.id.tv_artist }; /*,
-            R.id.name,
-            R.id.continent,
-            R.id.region,
-          };*/
-
+*/
+        Cursor cursor = ArtistCursor.getArtistsCursor(this);
         // create the adapter using the cursor pointing to the desired data
         //as well as the layout information
         //dataAdapter = new SimpleCursorAdapter(this, R.layout.row_artist, cursor, columns, to, 0);
@@ -123,10 +108,10 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
 
                 // Get the state's capital from this row in the database.
                 String artistId =
-                        cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+                        cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor._ID));
                 String artistName =
                         cursor.getString(cursor.getColumnIndexOrThrow("artist"));
-                //Toast.makeText(getApplicationContext(),artistName, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),tv_artist, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), SongsByArtistActivity.class);
                 intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, artistName);
                 startActivity(intent);
