@@ -128,7 +128,7 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
                         cursor.getString(cursor.getColumnIndexOrThrow("artist"));
                 //Toast.makeText(getApplicationContext(),artistName, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), SongsByArtistActivity.class);
-                intent.putExtra("artist", artistName);
+                intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, artistName);
                 startActivity(intent);
             }
         });

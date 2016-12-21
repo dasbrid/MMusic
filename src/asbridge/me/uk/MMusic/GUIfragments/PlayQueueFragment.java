@@ -1,15 +1,19 @@
 package asbridge.me.uk.MMusic.GUIfragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
+import android.widget.AdapterView;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.activities.ArtistListActivity;
+import asbridge.me.uk.MMusic.activities.SongsByArtistActivity;
 import asbridge.me.uk.MMusic.adapters.PlayQueueAdapter;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.utils.AppConstants;
 
 import java.util.ArrayList;
 
@@ -40,16 +44,41 @@ public class PlayQueueFragment extends Fragment
         listener = l;
     }
 
-        @Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_playqueue, container, false);
 
         lvPlayQueue = (ListView) v.findViewById(R.id.frag_lvrearangablePlayQueue);
         playQueueAdapter = new PlayQueueAdapter(getContext(), this, playQueue);
-
         lvPlayQueue.setAdapter(playQueueAdapter);
+        registerForContextMenu(lvPlayQueue);
+
         return v;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.menu_context_playqueue, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.context_menu_item_artist:
+                AdapterView.AdapterContextMenuInfo info=
+                        (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+                int postion = (info.position);
+                Song s = (Song)playQueueAdapter.getItem(postion);
+                Intent intent = new Intent(getActivity(), SongsByArtistActivity.class);
+                intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, s.getArtist());
+                startActivity(intent);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override

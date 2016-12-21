@@ -68,7 +68,7 @@ public class SongsByArtistActivity extends Activity
         String artistName = "";
 
         if (extras != null) {
-            artistName = extras.getString("artist");
+            artistName = extras.getString(AppConstants.INTENT_EXTRA_ARTIST);
         }
         tv_artist = (TextView)findViewById(R.id.tv_artist);
         tv_artist.setText(artistName);
