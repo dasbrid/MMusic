@@ -2,29 +2,23 @@ package asbridge.me.uk.MMusic.activities;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistListAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
-import asbridge.me.uk.MMusic.settings.SettingsActivity;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by asbridged on 20/12/2016.
@@ -39,6 +33,8 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
     }
+
+    private EditText editsearch;
 
     private ArtistListAdapter dataAdapter;
     private RetainFragment retainFragment = null;
@@ -80,16 +76,7 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
             retainFragment = new RetainFragment();
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
-/*
-        String where = null;
-        ContentResolver cr = this.getContentResolver();
-        final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        final String _ID = MediaStore.Audio.Artists._ID;
-        final String NUMBER_OF_TRACKS = MediaStore.Audio.Artists.NUMBER_OF_TRACKS;
-        final String ARTIST = MediaStore.Audio.Artists.ARTIST;
-        final String[] cursorColumns={_ID, NUMBER_OF_TRACKS, ARTIST};
-        Cursor cursor = cr.query(uri,cursorColumns,where,null, null);
-*/
+
         Cursor cursor = ArtistCursor.getArtistsCursor(this);
         // create the adapter using the cursor pointing to the desired data
         //as well as the layout information
@@ -112,10 +99,45 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
                 String artistName =
                         cursor.getString(cursor.getColumnIndexOrThrow("artist"));
                 //Toast.makeText(getApplicationContext(),tv_artist, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), SongsByArtistActivity.class);
+                Intent intent = new Intent(getApplicationContext(), SongListtActivity.class);
                 intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, artistName);
                 startActivity(intent);
             }
         });
+
+        // Locate the EditText in listview_main.xml
+        editsearch = (EditText) findViewById(R.id.search);
+        editsearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                dataAdapter.getFilter().filter(s.toString());
+
+            }
+        });
+
+
+        dataAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence constraint) {
+                String partialValue = constraint.toString();
+                Log.d (TAG, partialValue);
+                return ArtistCursor.getFilteredArtistsCursor(getApplicationContext(), partialValue);
+            }
+        });
+
     }
 }

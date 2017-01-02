@@ -13,6 +13,8 @@ import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 
+import java.util.Locale;
+
 import static android.content.ContentValues.TAG;
 
 /**

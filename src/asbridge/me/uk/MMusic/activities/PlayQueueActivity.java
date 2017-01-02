@@ -229,8 +229,11 @@ public class PlayQueueActivity extends FragmentActivity
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_playbuckets:
-                startActivity(new Intent(this, ArtistListActivity.class /*SelectSongsActivity.class*/));
+            case R.id.action_artists:
+                startActivity(new Intent(this, ArtistListActivity.class));
+                return true;
+            case R.id.action_songs:
+                startActivity(new Intent(this, SongListtActivity.class));
                 return true;
             case R.id.action_timer:
                 showTimerDialog();

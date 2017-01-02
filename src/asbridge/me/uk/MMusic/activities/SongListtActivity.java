@@ -9,29 +9,31 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
+import asbridge.me.uk.MMusic.cursors.SongCursor;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 
 /**
  * Created by asbridged on 20/12/2016.
  */
-public class SongsByArtistActivity extends Activity
+public class SongListtActivity extends Activity
     implements RetainFragment.RetainFragmentListener
 {
-    private static final String TAG = "SongsByArtistActivity";
+    private static final String TAG = "SongListtActivity";
 
     private SimpleCursorAdapter dataAdapter;
     private RetainFragment retainFragment = null;
+
+    private String artistName;
 
     private TextView tv_artist;
     // call back from retainfragment which binds to the music service
@@ -39,6 +41,8 @@ public class SongsByArtistActivity extends Activity
     public void onMusicServiceReady() {
         Log.d(TAG, "onMusicServiceReady");
     }
+
+    private EditText editsearch;
 
     // bind to the Service instance when the Activity instance starts
     @Override
@@ -66,41 +70,26 @@ public class SongsByArtistActivity extends Activity
 
 
         Bundle extras = getIntent().getExtras();
-        String artistName = "";
+        //String artistName = "";
 
         if (extras != null) {
             artistName = extras.getString(AppConstants.INTENT_EXTRA_ARTIST);
         }
         tv_artist = (TextView)findViewById(R.id.tv_artist);
-        tv_artist.setText(artistName);
-        String where = null;
-        String selection = MediaStore.Audio.Media.ARTIST + "=?";
-        String[] selectionArgs = {artistName};
-        ContentResolver cr = this.getContentResolver();
-        final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        final String _id = MediaStore.Audio.Media._ID;
+
+        tv_artist.setText(artistName==null?artistName:"All");
+
         final String title = MediaStore.Audio.Media.TITLE;
-        final String album_name =MediaStore.Audio.Media.ALBUM;
-        final String artist = MediaStore.Audio.Albums.ARTIST;
-        final String[] cursorColumns={_id,title, artist};
-        Cursor cursor = cr.query(uri,cursorColumns,selection, selectionArgs, null);
 
-
+        Cursor cursor = SongCursor.getSongsCursor(this, artistName);
 
         // The desired columns to be bound
         String[] columns = new String[] {
-                title /*,
-        CountriesDbAdapter.KEY_NAME,
-        CountriesDbAdapter.KEY_CONTINENT,
-        CountriesDbAdapter.KEY_REGION*/
+                title
         };
 
         // the XML defined views which the data will be bound to
-        int[] to = new int[] { R.id.tv_song_title }; /*,
-            R.id.name,
-            R.id.continent,
-            R.id.region,
-          };*/
+        int[] to = new int[] { R.id.tv_song_title };
 
         // create the adapter using the cursor pointing to the desired data
         //as well as the layout information
@@ -130,6 +119,40 @@ public class SongsByArtistActivity extends Activity
                         Toast.makeText(getApplicationContext(),s.getTitle(), Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        });
+
+        // Locate the EditText in listview_main.xml
+        editsearch = (EditText) findViewById(R.id.search);
+        editsearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                dataAdapter.getFilter().filter(s.toString());
+
+            }
+        });
+
+
+        dataAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence constraint) {
+                String partialValue = constraint.toString();
+                Log.d (TAG, partialValue);
+                return SongCursor.getFilteredSongsCursor(getApplicationContext(), artistName, partialValue);
             }
         });
     }

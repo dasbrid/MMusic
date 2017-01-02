@@ -23,4 +23,13 @@ public class ArtistCursor  {
         return cr.query(uri, cursorColumns, where, null, null);
     }
 
+    public static Cursor getFilteredArtistsCursor(Context context, String filterString) {
+        final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+        final String[] cursorColumns={_ID, NUMBER_OF_TRACKS, ARTIST};
+        final String where = ARTIST+" LIKE ?";
+        final String [] whereArgs = {"%" + filterString + "%"};
+        ContentResolver cr = context.getContentResolver();
+        return cr.query(uri, cursorColumns, where, whereArgs, null);
+    }
+
 }

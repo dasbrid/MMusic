@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ArtistListActivity"/>
-        <activity android:name=".activities.SongsByArtistActivity"/>
+        <activity android:name=".activities.SongListtActivity"/>
         <service android:enabled="true" android:name=".services.SimpleMusicService" />
 
         <provider
