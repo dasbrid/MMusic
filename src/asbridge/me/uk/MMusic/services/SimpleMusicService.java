@@ -47,7 +47,6 @@ public class SimpleMusicService extends Service
     // current position in playing song
     private int currentPos = 0;
 
-    private boolean shuffleOn = true;
     private int currentPickedSong = -1;
 
     private int nextSongPID = 0;
@@ -99,14 +98,6 @@ public class SimpleMusicService extends Service
         }
     }
 
-    public boolean getShuffleState() {
-        return shuffleOn;
-    }
-
-    public void setShuffleState(boolean newState) {
-        shuffleOn = newState;
-    }
-
     private Calendar sleepTime = null;
 
     public void setSleepTimer(int mins) {
@@ -136,8 +127,6 @@ public class SimpleMusicService extends Service
     public void onDestroy() {
         if (musicControlListener != null) unregisterReceiver(musicControlListener);
         if (becomingNoisyListener != null) unregisterReceiver(becomingNoisyListener);
-        Log.d(TAG, "stored shuffle " + (shuffleOn?"on":"off"));
-        Settings.setShuffleState(getApplicationContext(), shuffleOn);
         super.onDestroy();
     }
 
@@ -204,7 +193,6 @@ public class SimpleMusicService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SimpleMusicService onStartCommand");
-        shuffleOn = Settings.getShuffleState(getApplicationContext());
         return START_STICKY; // Ensures that onStartCommand is called if the Service needs to restart after being killed by the system
     }
 
@@ -351,18 +339,12 @@ public class SimpleMusicService extends Service
             while ( playQueue.size() < queueSize && ((numSongsOnDevice - notFoundSongIndicess.size()) > playQueue.size() )) {
         Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsOnDevice="+numSongsOnDevice);
         int nextSongIndex;
-        if (shuffleOn) {
-            do {
-                nextSong =  MusicContent.getRandomSongFromAllSongsOnDevice(getApplicationContext());
-                //nextSongIndex = getRandomSongIndex();
-                //nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
-            } while (nextSong!=null && playqueueContainsSong(nextSong.getID()));
-        } else {
-            currentPickedSong++;
-            if (currentPickedSong >= numSongsOnDevice) currentPickedSong = 0;
-            nextSongIndex = currentPickedSong;
-            nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
-        }
+        do {
+            nextSong =  MusicContent.getRandomSongFromAllSongsOnDevice(getApplicationContext());
+            //nextSongIndex = getRandomSongIndex();
+            //nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
+        } while (nextSong!=null && playqueueContainsSong(nextSong.getID()));
+
         if (nextSong==null) {
                     /*
                     if (!notFoundSongIndicess.contains(nextSongIndex))
@@ -383,57 +365,6 @@ public class SimpleMusicService extends Service
     sendBroadcast(changeNextSongIntent);
 }
 
-    /*
-    OLD version, uses playbuckets. But runs out of memory when trying to fill the playbucket...
-    public void fillPlayQueue() {
-        // get number of songs in the current playbucket
-        int numSongsInBucket;
-        numSongsInBucket = MusicContent.getNumSongsInPlaylist(getApplicationContext(), 0);
-        if (numSongsInBucket == 0) {
-            Log.v(TAG, "No songs in playbucket");
-            return;
-        }
-        ArrayList<Integer> notFoundSongIndicess = new ArrayList<>(); // list of 'bad' songs in current playlist. Deleted from device
-        int numItemsInQueue = playQueue.size();
-        int queueSize = Settings.getPlayQueueSize(getApplicationContext());
-        Song nextSong;
-        // repeat while ...
-        // the playqueue is not full && there are still some songs left for us to choose
-        Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsInBucket="+numSongsInBucket);
-        while ( playQueue.size() < queueSize && ((numSongsInBucket - notFoundSongIndicess.size()) > playQueue.size() )) {
-            Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsInBucket="+numSongsInBucket);
-            int nextSongIndex;
-            if (shuffleOn) {
-                do {
-
-                    nextSongIndex = getRandomSongIndex();
-                    nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
-                } while (nextSong!=null && playqueueContainsSong(nextSong.getID()));
-            } else {
-                currentPickedSong++;
-                if (currentPickedSong >= numSongsInBucket) currentPickedSong = 0;
-                nextSongIndex = currentPickedSong;
-                nextSong = MusicContent.getSongInCurrentPlaylist(getApplicationContext(), nextSongIndex);
-            }
-            if (nextSong==null) {
-
-                if (!notFoundSongIndicess.contains(nextSongIndex))
-                    notFoundSongIndicess.add(nextSongIndex);
-
-                // this song in the bucket doesn't exist (deleted from device...???)
-                Log.d(TAG, "SONG NOT FOUND - index="+" nextSongIndex"+" numsongsinbucket="+numSongsInBucket);
-            } else {
-                if (nextSongPID++ > 100) nextSongPID = 0; // PID for managing the playqueue (ot song ID or PID)
-                Song pqSong = new Song(nextSong, nextSongPID);
-                playQueue.add(pqSong);//songs.get(nextSongIndex)); // Adds at the END
-            }
-        }
-        // broadcast that the play queue has changed
-        // can be used by the activity to update its playqueue
-        Intent changeNextSongIntent = new Intent(AppConstants.INTENT_ACTION_PLAY_QUEUE_CHANGED);
-        sendBroadcast(changeNextSongIntent);
-    }
-*/
     public void removeSongFromPlayQueue(int songPID) {
         Log.d(TAG, "SimpleMusicService removeSongFromPlayQueue:id="+songPID+" size="+playQueue.size());
         for (Song s : playQueue) {

@@ -43,7 +43,6 @@ public class PlayQueueActivity extends FragmentActivity
     private RetainFragment retainFragment = null;
     private TextView tvNowPlaying;
     private ImageButton btnPlayPause;
-    private boolean shuffleOn = true;
 
     private PlayQueueFragment mPlayQueueFragment = null;
     private PlayedListFragment mPlayedListFragment = null;
@@ -188,7 +187,6 @@ public class PlayQueueActivity extends FragmentActivity
     @Override
     public void onMusicServiceReady() {
         // music service is bound and ready
-        shuffleOn = retainFragment.serviceReference.getShuffleState();
     }
 
     MenuItem sleepIcon;
@@ -206,16 +204,6 @@ public class PlayQueueActivity extends FragmentActivity
         if (retainFragment != null && retainFragment.serviceReference != null) {
             long secsTillSleep = retainFragment.serviceReference.getSecsTillSleep();
             sleepIcon.setVisible(secsTillSleep > 0);
-        }
-
-
-        MenuItem shuffleMenuItem = menu.findItem(R.id.action_shuffle);
-        if(shuffleOn){
-            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_on);
-            shuffleMenuItem.setTitle("Turn Shuffle Off");
-        }else{
-            shuffleMenuItem.setIcon(R.drawable.ic_action_shuffle_off);
-            shuffleMenuItem.setTitle("Turn Shuffle On");
         }
 
         return true;
@@ -244,20 +232,6 @@ public class PlayQueueActivity extends FragmentActivity
                 retainFragment.serviceReference=null;
                 finish();
                 break;
-            case R.id.action_shuffle:
-                if(shuffleOn){
-                    shuffleOn = false;
-                    //change your view and sort it by Alphabet
-                    item.setIcon(R.drawable.ic_action_shuffle_off);
-                    item.setTitle("Turn Shuffle On");
-                }else{
-                    shuffleOn = true;
-                    //change your view and sort it by Alphabet
-                    item.setIcon(R.drawable.ic_action_shuffle_on);
-                    item.setTitle("Turn Shuffle Off");
-                }
-                retainFragment.serviceReference.setShuffleState(shuffleOn);
-
         }
         return super.onOptionsItemSelected(item);
     }
