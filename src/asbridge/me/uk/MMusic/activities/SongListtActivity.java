@@ -17,6 +17,7 @@ import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.controls.ClearableEditText;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 import asbridge.me.uk.MMusic.cursors.SongCursor;
 import asbridge.me.uk.MMusic.utils.AppConstants;
@@ -42,7 +43,7 @@ public class SongListtActivity extends Activity
         Log.d(TAG, "onMusicServiceReady");
     }
 
-    private EditText editsearch;
+    private ClearableEditText editsearch;
 
     // bind to the Service instance when the Activity instance starts
     @Override
@@ -123,7 +124,7 @@ public class SongListtActivity extends Activity
         });
 
         // Locate the EditText in listview_main.xml
-        editsearch = (EditText) findViewById(R.id.search);
+        editsearch = (ClearableEditText) findViewById(R.id.search);
         editsearch.addTextChangedListener(new TextWatcher() {
 
             @Override

@@ -5,12 +5,12 @@
               android:layout_height="match_parent">
 
 
-    <EditText
+    <asbridge.me.uk.MMusic.controls.ClearableEditText
             android:id="@+id/search"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
         <requestFocus />
-    </EditText>
+    </asbridge.me.uk.MMusic.controls.ClearableEditText>
 
     <ListView android:id="@+id/artistListView" android:layout_width="fill_parent"
               android:layout_height="fill_parent" />

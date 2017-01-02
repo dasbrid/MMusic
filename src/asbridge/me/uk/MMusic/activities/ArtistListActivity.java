@@ -14,6 +14,7 @@ import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.adapters.ArtistListAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
+import asbridge.me.uk.MMusic.controls.ClearableEditText;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
@@ -34,7 +35,7 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
         Log.d(TAG, "onMusicServiceReady");
     }
 
-    private EditText editsearch;
+    private ClearableEditText editsearch;
 
     private ArtistListAdapter dataAdapter;
     private RetainFragment retainFragment = null;
@@ -106,7 +107,7 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
         });
 
         // Locate the EditText in listview_main.xml
-        editsearch = (EditText) findViewById(R.id.search);
+        editsearch = (ClearableEditText) findViewById(R.id.search);
         editsearch.addTextChangedListener(new TextWatcher() {
 
             @Override

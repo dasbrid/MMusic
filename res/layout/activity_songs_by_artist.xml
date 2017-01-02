@@ -13,12 +13,12 @@
             android:textSize="16sp"
             android:layout_marginRight="5dp"
     />
-    <EditText
+    <asbridge.me.uk.MMusic.controls.ClearableEditText
             android:id="@+id/search"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
         <requestFocus />
-    </EditText>
+    </asbridge.me.uk.MMusic.controls.ClearableEditText>
     <ListView android:id="@+id/lvSongsByArtist" android:layout_width="fill_parent"
               android:layout_height="fill_parent" />
 
