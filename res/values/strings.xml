@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MMusic</string>
+    <string name="artist_list_title">Artists</string>
+    <string name="song_list_title">Songs</string>
+
+    <string name="all_songs">All songs</string>
+    <string name="songs_by">Songs by </string>
+
+
+
 </resources>

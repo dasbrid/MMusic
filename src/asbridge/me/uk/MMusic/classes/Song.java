@@ -31,7 +31,7 @@ public class Song implements Parcelable {
             return SongProperty1.compareTo(SongProperty2);
         }};
 
-    /* Comparator for sorting songs by artist */
+    /* Comparator for sorting songs by ic_artist */
     public static Comparator<Song> SongArtistComparator = new Comparator<Song>() {
 
         public int compare(Song s1, Song s2) {

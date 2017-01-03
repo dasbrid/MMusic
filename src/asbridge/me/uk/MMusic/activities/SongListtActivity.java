@@ -78,7 +78,7 @@ public class SongListtActivity extends Activity
         }
         tv_artist = (TextView)findViewById(R.id.tv_artist);
 
-        tv_artist.setText(artistName==null?artistName:"All");
+        tv_artist.setText(artistName==null?getResources().getString(R.string.all_songs):getResources().getString(R.string.songs_by) + artistName);
 
         final String title = MediaStore.Audio.Media.TITLE;
 

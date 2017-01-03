@@ -98,8 +98,8 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
                 String artistId =
                         cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor._ID));
                 String artistName =
-                        cursor.getString(cursor.getColumnIndexOrThrow("artist"));
-                //Toast.makeText(getApplicationContext(),tv_artist, Toast.LENGTH_SHORT).show();
+                        cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor.ARTIST));
+
                 Intent intent = new Intent(getApplicationContext(), SongListtActivity.class);
                 intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, artistName);
                 startActivity(intent);

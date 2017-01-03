@@ -58,7 +58,7 @@ public class ArtistListAdapter extends CursorAdapter {
         @Override
         public void onClick(View v) {
             // checkbox clicked
-            Log.d(TAG, "add artist to playqueue "+artistName);
+            Log.d(TAG, "add ic_artists to playqueue "+artistName);
             if (artistListActionsListener != null)
                 artistListActionsListener.onAddArtistToPlaylistClicked(artistName);
         }
