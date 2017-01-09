@@ -10,14 +10,18 @@ import android.provider.MediaStore;
  * Created by AsbridgeD on 21/12/2016.
  */
 public class SongCursor {
-    public static final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-    final static String _ID = MediaStore.Audio.Media._ID;
-    final static String TITLE = MediaStore.Audio.Media.TITLE;
-    final static String ARTIST = MediaStore.Audio.Albums.ARTIST;
+    private static final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+    public final static String _ID = MediaStore.Audio.Media._ID;
+    public final static String TITLE = MediaStore.Audio.Media.TITLE;
+    public final static String ARTIST = MediaStore.Audio.Albums.ARTIST;
+
+    private final static String[] cursorColumns={_ID,TITLE, ARTIST};
+
+    private static final String orderby = TITLE + " COLLATE NOCASE";
 
     public static Cursor getSongsCursor(Context context, String artistName) {
-        final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        final String[] cursorColumns={_ID,TITLE, ARTIST};
+
         String selection = null;
         String[] selectionArgs = null;
         if (artistName != null && !artistName.isEmpty()) {
@@ -26,12 +30,10 @@ public class SongCursor {
             selectionArgs[0] = artistName;
         }
         ContentResolver cr = context.getContentResolver();
-        return cr.query(uri, cursorColumns, selection, selectionArgs, null);
+        return cr.query(uri, cursorColumns, selection, selectionArgs, orderby);
     }
 
     public static Cursor getFilteredSongsCursor(Context context, String artistName, String filterString) {
-        final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        final String[] cursorColumns={_ID,TITLE, ARTIST};
         String selection;
         String [] selectionArgs;
         if (artistName != null && !artistName.isEmpty()) {
@@ -46,7 +48,7 @@ public class SongCursor {
         }
 
         ContentResolver cr = context.getContentResolver();
-        return cr.query(uri, cursorColumns, selection, selectionArgs, null);
+        return cr.query(uri, cursorColumns, selection, selectionArgs, orderby);
     }
 
 }

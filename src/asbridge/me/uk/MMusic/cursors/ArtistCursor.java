@@ -14,22 +14,20 @@ public class ArtistCursor  {
     public static final String _ID = MediaStore.Audio.Artists._ID;
     public static final String NUMBER_OF_TRACKS = MediaStore.Audio.Artists.NUMBER_OF_TRACKS;
     public static final String ARTIST = MediaStore.Audio.Artists.ARTIST;
+    private static final String[] cursorColumns={_ID, NUMBER_OF_TRACKS, ARTIST};
+    private static final String orderby = ARTIST + " COLLATE NOCASE";
 
     public static Cursor getArtistsCursor(Context context) {
-        final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        final String[] cursorColumns={_ID, NUMBER_OF_TRACKS, ARTIST};
         final String where = null;
         ContentResolver cr = context.getContentResolver();
-        return cr.query(uri, cursorColumns, where, null, null);
+        return cr.query(uri, cursorColumns, where, null, orderby);
     }
 
     public static Cursor getFilteredArtistsCursor(Context context, String filterString) {
-        final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        final String[] cursorColumns={_ID, NUMBER_OF_TRACKS, ARTIST};
         final String where = ARTIST+" LIKE ?";
         final String [] whereArgs = {"%" + filterString + "%"};
         ContentResolver cr = context.getContentResolver();
-        return cr.query(uri, cursorColumns, where, whereArgs, null);
+        return cr.query(uri, cursorColumns, where, whereArgs, orderby);
     }
 
 }

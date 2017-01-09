@@ -23,7 +23,6 @@
             android:title="Delete playbucket"/>
     <item
             android:id="@+id/action_end"
-            android:icon="@drawable/ic_action_exit"
             android:orderInCategory="2"
             android:showAsAction="always"
             android:title="End"/>

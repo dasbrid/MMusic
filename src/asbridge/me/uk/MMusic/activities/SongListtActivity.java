@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
+import asbridge.me.uk.MMusic.adapters.SongListAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.ClearableEditText;
@@ -31,7 +32,7 @@ public class SongListtActivity extends Activity
 {
     private static final String TAG = "SongListtActivity";
 
-    private SimpleCursorAdapter dataAdapter;
+    private SongListAdapter dataAdapter;
     private RetainFragment retainFragment = null;
 
     private String artistName;
@@ -78,26 +79,16 @@ public class SongListtActivity extends Activity
         }
         tv_artist = (TextView)findViewById(R.id.tv_artist);
 
-        tv_artist.setText(artistName==null?getResources().getString(R.string.all_songs):getResources().getString(R.string.songs_by) + artistName);
+        tv_artist.setText(artistName==null?getResources().getString(R.string.all_songs):getResources().getString(R.string.songs_by) + " " + artistName);
 
         final String title = MediaStore.Audio.Media.TITLE;
 
         Cursor cursor = SongCursor.getSongsCursor(this, artistName);
 
-        // The desired columns to be bound
-        String[] columns = new String[] {
-                title
-        };
-
-        // the XML defined views which the data will be bound to
-        int[] to = new int[] { R.id.tv_song_title };
-
         // create the adapter using the cursor pointing to the desired data
-        //as well as the layout information
-        dataAdapter = new SimpleCursorAdapter(this, R.layout.row_song_by_artist, cursor, columns, to, 0);
+        dataAdapter = new SongListAdapter(this, cursor);
 
         ListView listView = (ListView) findViewById(R.id.lvSongsByArtist);
-        // Assign adapter to ListView
         listView.setAdapter(dataAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

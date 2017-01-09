@@ -39,7 +39,6 @@ public class ArtistListAdapter extends CursorAdapter {
         View view =  LayoutInflater.from(context).inflate(R.layout.row_artist, parent, false);
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.tv_artist = (TextView) view.findViewById(R.id.tv_artist);
-        viewHolder.tv_numTracks = (TextView) view.findViewById(R.id.tv_numTracks);
         viewHolder.btnAddToPlayqueue = (ImageButton) view.findViewById(R.id.btnAddToPlayqueue);
         int position = cursor.getPosition();
         String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST));
@@ -77,8 +76,8 @@ public class ArtistListAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         String artistName = cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor.ARTIST));
         int numTracks = cursor.getInt(cursor.getColumnIndexOrThrow(ArtistCursor.NUMBER_OF_TRACKS));
-        viewHolder.tv_artist.setText(artistName);
-        viewHolder.tv_numTracks.setText(Integer.toString(numTracks));
+        viewHolder.tv_artist.setText(artistName + " (" + Integer.toString(numTracks) + ")");
+        //viewHolder.tv_numTracks.setText(Integer.toString(numTracks));
     }
 
 }

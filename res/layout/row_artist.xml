@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:orientation="vertical"
-                android:padding="6dip"
+                android:paddingRight="16dip"
+                android:paddingLeft="16dip"
                 android:descendantFocusability="blocksDescendants">
 
     <TextView
@@ -14,14 +15,7 @@
             android:layout_alignParentTop="true"
             android:text="Artist"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-    <TextView
-            android:id="@+id/tv_numTracks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_artist"
-            android:layout_alignParentLeft="true"
-            android:text="Num Tracks "
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <ImageButton
             android:id="@+id/btnAddToPlayqueue"
             android:layout_height="34dp"
