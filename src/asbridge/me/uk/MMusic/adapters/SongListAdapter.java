@@ -2,19 +2,13 @@ package asbridge.me.uk.MMusic.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
-import asbridge.me.uk.MMusic.cursors.ArtistCursor;
 import asbridge.me.uk.MMusic.cursors.SongCursor;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by asbridged on 20/12/2016.
@@ -31,7 +25,7 @@ public class SongListAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view =  LayoutInflater.from(context).inflate(R.layout.row_song, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        viewHolder.tv_artist = (TextView) view.findViewById(R.id.tv_artist);
+        viewHolder.tv_artist = (TextView) view.findViewById(R.id.tv_name);
         viewHolder.tv_title = (TextView) view.findViewById(R.id.tv_title);
 
         view.setTag(viewHolder);

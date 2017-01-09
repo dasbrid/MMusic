@@ -2,10 +2,12 @@
 <resources>
     <string name="app_name">MMusic</string>
     <string name="artist_list_title">Artists</string>
+    <string name="album_list_title">Albums</string>
     <string name="song_list_title">Songs</string>
 
     <string name="all_songs">All songs</string>
-    <string name="songs_by">Songs by </string>
+    <string name="songs_by_artist">Songs by</string>
+    <string name="songs_on_album">Songs on</string>
 
 
 

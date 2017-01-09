@@ -16,7 +16,11 @@ public class AppConstants {
     public static final String INTENT_EXTRA_SONG_TITLE = "asbridge.me.uk.MMusic.SONG_TITLE";
     public static final String INTENT_EXTRA_SONG_ARTIST = "asbridge.me.uk.MMusic.SONG_ARTIST";
 
-    public static final String INTENT_EXTRA_ARTIST = "asbridge.me.uk.MMusic.ARTIST";
+    public static final String INTENT_EXTRA_NAME = "asbridge.me.uk.MMusic.NAME";
+    public static final String INTENT_EXTRA_TYPE = "asbridge.me.uk.MMusic.TYPE";
+
+    public static final String INTENT_EXTRA_VALUE_ARTIST = "asbridge.me.uk.MMusic.ARTIST";
+    public static final String INTENT_EXTRA_VALUE_ALBUM = "asbridge.me.uk.MMusic.ALBUM";
 
     public static final String INTENT_ACTION_PLAY_QUEUE_CHANGED = "asbridge.me.uk.MMusic.ACTION_PLAY_QUEUE_CHANGED";
 

@@ -11,7 +11,7 @@
             android:layout_height="wrap_content" >
     </asbridge.me.uk.MMusic.controls.ClearableEditText>
 
-    <ListView android:id="@+id/artistListView" android:layout_width="fill_parent"
+    <ListView android:id="@+id/songGroupListView" android:layout_width="fill_parent"
               android:layout_height="fill_parent" />
 
 </LinearLayout>

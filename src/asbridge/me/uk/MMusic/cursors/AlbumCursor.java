@@ -9,19 +9,15 @@ import android.provider.MediaStore;
 /**
  * Created by AsbridgeD on 21/12/2016.
  */
-public class ArtistCursor  {
-    public static final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-    public static final String _ID = MediaStore.Audio.Artists._ID;
-    public static final String NUM_ITEMS_COLUMN = MediaStore.Audio.Artists.NUMBER_OF_TRACKS;
-//    public static final String ARTIST = MediaStore.Audio.Artists.ARTIST;
+public class AlbumCursor {
+    public static final Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+    public static final String _ID = MediaStore.Audio.Albums._ID;
+    public static final String NUM_ITEMS_COLUMN = MediaStore.Audio.Albums.NUMBER_OF_SONGS;
 
-    public static final String NAME_COLUMN = MediaStore.Audio.Artists.ARTIST;
+    public static final String NAME_COLUMN = MediaStore.Audio.Albums.ALBUM;
 
     private static final String[] cursorColumns={_ID, NUM_ITEMS_COLUMN, NAME_COLUMN};
     private static final String orderby = NAME_COLUMN + " COLLATE NOCASE";
-
-
-
 
     public static Cursor getCursor(Context context) {
         final String where = null;

@@ -2,13 +2,9 @@ package asbridge.me.uk.MMusic.activities;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,7 +31,8 @@ public class SongListtActivity extends Activity
     private SongListAdapter dataAdapter;
     private RetainFragment retainFragment = null;
 
-    private String artistName;
+    private String name;
+    private String type;
 
     private TextView tv_artist;
     // call back from retainfragment which binds to the music service
@@ -72,18 +69,26 @@ public class SongListtActivity extends Activity
 
 
         Bundle extras = getIntent().getExtras();
-        //String artistName = "";
-
+        //String name = "";
+        type = "none";
         if (extras != null) {
-            artistName = extras.getString(AppConstants.INTENT_EXTRA_ARTIST);
+            name = extras.getString(AppConstants.INTENT_EXTRA_NAME);
+            type = extras.getString(AppConstants.INTENT_EXTRA_TYPE);
         }
-        tv_artist = (TextView)findViewById(R.id.tv_artist);
+        tv_artist = (TextView)findViewById(R.id.tv_name);
 
-        tv_artist.setText(artistName==null?getResources().getString(R.string.all_songs):getResources().getString(R.string.songs_by) + " " + artistName);
+        tv_artist.setText(name ==null?getResources().getString(R.string.all_songs):
+                (type.equals(AppConstants.INTENT_EXTRA_VALUE_ARTIST)?getResources().getString(R.string.songs_by_artist):getResources().getString(R.string.songs_on_album))
+                        + " " + name);
 
         final String title = MediaStore.Audio.Media.TITLE;
 
-        Cursor cursor = SongCursor.getSongsCursor(this, artistName);
+        Cursor cursor;
+        if (type.equals(AppConstants.INTENT_EXTRA_VALUE_ARTIST)) {
+            cursor = SongCursor.getSongsCursorForArtist(this, name);
+        } else {
+            cursor = SongCursor.getSongsCursorForAlbum(this, name);
+        }
 
         // create the adapter using the cursor pointing to the desired data
         dataAdapter = new SongListAdapter(this, cursor);
@@ -144,7 +149,13 @@ public class SongListtActivity extends Activity
             public Cursor runQuery(CharSequence constraint) {
                 String partialValue = constraint.toString();
                 Log.d (TAG, partialValue);
-                return SongCursor.getFilteredSongsCursor(getApplicationContext(), artistName, partialValue);
+                Cursor cursor;
+                if (type.equals(AppConstants.INTENT_EXTRA_VALUE_ARTIST)) {
+                    cursor = SongCursor.getFilteredSongsCursorForArtist(getApplicationContext(), name, partialValue);
+                } else {
+                    cursor = SongCursor.getFilteredSongsCursorForAlbum(getApplicationContext(), name, partialValue);
+                }
+                return cursor;
             }
         });
     }

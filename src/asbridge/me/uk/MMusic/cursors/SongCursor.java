@@ -20,7 +20,7 @@ public class SongCursor {
 
     private static final String orderby = TITLE + " COLLATE NOCASE";
 
-    public static Cursor getSongsCursor(Context context, String artistName) {
+    public static Cursor getSongsCursorForArtist(Context context, String artistName) {
 
         String selection = null;
         String[] selectionArgs = null;
@@ -33,11 +33,44 @@ public class SongCursor {
         return cr.query(uri, cursorColumns, selection, selectionArgs, orderby);
     }
 
-    public static Cursor getFilteredSongsCursor(Context context, String artistName, String filterString) {
+    public static Cursor getSongsCursorForAlbum(Context context, String artistName) {
+
+        String selection = null;
+        String[] selectionArgs = null;
+        if (artistName != null && !artistName.isEmpty()) {
+            selection = MediaStore.Audio.Media.ALBUM + "=?";
+            selectionArgs = new String [1];
+            selectionArgs[0] = artistName;
+        }
+        ContentResolver cr = context.getContentResolver();
+        return cr.query(uri, cursorColumns, selection, selectionArgs, orderby);
+    }
+
+
+
+    public static Cursor getFilteredSongsCursorForArtist(Context context, String artistName, String filterString) {
         String selection;
         String [] selectionArgs;
         if (artistName != null && !artistName.isEmpty()) {
             selection = TITLE +" LIKE ? AND " + ARTIST + " LIKE ?";
+            selectionArgs = new String [2];
+            selectionArgs[0] = "%" + filterString + "%";
+            selectionArgs[1] = "%" + artistName + "%";
+        } else {
+            selection = TITLE +" LIKE ?";
+            selectionArgs = new String [1];
+            selectionArgs[0] = "%" + filterString + "%";
+        }
+
+        ContentResolver cr = context.getContentResolver();
+        return cr.query(uri, cursorColumns, selection, selectionArgs, orderby);
+    }
+
+    public static Cursor getFilteredSongsCursorForAlbum(Context context, String artistName, String filterString) {
+        String selection;
+        String [] selectionArgs;
+        if (artistName != null && !artistName.isEmpty()) {
+            selection = TITLE +" LIKE ? AND " + MediaStore.Audio.Media.ALBUM + " LIKE ?";
             selectionArgs = new String [2];
             selectionArgs[0] = "%" + filterString + "%";
             selectionArgs[1] = "%" + artistName + "%";

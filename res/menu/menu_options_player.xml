@@ -31,6 +31,13 @@
             android:title="Artists"/>
 
     <item
+            android:id="@+id/action_albums"
+            android:icon="@drawable/ic_artists"
+            android:orderInCategory="1"
+            android:showAsAction="always"
+            android:title="Albums"/>
+
+    <item
             android:id="@+id/action_songs"
             android:icon="@drawable/ic_songs"
             android:orderInCategory="1"

@@ -12,8 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
-
-import java.util.Locale;
+import asbridge.me.uk.MMusic.cursors.ListCursor;
 
 import static android.content.ContentValues.TAG;
 
@@ -22,14 +21,19 @@ import static android.content.ContentValues.TAG;
  */
 public class ArtistListAdapter extends CursorAdapter {
 
+    private String numItemsColumn;
+    private String nameColumn;
     private artistListActionsListener artistListActionsListener = null;
     public interface artistListActionsListener {
         void onAddArtistToPlaylistClicked(String artistName);
     }
 
-    public ArtistListAdapter (Context activity, Cursor cursor) {
-        super(activity, cursor, 0);
+    public ArtistListAdapter (Context activity, ListCursor listCursor) {
+        super(activity, listCursor.cursor, 0);
         artistListActionsListener = (artistListActionsListener)activity;
+        nameColumn = listCursor.nameColumn;
+        Log.v(TAG, "nameColumn="+nameColumn );
+        numItemsColumn = listCursor.numItemsColumn;
     }
 
     // The newView method is used to inflate a new view and return it,
@@ -38,11 +42,11 @@ public class ArtistListAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view =  LayoutInflater.from(context).inflate(R.layout.row_artist, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        viewHolder.tv_artist = (TextView) view.findViewById(R.id.tv_artist);
+        viewHolder.tv_name = (TextView) view.findViewById(R.id.tv_name);
         viewHolder.btnAddToPlayqueue = (ImageButton) view.findViewById(R.id.btnAddToPlayqueue);
-        int position = cursor.getPosition();
-        String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST));
-        viewHolder.btnAddToPlayqueue.setOnClickListener(new btnAddToPlayqueueClickListener(artistName));
+
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(nameColumn));
+        viewHolder.btnAddToPlayqueue.setOnClickListener(new btnAddToPlayqueueClickListener(name));
         view.setTag(viewHolder);
         return view;
     }
@@ -63,9 +67,8 @@ public class ArtistListAdapter extends CursorAdapter {
         }
     }
     public static class ViewHolder{
-        public TextView tv_artist;
+        public TextView tv_name;
         public ImageButton btnAddToPlayqueue;
-        public TextView tv_numTracks;
         public View view;
     }
 
@@ -74,10 +77,9 @@ public class ArtistListAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        String artistName = cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor.ARTIST));
-        int numTracks = cursor.getInt(cursor.getColumnIndexOrThrow(ArtistCursor.NUMBER_OF_TRACKS));
-        viewHolder.tv_artist.setText(artistName + " (" + Integer.toString(numTracks) + ")");
-        //viewHolder.tv_numTracks.setText(Integer.toString(numTracks));
+        String artistName = cursor.getString(cursor.getColumnIndexOrThrow(nameColumn));
+        int numTracks = cursor.getInt(cursor.getColumnIndexOrThrow(numItemsColumn));
+        viewHolder.tv_name.setText(artistName + " (" + Integer.toString(numTracks) + ")");
     }
 
 }

@@ -16,8 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ArtistListActivity"
-                  android:label="@string/artist_list_title"
+        <activity android:name=".activities.SongGroupListActivity"
                   android:icon="@drawable/ic_artists"/>
         <activity android:name=".activities.SongListtActivity"
                   android:label="@string/song_list_title"

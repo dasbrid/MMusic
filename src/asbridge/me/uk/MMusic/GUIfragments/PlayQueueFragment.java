@@ -71,7 +71,7 @@ public class PlayQueueFragment extends Fragment
                 int postion = (info.position);
                 Song s = (Song)playQueueAdapter.getItem(postion);
                 Intent intent = new Intent(getActivity(), SongListtActivity.class);
-                intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, s.getArtist());
+                intent.putExtra(AppConstants.INTENT_EXTRA_NAME, s.getArtist());
                 startActivity(intent);
                 return true;
             default:

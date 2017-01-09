@@ -105,7 +105,7 @@ public class PlayQueueActivity extends FragmentActivity
                     Song currentSong = retainFragment.serviceReference.getCurrentSong();
                     if (currentSong != null) {
                         Intent intent = new Intent(this, SongListtActivity.class);
-                        intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, currentSong.getArtist());
+                        intent.putExtra(AppConstants.INTENT_EXTRA_NAME, currentSong.getArtist());
                         startActivity(intent);
                     }
                 }
@@ -245,13 +245,23 @@ public class PlayQueueActivity extends FragmentActivity
     // handle user interaction with the menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
+                intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_artists:
-                startActivity(new Intent(this, ArtistListActivity.class));
+                intent = new Intent(getApplicationContext(), SongGroupListActivity.class);
+                intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ARTIST);
+                Log.v(TAG, "type="+AppConstants.INTENT_EXTRA_VALUE_ARTIST);
+                startActivity(intent);
+                return true;
+            case R.id.action_albums:
+                intent = new Intent(getApplicationContext(), SongGroupListActivity.class);
+                intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ALBUM);
+                Log.v(TAG, "type="+AppConstants.INTENT_EXTRA_VALUE_ALBUM);
+                startActivity(intent);
                 return true;
             case R.id.action_songs:
                 startActivity(new Intent(this, SongListtActivity.class));

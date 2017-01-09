@@ -15,7 +15,9 @@ import asbridge.me.uk.MMusic.adapters.ArtistListAdapter;
 import asbridge.me.uk.MMusic.classes.RetainFragment;
 import asbridge.me.uk.MMusic.classes.Song;
 import asbridge.me.uk.MMusic.controls.ClearableEditText;
+import asbridge.me.uk.MMusic.cursors.AlbumCursor;
 import asbridge.me.uk.MMusic.cursors.ArtistCursor;
+import asbridge.me.uk.MMusic.cursors.ListCursor;
 import asbridge.me.uk.MMusic.utils.AppConstants;
 import asbridge.me.uk.MMusic.utils.MusicContent;
 
@@ -24,10 +26,12 @@ import java.util.ArrayList;
 /**
  * Created by asbridged on 20/12/2016.
  */
-public class ArtistListActivity extends Activity
+public class SongGroupListActivity extends Activity
 implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFragmentListener {
 
-    private static final String TAG = "ArtistListActivity";
+    private static final String TAG = "SongGroupListActivity";
+
+    private String type;
 
     // call back from retainfragment which binds to the music service
     @Override
@@ -65,7 +69,7 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_artist_list);
+        setContentView(R.layout.activity_song_group_list);
 
         FragmentManager fm = getFragmentManager();
         retainFragment = (RetainFragment) fm.findFragmentByTag(AppConstants.TAG_RETAIN_FRAGMENT);
@@ -78,13 +82,28 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
             fm.beginTransaction().add(retainFragment, AppConstants.TAG_RETAIN_FRAGMENT).commit();
         }
 
-        Cursor cursor = ArtistCursor.getArtistsCursor(this);
-        // create the adapter using the cursor pointing to the desired data
-        //as well as the layout information
-        //dataAdapter = new SimpleCursorAdapter(this, R.layout.row_artist, cursor, columns, to, 0);
-        dataAdapter = new ArtistListAdapter(this,  cursor);
-        ListView listView = (ListView) findViewById(R.id.artistListView);
-        // Assign adapter to ListView
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            type = extras.getString(AppConstants.INTENT_EXTRA_TYPE);
+            Log.d(TAG, "bundle type="+type);
+        }
+
+        ListCursor listcursor = new ListCursor();
+        if (type.equals(AppConstants.INTENT_EXTRA_VALUE_ARTIST)) {
+            listcursor.cursor = ArtistCursor.getCursor(this);
+            listcursor.nameColumn = ArtistCursor.NAME_COLUMN;
+            listcursor.numItemsColumn = ArtistCursor.NUM_ITEMS_COLUMN;
+            setTitle(getResources().getString(R.string.artist_list_title));
+        } else {
+            listcursor.cursor = AlbumCursor.getCursor(this);
+            listcursor.nameColumn = AlbumCursor.NAME_COLUMN;
+            listcursor.numItemsColumn = AlbumCursor.NUM_ITEMS_COLUMN;
+            setTitle(getResources().getString(R.string.album_list_title));
+        }
+
+        dataAdapter = new ArtistListAdapter(this,  listcursor);
+        ListView listView = (ListView) findViewById(R.id.songGroupListView);
         listView.setAdapter(dataAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,15 +112,16 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
                                     int position, long id) {
                 // Get the cursor, positioned to the corresponding row in the result set
                 Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-
-                // Get the state's capital from this row in the database.
-                String artistId =
-                        cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor._ID));
-                String artistName =
-                        cursor.getString(cursor.getColumnIndexOrThrow(ArtistCursor.ARTIST));
+                String name =
+                        cursor.getString(cursor.getColumnIndexOrThrow(listcursor.nameColumn));
 
                 Intent intent = new Intent(getApplicationContext(), SongListtActivity.class);
-                intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, artistName);
+                intent.putExtra(AppConstants.INTENT_EXTRA_NAME, name);
+                if (type.equals(AppConstants.INTENT_EXTRA_VALUE_ARTIST)) {
+                    intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ARTIST);
+                } else {
+                    intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ALBUM);
+                }
                 startActivity(intent);
             }
         });
@@ -136,7 +156,14 @@ implements ArtistListAdapter.artistListActionsListener,  RetainFragment.RetainFr
             public Cursor runQuery(CharSequence constraint) {
                 String partialValue = constraint.toString();
                 Log.d (TAG, partialValue);
-                return ArtistCursor.getFilteredArtistsCursor(getApplicationContext(), partialValue);
+
+                Cursor cursor;
+                if (type.equals(AppConstants.INTENT_EXTRA_VALUE_ARTIST)) {
+                    cursor = ArtistCursor.getFilteredCursor(getApplicationContext(), partialValue);
+                } else {
+                    cursor = AlbumCursor.getFilteredCursor(getApplicationContext(), partialValue);
+                }
+                return cursor;
             }
         });
 
