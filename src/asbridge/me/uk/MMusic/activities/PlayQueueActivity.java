@@ -72,7 +72,7 @@ public class PlayQueueActivity extends FragmentActivity
         }
 
         tvNowPlaying = (TextView) findViewById(R.id.pqa_tvPlaying);
-        
+
         mPlayQueueFragment = (PlayQueueFragment)getSupportFragmentManager().findFragmentById(R.id.fragplayqueue);
         mPlayQueueFragment.setOnPlayQueueListener(this);
 

@@ -339,21 +339,9 @@ public class MusicContent {
         }
         // Now get the song by the randomly chosen ID
         Song song = getSongBySongID(context, randomSongID);
-        Log.d(TAG, "song ID="+randomSongID+(song!=null?" title="+song.getTitle():" not found"));
         return song;
     }
 
-    /* This would be MUCH better if we didn't return ALL the songs in a playlist get the nth one*/
-    /* Better to have the database / content provider so that we can get the nth song in the playlist with one query */
-    // ... but it works!
-    public static Song getSongInCurrentPlaylist(Context context, int  songINDEX) {
-        ArrayList<Long> songIDs = getSongsInPlaylist(context, 0 /*Current playlist*/);
-        Long songID = songIDs.get(songINDEX);
-        Log.d(TAG, "get "+songINDEX+"th song in current playlist. ID="+songID);
-        Song song = getSongBySongID(context, songID);
-        Log.d(TAG, "song ID="+songID+(song!=null?" title="+song.getTitle():" not found"));
-        return song;
-    }
 
     // Update an existing playbucket to be the same as the current playbucket (save the current playbucket)
     // Do the insert new then delete old trick (could just clear the savedPlaybucket and copy everything from current
