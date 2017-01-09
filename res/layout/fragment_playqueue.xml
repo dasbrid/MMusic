@@ -9,9 +9,9 @@
             android:textSize="10sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    <asbridge.me.uk.MMusic.controls.RearrangeableListView
+    <ListView
             android:id="@+id/frag_lvrearangablePlayQueue"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
-    </asbridge.me.uk.MMusic.controls.RearrangeableListView>
+    </ListView>
 </LinearLayout>

@@ -1,9 +1,7 @@
 package asbridge.me.uk.MMusic.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.*;
 import asbridge.me.uk.MMusic.R;
 import asbridge.me.uk.MMusic.classes.Song;
-import asbridge.me.uk.MMusic.controls.RearrangeableListView;
 
 import java.util.ArrayList;
 
