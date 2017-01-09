@@ -6,10 +6,7 @@ import android.content.*;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +36,10 @@ public class PlayQueueActivity extends FragmentActivity
 {
 
     private static final String TAG = "PlayQueueActivity";
+
+
+    private static final int SONGS_BY_ARTIST_MENU_ITEM = Menu.FIRST;
+    private static final int SONGS_FROM_ALBUM_MENU_ITEM = SONGS_BY_ARTIST_MENU_ITEM + 1;
 
     private RetainFragment retainFragment = null;
     private TextView tvNowPlaying;
@@ -84,6 +85,37 @@ public class PlayQueueActivity extends FragmentActivity
     protected void onStart() {
         super.onStart();
         retainFragment.doBindService();
+    }
+
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("My Context Menu");
+        menu.add(0, SONGS_BY_ARTIST_MENU_ITEM, 0, "songs by this artist");
+        menu.add(0, SONGS_FROM_ALBUM_MENU_ITEM, 1, "songs from this album");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        // Call your function to preform for buttons pressed in a context menu
+        // can use item.getTitle() or similar to find out button pressed
+        // item.getItemID() will return the v.getID() that we passed before
+        switch (item.getItemId()) {
+            case SONGS_BY_ARTIST_MENU_ITEM:
+                if (retainFragment.serviceReference != null) {
+                    Song currentSong = retainFragment.serviceReference.getCurrentSong();
+                    if (currentSong != null) {
+                        Intent intent = new Intent(this, SongListtActivity.class);
+                        intent.putExtra(AppConstants.INTENT_EXTRA_ARTIST, currentSong.getArtist());
+                        startActivity(intent);
+                    }
+                }
+                break;
+            case SONGS_FROM_ALBUM_MENU_ITEM:
+                //doSomething();
+                break;
+        }
+        return super.onContextItemSelected(item);
+
     }
 
     private SongPlayingReceiver songPlayingReceiver;
@@ -139,6 +171,7 @@ public class PlayQueueActivity extends FragmentActivity
 
     private void updateNowPlaying(String songArtist, String songTitle) {
         tvNowPlaying.setText(songArtist + " - " + songTitle);
+        registerForContextMenu(tvNowPlaying);
     }
 
     // used to save paused state so it can be resumed

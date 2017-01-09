@@ -335,9 +335,7 @@ public class SimpleMusicService extends Service
         Song nextSong;
         // repeat while ...
         // the playqueue is not full && there are still some songs left for us to choose
-            Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsOnDevice="+numSongsOnDevice);
             while ( playQueue.size() < queueSize && ((numSongsOnDevice - notFoundSongIndicess.size()) > playQueue.size() )) {
-        Log.d (TAG, "setting size="+queueSize+ " current size="+playQueue.size()+" numSongsOnDevice="+numSongsOnDevice);
         int nextSongIndex;
         do {
             nextSong =  MusicContent.getRandomSongFromAllSongsOnDevice(getApplicationContext());
