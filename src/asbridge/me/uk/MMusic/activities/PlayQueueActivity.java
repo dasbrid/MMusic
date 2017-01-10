@@ -89,11 +89,6 @@ public class PlayQueueActivity extends FragmentActivity
 
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        /*
-        menu.setHeaderTitle("My Context Menu");
-        menu.add(0, SONGS_BY_ARTIST_MENU_ITEM, 0, "songs by this artist");
-        menu.add(0, SONGS_FROM_ALBUM_MENU_ITEM, 1, "songs from this album");
-        */
         getMenuInflater().inflate(R.menu.menu_context_view_songs_by, menu);
     }
 
