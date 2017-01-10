@@ -332,9 +332,9 @@ public class SelectSongsFragment extends Fragment implements
         int type = ExpandableListView.getPackedPositionType(elvcmi.packedPosition);
         MenuInflater menuInflater = getActivity().getMenuInflater();
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            menuInflater.inflate(R.menu.menu_song_long_click, menu);
+            menuInflater.inflate(R.menu.menu_context_song, menu);
         } else {
-            menuInflater.inflate(R.menu.menu_artist_long_click, menu);
+            menuInflater.inflate(R.menu.menu_context_artist, menu);
         }
     }
 

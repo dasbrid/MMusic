@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/context_menu_item_artist"
-          android:title="View Songs By Artist" />
+          android:title="View songs by artist" />
+    <item android:id="@+id/context_menu_item_album"
+          android:title="View songs on album" />
 </menu>

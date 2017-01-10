@@ -55,23 +55,32 @@ public class PlayQueueFragment extends Fragment
         return v;
     }
 
+    // Context menu for long click on play queue song
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.menu_context_playqueue, menu);
+        inflater.inflate(R.menu.menu_context_view_songs_by, menu);
     }
 
+    // Context menu for long click on play queue song
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info=
+                (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int postion = (info.position);
+        Song s = (Song)playQueueAdapter.getItem(postion);
+        Intent intent = new Intent(getActivity(), SongListtActivity.class);
+
         switch(item.getItemId()) {
+
             case R.id.context_menu_item_artist:
-                AdapterView.AdapterContextMenuInfo info=
-                        (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-                int postion = (info.position);
-                Song s = (Song)playQueueAdapter.getItem(postion);
-                Intent intent = new Intent(getActivity(), SongListtActivity.class);
                 intent.putExtra(AppConstants.INTENT_EXTRA_NAME, s.getArtist());
+                intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ARTIST);
+                startActivity(intent);
+                return true;
+            case R.id.context_menu_item_album:
+                intent.putExtra(AppConstants.INTENT_EXTRA_NAME, s.getAlbum());
+                intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ALBUM);
                 startActivity(intent);
                 return true;
             default:

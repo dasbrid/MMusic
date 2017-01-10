@@ -89,29 +89,35 @@ public class PlayQueueActivity extends FragmentActivity
 
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        /*
         menu.setHeaderTitle("My Context Menu");
         menu.add(0, SONGS_BY_ARTIST_MENU_ITEM, 0, "songs by this artist");
         menu.add(0, SONGS_FROM_ALBUM_MENU_ITEM, 1, "songs from this album");
+        */
+        getMenuInflater().inflate(R.menu.menu_context_view_songs_by, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // Call your function to preform for buttons pressed in a context menu
-        // can use item.getTitle() or similar to find out button pressed
-        // item.getItemID() will return the v.getID() that we passed before
+        Intent intent = new Intent(this, SongListtActivity.class);
+        Song currentSong = null;
+        if (retainFragment.serviceReference != null) {
+            currentSong = retainFragment.serviceReference.getCurrentSong();
+        }
+        if (currentSong == null) {
+            return super.onContextItemSelected(item);
+        }
+
         switch (item.getItemId()) {
-            case SONGS_BY_ARTIST_MENU_ITEM:
-                if (retainFragment.serviceReference != null) {
-                    Song currentSong = retainFragment.serviceReference.getCurrentSong();
-                    if (currentSong != null) {
-                        Intent intent = new Intent(this, SongListtActivity.class);
-                        intent.putExtra(AppConstants.INTENT_EXTRA_NAME, currentSong.getArtist());
-                        startActivity(intent);
-                    }
-                }
+            case R.id.context_menu_item_artist:
+                intent.putExtra(AppConstants.INTENT_EXTRA_NAME, currentSong.getArtist());
+                intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ARTIST);
+                startActivity(intent);
                 break;
-            case SONGS_FROM_ALBUM_MENU_ITEM:
-                //doSomething();
+            case R.id. context_menu_item_album:
+                intent.putExtra(AppConstants.INTENT_EXTRA_NAME, currentSong.getAlbum());
+                intent.putExtra(AppConstants.INTENT_EXTRA_TYPE, AppConstants.INTENT_EXTRA_VALUE_ALBUM);
+                startActivity(intent);
                 break;
         }
         return super.onContextItemSelected(item);
